@@ -1,0 +1,31 @@
+{block content}
+
+{include "../head.latte"}
+
+{include "./head.latte"}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th style="width: 75%;">{_"Name"}</th>
+			<th style="width: 25%;"></th>
+		</tr>
+	</thead>
+	<tbody>
+		{foreach $items as $item}
+		<tr class="screens {if $iterator->getCounter()%2 == 0} even{/if}{if $iterator->isLast()} footer{/if}">
+			<td>
+				{$item->regex}
+			</td>
+			<td class="actions">
+				<ul>
+					{if $presenter->isAllowed('edit')}
+					<li><a href="{link edit key=>$item->id}">edit</a></li>
+					<li><a n:confirm="really?" href="{link delete! key=>$item->id}">delete</a></li>
+					{/if}
+				</ul>
+			</td>
+		</tr>
+		{/foreach}
+	</tbody>
+</table>

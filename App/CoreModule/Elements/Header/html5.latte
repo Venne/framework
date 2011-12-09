@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<meta name="description" content="{$presenter->description}" n:if="$presenter->description">
+	<meta name="keywords" content="{$presenter->keywords}" n:if="$presenter->keywords">
+	<meta name="author" content="{$presenter->author}" n:if="$presenter->author">
+	<meta name="robots" content="{$presenter->robots}" n:if="$presenter->robots">
+
+	<title>{str_replace("%s", !$presenter->title ? "" : $presenter->titleSeparator, str_replace("%t", $presenter->title, $presenter->titleTemplate))}</title>
+
+	{foreach $presenter->css  as $item}
+	<link rel="stylesheet" media="screen,projection,tv" href="{$basePath}{$item}" type="text/css">
+	{/foreach}
+
+	<link rel="shortcut icon" href="{$basePath}/templates/{$theme}/favicon.ico" type="image/x-icon">
+
+	<script n:foreach="$presenter->js as $item" type="text/javascript" src="{$basePath}{$item}"></script>
+</head>

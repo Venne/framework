@@ -1,0 +1,16 @@
+<h1>{_"Layout settings"}</h1>
+
+{*}<ul class="toolbar">
+	
+	<li n:if="$presenter->isAllowed('Repository:Default:default')">
+		<a href="{plink Default:}"{if $presenter->isLinkCurrent("Repository:Default:*")} class="active"{/if}>Repositories</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Repository:Packages:default')">
+		<a href="{plink Packages:}"{if $presenter->isLinkCurrent("Repository:Packages:*")} class="active"{/if}>Packages</a>
+	</li>
+	
+	{if isset($showSelect)}
+	<li class="form"><label>{form form}<span>repository:</span>{input repository}{/form}</li>
+	{/if}
+
+</ul>{*}

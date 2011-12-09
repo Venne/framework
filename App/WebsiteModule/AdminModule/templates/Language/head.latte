@@ -1,0 +1,11 @@
+<ul class="menu">
+
+	<li n:if="$presenter->isAllowed('Website:Admin:Language:default')">
+		<a href="{link default type=>null, id=>null}"{if $presenter->isLinkCurrent("default")} class="active"{/if}>list</a>
+	</li>
+	
+	<li n:if="$presenter->isAllowed('Website:Admin:Language:create')">
+		<a href="{link create}"{if $presenter->isLinkCurrent("create")} class="active"{/if}>new item</a>
+	</li>
+
+</ul>

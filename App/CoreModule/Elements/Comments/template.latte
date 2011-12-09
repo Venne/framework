@@ -1,0 +1,21 @@
+{if isset($show)}
+
+<div class="element-comments">
+<h2>Comments</h2>
+
+{control form}
+
+<ol>
+{foreach $items as $item}
+	<li>
+		<h3>{$item->author} <small>| {$item->created->format('Y-m-d')}{if $presenter->user->isAllowed("element-comments")} | <a n:href="delete $item->id">delete</a>{/if}</small></h3>
+		<p>
+			{$item->text}
+		</p>
+	</li>
+{/foreach}
+</ol>
+
+</div>
+
+{/if}

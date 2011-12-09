@@ -1,0 +1,4 @@
+<ul class="menu">
+	<li><a n:href="default"{if $presenter->isLinkCurrent("Layout:*:default")} class="active"{/if}>list</a></li>
+	<li n:if="$presenter->isAllowed('create')"><a n:href="create"{if $presenter->isLinkCurrent("Layout:*:create")} class="active"{/if}>new item</a></li>
+</ul>

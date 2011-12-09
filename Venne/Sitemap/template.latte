@@ -1,0 +1,12 @@
+<?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	{foreach $arr as $item}
+	<url>
+		<loc>{$item[0]}</loc>
+		<lastmod>{$item[1]}</lastmod>
+		<changefreq>{$item[2]}</changefreq>
+		<priority>{$item[3]}</priority>
+	</url>
+	{/foreach}
+</urlset>

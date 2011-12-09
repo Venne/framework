@@ -1,0 +1,203 @@
+{if $presenter->user->isAllowed("CoreModule") || isset($login)}
+
+{css /css/panel/style.css}
+
+<script type="text/javascript">
+	var adminpanel = true;
+	$(function() {
+		{if $venneModeFront}
+		$("#venne-panel-roller a").click(function(){
+			if(adminpanel){
+				$.get("./?do=element_panel-closePanel");
+				$("#venne-panel").animate({
+					marginTop: "-35px"
+				}, 200);
+				$("#venne-panel-roller").animate({
+					marginTop: "-7px"
+				}, 200);
+				$(this).text("open");
+			}else{
+				$.get("./?do=element_panel-openPanel");
+				$("#venne-panel").animate({
+					marginTop: "0px"
+				}, 200);
+				$("#venne-panel-roller").animate({
+					marginTop: "23px"
+				}, 200);
+				$(this).text("close");
+			}
+			adminpanel = !adminpanel;
+		});
+		{/if}
+
+		$("#venne-panel .elements a").hover(
+		function(){
+			cl = $(this).attr('class');
+			cl = cl.toString().substr(7);
+			$(".element-"+cl).addClass("element-hover");
+		},
+		function(){
+			cl = $(this).attr('class');
+			cl = cl.toString().substr(7);
+
+			$(".element-"+cl).removeClass("element-hover");
+		});
+		
+		$("#venne-panel .areas a").hover(
+		function(){
+			cl = $(this).attr('class');
+			c = cl.toString().substr(7);
+			$(".area-"+cl).addClass("area-hover");
+		},
+		function(){
+			cl = $(this).attr('class');
+			cl = cl.toString().substr(7);
+
+			$(".area-"+cl).removeClass("area-hover");
+		});
+
+		{if $showAdminPanel}
+		adminpanel = false;
+		$("#venne-panel-roller a").text("open");
+		{/if}
+
+		{*if !$Venne->administration}
+		{if $presenter->isModeEditLayout()}
+
+		$( ".sortable" ).sortable({
+			connectWith: ".sortable",
+			placeholder: "placeholder",
+			tabSize: 25,
+			tolerance: 'pointer',
+			accept: ".area-block",
+			forcePlaceholderSize: true,
+		});
+
+		$("#venne-panel a.saveLayout").click(function(){
+			var data = "{";
+			var key;
+			var first = 1;
+			var first2 = 1;
+			$("body").find(".sortable").each(function(){
+				if(!first) data += ",";
+				else first = 0;
+				data += '"'+$(this).attr("id").replace("sortable-","")+'":{';
+				key = $(this).attr("id");
+
+				first2 = 1;
+				$(this).find(".area-block").each(function(){
+					if(!first2) data += ",";
+					else first2 = 0;
+					data += '"'+$(this).attr("id")+'":"1"';
+				});
+				data += "}";
+			});
+			data += "}";
+			$.post("?do=saveLayout", { data: data}, function (payload) {
+				//$.nette.success(payload);
+				alert("Layout has been saved.");
+			});
+		});
+
+		{/if}
+		{/if*}
+	});
+</script>
+
+{if $venneModeFront}
+<div id="venne-panel-roller" class="{if $showAdminPanel}closed{/if}">
+	<a href="javaScript:;">close</a>
+</div>
+{/if}
+
+<div id="venne-panel" class="{if $venneModeFront}{if $showAdminPanel}closed{/if}{/if}">
+	{if $presenter->user->isLoggedIn()}
+	<div class="panel-left">
+		<div class="first box">
+			<img src="{$basePath}/themes/admin/img/logo-solo.png" />
+		</div>
+
+		{*foreach $presenter->getPanelMenu()->getChildrens() as $item}
+		<div class="box">
+			{if $item->getChildrens()}<div class="popup">{/if}
+				<a href="{$item->getLink()}"{if $item->getClass()} class="{$item->getClass()}"{/if}>{$item->getName()}</a>
+			{if $item->getChildrens()}
+				<div class="popup-open elements">
+					<ul>
+						{foreach $item->getChildrens() as $item2}
+						<li><a href="{$item2->getLink()}" class="button-module{if $item2->getClass()} {$item->getClass()}{/if}">{$item2->getName()}</a></li>
+						{/foreach}
+					</ul>
+				</div>
+			</div>
+			{/if}
+		</div>
+		{/foreach*}
+	</div>
+	<div class="panel-right">
+
+		<div class="box first"><a href="{link logout!}">{_"Sign Out"}</a></div>
+
+		<div class="box">{_"Hello"} {$presenter->user->identity->name}</div>
+
+
+		{if $venneModeAdmin}
+		<div class="box"><a href="{$basePath}/">{_"View the Site"}</a></div>
+		
+		<div class="box">
+			<div class="popup">
+				{_"Mode"} <a href="javaScript:;">{$presenter->mode}</a>
+				<div class="popup-open elements">
+					<ul>
+					{foreach $presenter->context->configManager->getSections() as $item}
+						<li><a href="{plink this, 'mode'=>$item}">{$item}</a></li>
+					{/foreach}
+					</ul>
+				</div>
+			</div>
+		</div>
+		{else}
+			{if $presenter->user->isAllowed("CoreModule")}
+			<div class="box"><a href="{$basePath}/admin">{_"View the Administration"}</a></div>
+			{/if}
+		{/if}
+
+		{if $venneModeFront}
+		<div class="box">
+			<div class="popup">Mode
+				{if $presenter->isModeModule()}<a href="javaScript:;">{_"Edit module"}</a>
+				{elseif $presenter->isModeLayout()}<a href="javaScript:;">{_"Edit Layout"}</a>
+				{elseif $presenter->isModeElements()}<a href="javaScript:;">{_"Edit Elements"}</a>
+				{else}<a href="javaScript:;">{_"Normal"}</a>
+				{/if}
+				<div class="popup-open elements">
+					<ul>
+						<li><a href="{plink this, 'mode'=>0}">Normal</a></li>
+						<li><a href="{plink this, 'mode'=>1}">Edit module</a></li>
+						<li><a href="{plink this, 'mode'=>2}">Edit Layout</a></li>
+						<li><a href="{plink this, 'mode'=>3}">Edit Elements</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		{/if}
+
+	</div>
+	{else}
+<div class="panel-left">
+		{widget formLogin begin}
+	<div class="first box">
+			{_"Login:"} {$control["formLogin"]["name"]->control}
+	</div>
+	<div class="box">
+			{_"Password:"} {$control["formLogin"]["password"]->control}
+	</div>
+	<div class="box">
+			{$control["formLogin"]["submit"]->control}
+	</div>
+		{widget formLogin end}
+</div>
+	{/if}
+</div>
+
+{/if}

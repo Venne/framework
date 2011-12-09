@@ -1,0 +1,36 @@
+{if !$presenter->isModeModule()}
+{!$text}
+{else}
+
+{js /ckeditor/ckeditor.js}
+{js /ckeditor/adapters/jquery.js}
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+				
+				$( '#frm-element_editor-form textarea' ).ckeditor(function(){}, {
+					height: "600",
+					toolbar :
+						[
+							['Save', 'Source'],
+							['Undo','Redo','-','RemoveFormat'],
+							['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
+							['NumberedList','BulletedList','-','Outdent','Indent'],
+							['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+							['Link','Unlink','Anchor'],
+							['Image','Flash','Table','HorizontalRule','SpecialChar','PageBreak'],['Maximize', 'ShowBlocks']
+							['Styles','Format','Font','FontSize'],
+							['TextColor','BGColor'],
+							
+						]
+				});
+
+    });
+</script>
+
+{form form}
+{input text2}
+{/form}
+
+{/if}
+

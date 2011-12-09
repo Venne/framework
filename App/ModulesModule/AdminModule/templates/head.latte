@@ -1,0 +1,18 @@
+<h1>{_"Modules settings"}</h1>
+
+<ul class="toolbar">
+	
+	<li n:if="$presenter->isAllowed('Modules:Admin:Default:default')">
+		<a href="{plink Default:}"{if $presenter->isLinkCurrent("Default:*")} class="active"{/if}>Modules</a>
+	</li>
+	{*}<li n:if="$presenter->isAllowed('Modules:Admin:Packages:default')">
+		<a href="{plink Packages:}"{if $presenter->isLinkCurrent("Modules:Admin:Packages:*")} class="active"{/if}>Packages</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Modules:Admin:Repositories:default')">
+		<a href="{plink Repositories:}"{if $presenter->isLinkCurrent("Modules:Admin:Repositories:*")} class="active"{/if}>Repositories</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Modules:Admin:Creator:default')">
+		<a href="{plink Creator:}"{if $presenter->isLinkCurrent("Modules:Admin:Creator:*")} class="active"{/if}>Builds</a>
+	</li>{*}
+
+</ul>

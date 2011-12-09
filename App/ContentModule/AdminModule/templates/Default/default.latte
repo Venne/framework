@@ -1,0 +1,53 @@
+{block #item}
+		<tr class="screens {if $iterator->getCounter()%2 == 0} even{/if}{if $iterator->isLast()} footer{/if}">
+			<td>
+				{$prefix . $item->title}
+			</td>
+			<td>
+				{$item->url}
+			</td>
+			<td>
+				{$item->type}
+			</td>
+			<td>
+				{implode(", ", $item->languages->toArray())}
+			</td>
+			<td class="actions">
+				<ul>
+					<li><span>actions</span>
+						<ul>
+							<li n:if="$presenter->isAllowed('edit')"><a href="{link edit id=>$item->id}">translate</a></li>
+							<li n:if="$presenter->isAllowed('edit')"><a href="{link edit id=>$item->id}">edit</a></li>
+							<li n:if="$presenter->isAllowed('delete!')"><a n:confirm="really?" href="{link delete! id=>$item->id}">delete</a></li>
+						</ul>
+					</li>
+				</ul>
+			</td>
+		</tr>
+		{foreach $item->translations as $item2}
+		{include #item item=>$item2, iterator=>$iterator, prefix=>$prefix."+- "}
+		{/foreach}
+{/block}
+
+{block content}
+
+{include "../head.latte"}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th style="width: 20%;">{_"Title"}</th>
+			<th style="width: 20%;">{_"URL"}</th>
+			<th style="width: 15%;">{_"Type"}</th>
+			<th style="width: 25%;">{_"Languages"}</th>
+			<th style="width: 20%;"></th>
+		</tr>
+	</thead>
+	<tbody>
+		{if $table}
+		{foreach $table as $item}
+			{include #item item=>$item, iterator=>$iterator, prefix=>""}
+		{/foreach}
+		{/if}
+	</tbody>
+</table>

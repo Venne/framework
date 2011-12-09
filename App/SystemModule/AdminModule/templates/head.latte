@@ -1,0 +1,19 @@
+<h1>{_"System settings"}</h1>
+
+<ul class="toolbar">
+	
+	<li n:if="$presenter->isAllowed('System:Admin:Default:default')">
+		<a href="{plink Default:}"{if $presenter->isLinkCurrent("Default:*")} class="active"{/if}>general</a>
+	</li>
+	<li n:if="$presenter->isAllowed('System:Admin:Debugger:default')">
+		<a href="{plink Debugger:}"{if $presenter->isLinkCurrent("Debugger:*")} class="active"{/if}>debugger</a>
+	</li>
+	<li n:if="$presenter->isAllowed('System:Admin:Database:default')">
+		<a href="{plink Database:}"{if $presenter->isLinkCurrent("Database:*")} class="active"{/if}>database</a>
+	</li>
+	<li n:if="$presenter->isAllowed('System:Admin:Account:default')">
+		<a href="{plink Account:}"{if $presenter->isLinkCurrent("Account:*")} class="active"{/if}>account</a>
+	</li>
+	
+</ul>
+

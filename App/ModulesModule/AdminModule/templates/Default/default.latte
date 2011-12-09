@@ -1,0 +1,102 @@
+{* This is temporary page, you can delete it *}
+
+{block content}
+
+{include "../head.latte"}
+
+{if isset($showDialog)}
+{dialog confirm label=>install,"link"=>$presenter->link("install!", array("key"=>$dialogModule, "confirm"=>true))}
+	<h2>Dependencies</h2>
+	<ul>
+	{foreach $showDialog as $name=>$item2}
+		{foreach $item2 as $item}
+		<li>{$name} {$item["operator"]} {$item["version"]}</li>
+		{/foreach}
+	{/foreach}
+	</ul>
+	
+{/dialog}
+{/if}
+	
+{if isset($showUninstallDialog)}
+{dialog confirm label=>uninstall,"link"=>$presenter->link("uninstall!", array("key"=>$dialogModule, "confirm"=>true))}
+	<h2>Dependencies</h2>
+	<ul>
+	{foreach $showUninstallDialog as $name=>$item}
+		<li>{$item}</li>
+	{/foreach}
+	</ul>
+	
+{/dialog}
+{/if}
+
+<h2>Modules</h2>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th style="width: 25%;">{_"Name"}</th>
+			<th style="width: 15%;">{_"Version"}</th>
+			<th style="width: 20%;">{_"Route prefix"}</th>
+			<th style="width: 40%;"></th>
+		</tr>
+	</thead>
+	<tbody>
+		{foreach $modules as $name=>$module}
+		
+		{var item=>isset($presenter->context->params["modules"][$name]) ? $presenter->context->params["modules"][$name] : NULL}
+		
+				
+		<tr class="screens {if $iterator->getCounter()%2 == 0} even{/if}{if $iterator->isLast()} footer{/if}">
+			<td>
+				{$name}
+			</td>
+			<td>
+				{if isset($item["run"]) && version_compare($module->getVersion(), $item["version"], ">")}
+				{$item["version"]}->
+				{var upgrade=>1}
+				{elseif isset($item["run"]) && version_compare($module->getVersion(), $item["version"], "<")}
+				{$item["version"]}->
+				{var upgrade=>-1}
+				{else}
+				{var upgrade=>0}
+				{/if}
+				{$module->getVersion()}
+			</td>
+			<td>
+				{if isset($item["routePrefix"])}{$item["routePrefix"]}{/if}
+			</td>
+			<td class="actions">
+				<ul>
+					{if $presenter->isAllowed('edit')}
+					
+					{if !isset($item["run"])}
+					<li><a href="{link install! key=>$name}">install</a></li>
+					{else}
+					
+					{if $upgrade == 1}
+					<li><a href="{link upgrade! key=>$name}">upgrade</a></li>
+					{elseif $upgrade == -1}
+					<li><a href="{link downgrade! key=>$name}">downgrade</a></li>
+					{/if}
+					
+					{if isset($item["run"])}
+					<li><a href="{link edit key=>$name}">edit</a></li>
+					{/if}
+					
+					{if $name != "core"}
+					<li><a n:confirm="really?" href="{link uninstall! key=>$name}">uninstall</a></li>
+					{/if}
+					{/if}
+					
+					{/if}
+				</ul>
+			</td>
+		</tr>
+		{/foreach}
+	</tbody>
+</table>
+
+<h2>Default modules</h2>
+
+{control defaultForm}

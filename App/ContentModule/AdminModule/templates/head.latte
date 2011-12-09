@@ -1,0 +1,30 @@
+{if isset($showCreate)}
+	{dialog}
+		<h2>Page type</h2>
+		
+		{if count($showCreate) == 0}
+		<h3>Content extension not exist, please install some modules.</h3>
+		{else}
+		<ul>
+			{foreach $showCreate as $key=>$item}
+			<li><a n:href="create type=>$key">{$item}</a></li>
+			{/foreach}
+		</ul>
+		{/if}
+	{/dialog}
+{/if}
+
+
+<h1>{_"Content"}</h1>
+
+<ul class="menu">
+
+	<li n:if="$presenter->isAllowed('Pages:Admin:Default:default')">
+		<a href="{link default type=>null, id=>null}"{if $presenter->isLinkCurrent("default")} class="active"{/if}>list</a>
+	</li>
+	
+	<li n:if="$presenter->isAllowed('Pages:Admin:Default:create')">
+		<a href="{link create!}"{if $presenter->isLinkCurrent("create")} class="active"{/if}>new item</a>
+	</li>
+
+</ul>

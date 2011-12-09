@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<meta name="description" content="{$presenter->description}" n:if="$presenter->description">
+	<meta name="keywords" content="{$presenter->keywords}" n:if="$presenter->keywords">
+	<meta name="author" content="{$presenter->author}" n:if="$presenter->author">
+	<meta name="robots" content="{$presenter->robots}" n:if="$presenter->robots">
+
+	<title n:if="$presenter->title">{$presenter->title}</title>
