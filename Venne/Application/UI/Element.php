@@ -96,10 +96,10 @@ class Element extends Venne\Application\UI\Control implements IElement {
 	 */
 	public function formatTemplateFiles()
 	{
-		$theme = $this->context->params["venneModeFront"] ? $this->context->params["website"]["theme"] : "admin";
+		$theme = $this->context->parameters["venneModeFront"] ? $this->context->parameters["website"]["theme"] : "admin";
 		$dir = dirname($this->getReflection()->getFileName());
 		$list = array(
-			$this->getContext()->params["wwwDir"] . "/themes/" . $theme . "/" . ucfirst($this->type) . "Element/template.latte",
+			$this->getContext()->parameters["wwwDir"] . "/themes/" . $theme . "/" . ucfirst($this->type) . "Element/template.latte",
 			$dir . "/template.latte"
 		);
 		return $list;
@@ -149,9 +149,9 @@ class Element extends Venne\Application\UI\Control implements IElement {
 		if (!file_exists($this->template->getFile()))
 			throw new \Nette\FileNotFoundException("Template for element not found. Missing template '" . $this->template->getFile() . "'.");
 
-		$this->template->venneModeAdmin = $this->getContext()->params['venneModeAdmin'];
-		$this->template->venneModeFront = $this->getContext()->params['venneModeFront'];
-		$this->template->venneModeInstallation = $this->getContext()->params['venneModeInstallation'];
+		$this->template->venneModeAdmin = $this->getContext()->parameters['venneModeAdmin'];
+		$this->template->venneModeFront = $this->getContext()->parameters['venneModeFront'];
+		$this->template->venneModeInstallation = $this->getContext()->parameters['venneModeInstallation'];
 
 		$this->template->render();
 	}

@@ -32,21 +32,21 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 	public function startup()
 	{
 		parent::startup();
-		$this->addPath("Pages", $this->link(":Pages:Admin:Default:"));
+		$this->addPath("Content", $this->link(":Content:Admin:Default:"));
 	}
 
 
 
 	public function actionCreate()
 	{
-		$this->addPath("new item", $this->link(":Pages:Admin:Default:create"));
+		$this->addPath("new item", $this->link(":Content:Admin:Default:create"));
 	}
 
 
 
 	public function actionEdit()
 	{
-		$this->addPath("Edit ({$this->id})", $this->link(":Pages:Admin:Default:edit"));
+		$this->addPath("Edit ({$this->id})", $this->link(":Content:Admin:Default:edit"));
 	}
 
 
@@ -61,7 +61,7 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 	public function createComponentForm($name)
 	{
 		$entity = $this->context->cmsManager->getContentEntity($this->getParam("type"));
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 
 		$form = $this->context->cmsManager->getContentForm($this->getParam("type"), $entity);
 		$form->setSuccessLink("default", array("type" => null));
@@ -69,7 +69,17 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 		$form->setSubmitLabel("Create");
 		$form->onSave[] = function($form) use ($em) {
 					$em->persist($form->entity);
-					$em->flush();
+					try{
+						$em->flush();
+					}catch(\PDOException $ex){
+						if($ex->getCode() == "23000"){
+							$form->presenter->flashMessage("URL is not unique", "warning");
+							$form->setSuccessLink(NULL);
+							$form->setFlashMessage(NULL);
+						}else{
+							throw $ex;
+						}
+					}
 				};
 		return $form;
 	}
@@ -78,7 +88,7 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 
 	public function createComponentFormEdit($name)
 	{
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 		$pageEntity = $this->context->pageRepository->find($this->getParam("id"));
 		$entity = $this->context->cmsManager->getContentEntity($pageEntity->type);
 		$entity = $em->getRepository(get_class($entity))->findOneBy(array("page" => $pageEntity->id));
@@ -89,20 +99,19 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 		$form->setSubmitLabel("Update");
 		$form->onSave[] = function($form) use ($em) {
 					$em->persist($form->entity);
-					$em->flush();
+					try{
+						$em->flush();
+					}catch(\PDOException $ex){
+						if($ex->getCode() == "23000"){
+							$form->presenter->flashMessage("URL is not unique", "warning");
+							$form->setSuccessLink(NULL);
+							$form->setFlashMessage(NULL);
+						}else{
+							throw $ex;
+						}
+					}
 				};
 		return $form;
-	}
-
-
-
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | Pages administration");
-		$this->setKeywords("pages administration");
-		$this->setDescription("pages administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 

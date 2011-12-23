@@ -20,28 +20,16 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 
 
 	/** @persistent */
-	public $mode;
+	public $mode = "";
 
 
+
+	/**
+	 * @return void
+	 */
 	public function startup()
 	{
-		/*
-		 * Set default mode
-		 */
-		if(!$this->mode){
-			$this->mode = $this->context->params['mode'];
-		}
-		
-		/*
-		 * Login
-		 */
-		if (!$this->getUser()->isLoggedIn() && $this->getName() != "Core:Admin:Login") {
-			$this->redirect(":Core:Admin:Login:");
-		}
-
-		/*
-		 * Check database
-		 */
+		/* Check database */
 		if (!$this->context->doctrineContainer->checkConnection()) {
 			if (substr($this->getName(), 0, 13) != "System:Admin:" && $this->getName() != "Core:Admin:Login") {
 				$this->redirect(":System:Admin:Database:");
@@ -49,11 +37,9 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 			$this->flashMessage("Database connection not found. Please fix it.", "warning");
 		}
 
-		/*
-		 * Check updates
-		 */
-		foreach ($this->context->modules->getModules() as $module => $item) {
-			if (!version_compare($this->context->modules->{$module}->getVersion(), $item["version"], '==')) {
+		/* Check updates */
+		foreach ($this->context->findByTag("module") as $module => $item) {
+			if (!version_compare($this->context->{$module}->getVersion(), $this->context->parameters["modules"][lcfirst(substr($module, 0, -6))]["version"], '==')) {
 				if ($this->getName() != "Modules:Admin:Default" && $this->getName() != "Core:Admin:Login") {
 					$this->redirect(":Modules:Admin:Default:");
 				}
@@ -84,12 +70,19 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 
 
 
+	/**
+	 * Common render method.
+	 * @return void
+	 */
 	public function beforeRender()
 	{
 		parent::beforeRender();
 
+		$this->setTitle("Venne:CMS");
+		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
+
 		$this->template->adminMenu = new \App\CoreModule\Event\EventArgs;
-		$this->context->doctrineContainer->eventManager->dispatchEvent(\App\CoreModule\Events::onAdminMenu, $this->template->adminMenu);
+		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events::onAdminMenu, $this->template->adminMenu);
 		$this->template->adminMenu = $this->template->adminMenu->getNavigations();
 	}
 

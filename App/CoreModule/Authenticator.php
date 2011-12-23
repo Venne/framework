@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SecurityModule;
+namespace App\CoreModule;
 
 use Venne;
 
@@ -50,10 +50,9 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 		/*
 		 * Login from config file
 		 */
-		$cfg = \Nette\Config\NeonAdapter::load($this->container->params["appDir"] . "/config.neon");
 		if (
-				$this->container->params["admin"]["name"] == $username &&
-				$this->container->params["admin"]["password"] == $password
+				$this->container->parameters["admin"]["name"] == $username &&
+				$this->container->parameters["admin"]["password"] == $password
 		) {
 			return new \Nette\Security\Identity($username, array("admin"), array("name" => "admin"));
 		}
@@ -61,7 +60,7 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 		/*
 		 * Login from DB
 		 */
-		if ($this->container->doctrineContainer->checkConnection()) {
+		if ($this->container->createCheckConnection()) {
 			$user = $this->container->userRepository->findOneBy(array("name" => $username, "enable" => 1));
 			if ($user) {
 				$hash = md5($user->salt . $password);

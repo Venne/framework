@@ -16,27 +16,21 @@ namespace App\SystemModule\AdminModule;
  * 
  * @secured
  */
-class AccountPresenter extends BasePresenter
-{
-	
+class AccountPresenter extends BasePresenter {
+
+
+
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("Account", $this->link(":System:Admin:Account:"));
 	}
-	
-	public function createComponentFormEdit($name)
-	{
-		$form = new \App\SystemModule\SystemAccountForm($this->mode);
-		$form->setSuccessLink("default");
-		$form->setFlashMessage("Database settings has been updated");
-		$form->setSubmitLabel("Update");
-		return $form;
-	}
-	
+
+
+
 	public function renderDefault()
 	{
-
+		
 	}
 
 }

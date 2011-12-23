@@ -59,8 +59,8 @@ class TemplateContainer extends \Nette\Object {
 		}
 
 		// default parameters
-		$template->control = $component;
-		$template->presenter = $presenter;
+		$template->control = $template->_control = $component;
+		$template->presenter = $template->_presenter = $presenter;
 
 		// stuff from presenter
 		if ($presenter instanceof Presenter) {
@@ -73,7 +73,7 @@ class TemplateContainer extends \Nette\Object {
 
 			// flash message
 			if ($presenter->hasFlashSession()) {
-				$id = $component->getParamId('flash');
+				$id = $component->getParameterId('flash');
 				$template->flashes = $presenter->getFlashSession()->$id;
 			}
 		}

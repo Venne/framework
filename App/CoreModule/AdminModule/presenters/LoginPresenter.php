@@ -24,13 +24,17 @@ class LoginPresenter extends \Venne\Application\UI\AdminPresenter {
 	/** @persistent */
 	public $backlink;
 
+
+
 	public function startup()
 	{
 		parent::startup();
-		if (!$this->context->doctrineContainer->checkConnection()) {
+		if (!$this->context->createCheckConnection()) {
 			$this->flashMessage("Only administrator can be logged", "warning");
 		}
 	}
+
+
 
 	/**
 	 * Sign in form component factory.
@@ -38,22 +42,18 @@ class LoginPresenter extends \Venne\Application\UI\AdminPresenter {
 	 */
 	protected function createComponentSignInForm($name)
 	{
-		$form = new \App\SecurityModule\LoginForm;
+		$form = new \App\CoreModule\LoginForm;
 		$form->setSubmitLabel("Login");
-		
+
 		return $form;
 	}
+
 
 
 	public function beforeRender()
 	{
 		parent::beforeRender();
 		$this->template->hideMenuItems = true;
-
-		$this->setTitle("Venne:CMS | Login");
-		$this->setKeywords("login");
-		$this->setDescription("Login");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

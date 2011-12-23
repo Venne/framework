@@ -16,14 +16,20 @@ use Venne\ORM\Column;
 /**
  * @author Josef Kříž
  * @Entity(repositoryClass="\Venne\Doctrine\ORM\BaseRepository")
- * @Table(name="page")
+ * @Table(name="page",uniqueConstraints={
+ * 		@UniqueConstraint(name="search_idx", columns={"parent_id", "url"})
+ * })
  */
 class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
+
 
 	const LINK = "";
 
 	/** @Column(type="string") */
 	protected $url;
+
+	/** @Column(type="string") */
+	protected $localUrl;
 
 	/** @Column(type="string") */
 	protected $params;
@@ -43,11 +49,22 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	/** @Column(type="string") */
 	protected $robots;
 
-	/** @Column(type="string", nullable=true) */
-	protected $layout;
-
 	/** @Column(type="string") */
 	protected $type;
+
+	/**
+	 * @ManyToOne(targetEntity="PageEntity", inversedBy="childrens", cascade={"persist", "remove", "detach"})
+	 * @JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")
+	 */
+	protected $parent;
+
+	/** @Column(type="integer") */
+	protected $parent_id;
+
+	/**
+	 * @OneToMany(targetEntity="PageEntity", mappedBy="parent", cascade={"persist", "remove", "detach"})
+	 */
+	protected $childrens;
 
 	/**
 	 * @ManyToMany(targetEntity="LanguageEntity")
@@ -76,11 +93,14 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 		$this->type = $type;
 		$this->name = "";
 		$this->url = "";
+		$this->localUrl = "";
 		$this->description = "";
 		$this->keywords = "";
 		$this->params = json_encode(array());
 		$this->paramCounter = 0;
+		$this->parent_id = -1;
 		$this->languages = new \Doctrine\Common\Collections\ArrayCollection;
+		$this->childrens = new \Doctrine\Common\Collections\ArrayCollection;
 	}
 
 
@@ -113,9 +133,30 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 
 
 
-	public function setUrl($url)
+	public function getLocalUrl()
 	{
-		$this->url = $url;
+		return $this->localUrl;
+	}
+
+
+
+	public function generateUrl($recursively = true)
+	{
+		$this->url = ($this->parent == true ? $this->parent->url . "/" : "") . $this->localUrl;
+
+		if ($recursively) {
+			foreach ($this->childrens as $children) {
+				$children->generateUrl();
+			}
+		}
+	}
+
+
+
+	public function setLocalUrl($localUrl)
+	{
+		$this->localUrl = $localUrl;
+		$this->generateUrl();
 	}
 
 
@@ -130,12 +171,12 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	public function setParams($params)
 	{
 		$delete = array("module", "presenter", "action");
-		foreach($delete as $item){
-			if(isset($params[$item])){
+		foreach ($delete as $item) {
+			if (isset($params[$item])) {
 				unset($params[$item]);
 			}
 		}
-		
+
 		ksort($params);
 		$this->params = json_encode($params);
 		$this->paramCounter = count($params);
@@ -185,20 +226,6 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 
 
 
-	public function getLayout()
-	{
-		return $this->layout;
-	}
-
-
-
-	public function setLayout($layout)
-	{
-		$this->layout = $layout;
-	}
-
-
-
 	public function getType()
 	{
 		return $this->type;
@@ -223,6 +250,21 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	public function setRobots($robots)
 	{
 		$this->robots = $robots;
+	}
+
+
+
+	public function getParent()
+	{
+		return $this->parent;
+	}
+
+
+
+	public function setParent($parent)
+	{
+		$this->parent = $parent;
+		$this->parent_id = $parent ? $parent->id : -1;
 	}
 
 

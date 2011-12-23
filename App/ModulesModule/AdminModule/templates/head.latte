@@ -2,7 +2,7 @@
 
 <ul class="toolbar">
 	
-	<li n:if="$presenter->isAllowed('Modules:Admin:Default:default')">
+	<li n:if="$presenter->isAllowed(':Modules:Admin:Default:default')">
 		<a href="{plink Default:}"{if $presenter->isLinkCurrent("Default:*")} class="active"{/if}>Modules</a>
 	</li>
 	{*}<li n:if="$presenter->isAllowed('Modules:Admin:Packages:default')">

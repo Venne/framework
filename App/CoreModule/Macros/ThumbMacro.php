@@ -60,7 +60,7 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 		
 		$basePath = $presenter->context->httpRequest->url->basePath;
 		$path = $basePath . "cache/thumbs/";
-		$wwwDir = $presenter->context->params["wwwDir"];
+		$wwwDir = $presenter->context->parameters["wwwDir"];
 		$dir = $wwwDir . "/cache/thumbs";
 		
 		if(!$width && !$height){

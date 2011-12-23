@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SecurityModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;

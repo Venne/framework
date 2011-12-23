@@ -13,7 +13,7 @@ namespace App\CoreModule;
 
 use Venne;
 use Nette\Object;
-use Venne\DI\Container;
+use Nette\DI\Container;
 use Venne\Forms\PageForm;
 use \Closure;
 
@@ -40,7 +40,7 @@ class CmsManager extends Object {
 	public function __construct(Container $context)
 	{
 		$this->context = $context;
-		$this->evm = $this->context->doctrineContainer->eventManager;
+		$this->evm = $this->context->eventManager;
 	}
 
 	/* --------------------- Configuration ------------------------- */

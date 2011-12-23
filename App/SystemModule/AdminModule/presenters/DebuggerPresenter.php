@@ -16,27 +16,21 @@ namespace App\SystemModule\AdminModule;
  * 
  * @secured
  */
-class DebuggerPresenter extends BasePresenter
-{
-	
+class DebuggerPresenter extends BasePresenter {
+
+
+
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("Debugger", $this->link(":System:Admin:Debugger:"));
 	}
-	
-	public function createComponentFormEdit($name)
-	{
-		$form = new \App\SystemModule\SystemDebuggerForm;
-		$form->setSuccessLink("default");
-		$form->setFlashMessage("Database settings has been updated");
-		$form->setSubmitLabel("Update");
-		return $form;
-	}
-	
+
+
+
 	public function renderDefault()
 	{
-
+		
 	}
 
 }

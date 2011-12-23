@@ -37,6 +37,9 @@ class AuthorizatorFactory extends \Nette\Security\Permission {
 
 
 
+	/**
+	 * @return \Nette\Security\Permission
+	 */
 	public function create()
 	{
 		$session = $this->context->session->getSection("Venne.Security.Authorizator");
@@ -49,19 +52,15 @@ class AuthorizatorFactory extends \Nette\Security\Permission {
 			$permission->addRole($role);
 		}
 
-		/*
-		 * Add resources
-		 */
-		foreach ($this->context->modules->getModules() as $key => $module) {
-			$this->context->modules->$key->setPermissions($this->context, $permission);
+		/* Add resources */
+		foreach ($this->context->findByTag("module") as $key => $module) {
+			$this->context->{$key}->setPermissions($this->context, $permission);
 		}
 
 		$roles = array();
-		if ($this->context->doctrineContainer->checkConnection()) {
+		if ($this->context->createCheckConnection()) {
 
-			/*
-			 * Add roles
-			 */
+			/* Add roles */
 			$res = $this->context->roleRepository->findAll();
 			foreach ($res as $item) {
 				if (!$permission->hasRole($item->name)) {

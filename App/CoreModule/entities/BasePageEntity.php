@@ -38,12 +38,17 @@ class BasePageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	 */
 	protected $translationFor;
 
+	/**
+	 * @Form(type="manyToOne", targetEntity="\App\CoreModule\PageEntity")
+	 */
+	protected $parent;
+
 
 
 	public function __construct()
 	{
 		$this->page = new \App\CoreModule\PageEntity(static::LINK);
-		parent::construct();
+		parent::__construct();
 	}
 
 
@@ -72,9 +77,16 @@ class BasePageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 
 
 
-	public function setUrl($url)
+	public function getLocalUrl()
 	{
-		$this->getPage()->url = $url;
+		return $this->getPage()->localUrl;
+	}
+
+
+
+	public function setLocalUrl($url)
+	{
+		$this->getPage()->localUrl = $url;
 	}
 
 
@@ -135,20 +147,6 @@ class BasePageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 
 
 
-	public function getLayout()
-	{
-		return $this->getPage()->layout;
-	}
-
-
-
-	public function setLayout($layout)
-	{
-		$this->getPage()->layout = $layout;
-	}
-
-
-
 	public function getType()
 	{
 		return $this->getPage()->type;
@@ -173,6 +171,20 @@ class BasePageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	public function setRobots($robots)
 	{
 		$this->getPage()->robots = $robots;
+	}
+
+
+
+	public function getParent()
+	{
+		return $this->getPage()->parent;
+	}
+
+
+
+	public function setParent($parent)
+	{
+		$this->getPage()->parent = $parent;
 	}
 
 

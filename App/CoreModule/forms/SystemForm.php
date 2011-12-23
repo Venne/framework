@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SystemModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
@@ -17,7 +17,8 @@ use Nette\Utils\Html;
 /**
  * @author Josef Kříž
  */
-class SystemForm extends \Venne\Forms\EditForm {
+class SystemForm extends \Venne\Forms\ConfigForm {
+
 
 
 	public function startup()
@@ -27,23 +28,12 @@ class SystemForm extends \Venne\Forms\EditForm {
 		$this->addGroup();
 		$this->addSelect("mode", "Mode");
 	}
-	
+
+
+
 	public function setup()
 	{
-		$this["mode"]->setItems($this->presenter->context->configManager->getSections(), false);
-	}
-
-
-	public function load()
-	{
-		$model = \Nette\Config\NeonAdapter::load($this->presenter->context->params["appDir"] . "/global.neon");
-		$this->setDefaults($model);
-	}
-
-	public function save()
-	{
-		parent::save();
-		\Nette\Config\NeonAdapter::save($this->getValues(), $this->presenter->context->params["appDir"] . "/global.neon");
+		$this["mode"]->setItems($this->presenter->context->parameters["modes"], false);
 	}
 
 }

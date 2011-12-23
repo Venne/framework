@@ -11,6 +11,10 @@
 
 namespace Venne\Module;
 
+use Nette\DI\ContainerBuilder;
+use Nette\DI\Container;
+use Nette\Security\Permission;
+
 /**
  * @author Josef Kříž
  */
@@ -45,8 +49,8 @@ abstract class AutoModule extends BaseModule {
 		//$presenters = array();
 
 		$paths = array(
-			$container->params["appDir"] . "/" . ucfirst($this->getName()) . "Module",
-			$container->params["libsDir"] . "/App/" . ucfirst($this->getName()) . "Module"
+			$container->parameters["appDir"] . "/" . ucfirst($this->getName()) . "Module",
+			$container->parameters["libsDir"] . "/App/" . ucfirst($this->getName()) . "Module"
 		);
 
 
@@ -101,25 +105,7 @@ abstract class AutoModule extends BaseModule {
 
 
 
-	public function setServices(\Venne\DI\Container $container)
-	{
-		parent::setServices($container);
-
-		if (!$this->cacheLoaded) {
-			$this->startCache($container->cacheStorage);
-		}
-
-//		if (!isset($this->cacheData["presenters"]) || $this->cacheData["presenters"] === NULL) {
-//			$this->scan($container);
-//		}
-//		foreach ($this->cacheData["presenters"] as $presenter) {
-//			$container->addServiceAutoWire(substr($presenter, 1), $presenter);
-//		}
-	}
-
-
-
-	public function setPermissions(\Venne\DI\Container $container, \Nette\Security\Permission $permissions)
+	public function setPermissions(Container $container, Permission $permissions)
 	{
 		parent::setPermissions($container, $permissions);
 
@@ -162,10 +148,10 @@ abstract class AutoModule extends BaseModule {
 
 
 
-	public function install(\Venne\DI\Container $container)
+	public function install(Container $container)
 	{
 		parent::install($container);
-		$em = $container->doctrineContainer->entityManager;
+		$em = $container->entityManager;
 		$tool = new \Doctrine\ORM\Tools\SchemaTool($em);
 
 		/*
@@ -184,10 +170,10 @@ abstract class AutoModule extends BaseModule {
 
 
 
-	public function uninstall(\Venne\DI\Container $container)
+	public function uninstall(Container $container)
 	{
 		parent::uninstall($container);
-		$em = $container->doctrineContainer->entityManager;
+		$em = $container->entityManager;
 		$tool = new \Doctrine\ORM\Tools\SchemaTool($em);
 
 		/*

@@ -41,9 +41,9 @@ class LanguagePresenter extends \Venne\Application\UI\AdminPresenter {
 	{
 		$repository = $this->context->languageRepository;
 		$entity = $repository->createNew();
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 
-		$form = new \App\CoreModule\LanguageForm($entity, $this->context->doctrineContainer->entityFormMapper, $em);
+		$form = new \App\CoreModule\LanguageForm($this->context->entityFormMapper, $em, $entity);
 		$form->setSuccessLink("default");
 		$form->setFlashMessage("Language has been created");
 		$form->setSubmitLabel("Create");
@@ -59,9 +59,9 @@ class LanguagePresenter extends \Venne\Application\UI\AdminPresenter {
 	{
 		$repository = $this->context->languageRepository;
 		$entity = $repository->find($this->id);
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 
-		$form = new \App\CoreModule\LanguageForm($entity, $this->context->doctrineContainer->entityFormMapper, $em);
+		$form = new \App\CoreModule\LanguageForm($this->context->entityFormMapper, $em, $entity);
 		$form->setSuccessLink("this");
 		$form->setFlashMessage("Language has been updated");
 		$form->setSubmitLabel("Update");
@@ -69,17 +69,6 @@ class LanguagePresenter extends \Venne\Application\UI\AdminPresenter {
 					$repository->save($form->entity);
 				};
 		return $form;
-	}
-
-
-
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | Language administration");
-		$this->setKeywords("language administration");
-		$this->setDescription("Language administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 

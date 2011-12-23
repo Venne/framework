@@ -12,6 +12,7 @@
 namespace Venne\Application\UI;
 
 use Nette;
+use Nette\Forms\ISubmitterControl;
 
 /**
  * @author Josef Kříž
@@ -135,6 +136,12 @@ class Form extends \Nette\Application\UI\Form {
 			}
 		} else {
 			$this->dispatchEvent($this->onError, $this);
+		}
+
+		if ($this->isSubmitted() instanceof ISubmitterControl) {
+			if ($this->successLink && !$this->presenter->isAjax()) {
+				$this->presenter->redirect($this->successLink, $this->successLinkParams);
+			}
 		}
 	}
 

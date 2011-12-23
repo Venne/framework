@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\WebsiteModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
@@ -18,22 +18,22 @@ use Nette\Forms\Form;
 /**
  * @author Josef Kříž
  */
-class WebsiteForm extends \Venne\Forms\EditForm {
+class WebsiteForm extends \Venne\Forms\ConfigForm {
+
 
 	/** @var \App\CoreModule\ScannerService */
 	protected $scannerService;
-	
+
 	/** @var \Venne\Config\ConfigBuilder */
 	protected $configManager;
-	
-	/** @var string */
-	protected $mode;
-	
-	/** @var \Venne\DI\Container */
-	protected $themesContainer;
-	
-	
-	
+
+	/** @var array */
+	protected $themes;
+
+	/** @var \SystemContainer */
+	protected $container;
+
+
 
 	/**
 	 * Constructor
@@ -45,15 +45,29 @@ class WebsiteForm extends \Venne\Forms\EditForm {
 	 * @param \Venne\DI\Container $themesContainer
 	 * @param type $mode 
 	 */
-	public function __construct(\App\CoreModule\ScannerService $scannerService, \Venne\Config\ConfigBuilder $configManager, \Venne\DI\Container $themesContainer, $mode = "default")
+	public function __construct(\Venne\Forms\Mapping\ConfigFormMapper $mapper, \App\CoreModule\ScannerService $scannerService, \Venne\Config\ConfigBuilder $configManager, \Nette\DI\Container $container)
 	{
-		parent::__construct();
+		parent::__construct($mapper);
 		$this->scannerService = $scannerService;
-		$this->configManager = $configManager;
-		$this->themesContainer = $themesContainer;
-		$this->mode = $mode;
+		$this->configManager["venne"] = $configManager;
+		$this->container = $container;
 	}
-	
+
+
+
+	public function getThemes()
+	{
+		return $this->themes;
+	}
+
+
+
+	public function setThemes($themes)
+	{
+		$this->themes = $themes;
+	}
+
+
 
 	public function startup()
 	{
@@ -61,16 +75,15 @@ class WebsiteForm extends \Venne\Forms\EditForm {
 
 		$this->addGroup("Themes");
 		$this->addRadioList("theme", "Website theme");
-		
+
 		$this->addGroup("Global meta informations");
 		$this->addText("title", "Title")->setOption("description", "(%s - separator, %t - local title)");
 		$this->addText("titleSeparator", "Title separator");
 		$this->addText("keywords", "Keywords");
 		$this->addText("description", "Description");
 		$this->addText("author", "Author");
-		
+
 		$this->addGroup("System");
-		//$this->addTextWithSelect("routePrefix", "Language route")->setItems(array("<lang>/", "<lang>.company.cz"), false);
 		$this->addText("routePrefix", "Route prefix");
 		$this->addCheckbox("multilang", "Multilangual");
 		$this->addText("defaultLangAlias", "Default language alias");
@@ -80,34 +93,22 @@ class WebsiteForm extends \Venne\Forms\EditForm {
 
 	public function setup()
 	{
-		$skins = $this->scannerService->getThemes();
+		$themes = $this->scannerService->getThemes();
+		$arr = (array) $this->configManager["venne"];
 
-		$this->setDefaults($this->configManager[$this->mode]["website"]);
+		$this->setDefaults($arr);
 
 		$arr = array();
-		foreach ($skins as $skin) {
-			if ($skin == "admin") {
+		foreach ($themes as $theme => $item) {
+			if ($theme == "admin") {
 				continue;
 			}
-			$arr[$skin] = $this->themesContainer->{$skin}->getDescription();
+			
+			$class = "\\" . ucfirst($theme) . "Theme\\Theme";
+			$item = new $class($this->container);
+			$arr[$theme] = $item->getDescription();
 		}
 		$this["theme"]->setItems($arr);
-	}
-
-
-
-	public function save()
-	{
-		$this->configManager[$this->mode]["website"]["theme"] = $this["theme"]->getValue();
-		$this->configManager[$this->mode]["website"]["title"] = $this["title"]->getValue();
-		$this->configManager[$this->mode]["website"]["titleSeparator"] = $this["titleSeparator"]->getValue();
-		$this->configManager[$this->mode]["website"]["keywords"] = $this["keywords"]->getValue();
-		$this->configManager[$this->mode]["website"]["description"] = $this["description"]->getValue();
-		$this->configManager[$this->mode]["website"]["author"] = $this["author"]->getValue();
-		$this->configManager[$this->mode]["website"]["routePrefix"] = $this["routePrefix"]->getValue();
-		$this->configManager[$this->mode]["website"]["multilang"] = $this["multilang"]->getValue();
-		$this->configManager[$this->mode]["website"]["defaultLangAlias"] = $this["defaultLangAlias"]->getValue();
-		$this->configManager->save();
 	}
 
 }

@@ -39,97 +39,6 @@ class Container extends \Nette\DI\Container {
 
 
 
-	/**
-	 * @param \Nette\DI\Container
-	 * @return \Doctrine\Common\EventManager
-	 */
-	public function createServiceEventManager()
-	{
-		$evm = new \Doctrine\Common\EventManager;
-		foreach (array_keys($this->context->getServiceNamesByTag('listener')) as $name) {
-			$evm->addEventSubscriber($this->context->getService($name));
-		}
-		return $evm;
-	}
-
-
-
-	/**
-	 * @param \Nette\DI\IContainer
-	 * @return \Doctrine\ORM\EntityManager
-	 */
-	public function createServiceEntityManager()
-	{
-		$evm = $this->eventManager;
-
-		if (!$this->context->params["productionMode"]) {
-			$cache = new \Doctrine\Common\Cache\ArrayCache;
-		} else {
-			$cache = new \Doctrine\Common\Cache\ApcCache();
-		}
-
-		$config = new \Doctrine\ORM\Configuration();
-		$config->setMetadataCacheImpl($cache);
-		$driverImpl = $config->newDefaultAnnotationDriver(array($this->context->params["appDir"], $this->context->params["venneDir"]));
-		$config->setMetadataDriverImpl($driverImpl);
-		$config->setQueryCacheImpl($cache);
-		$config->setProxyDir($this->context->params["appDir"] . '/proxies');
-		$config->setProxyNamespace('App\Proxies');
-
-		//if ($applicationMode == "development") {
-		$config->setAutoGenerateProxyClasses(true);
-		//} else {
-		//	$config->setAutoGenerateProxyClasses(false);
-		//}
-		return \Doctrine\ORM\EntityManager::create((array) $this->context->params['database'], $config, $evm);
-	}
-
-
-
-	/**
-	 * @param \Nette\DI\IContainer
-	 * @return \Doctrine\DBAL\Schema\SchemaManager
-	 */
-	public function createServiceSchemaManager()
-	{
-		$db = \Doctrine\DBAL\DriverManager::getConnection($this->context->params['database']);
-		return $db->getSchemaManager();
-	}
-
-
-
-	/**
-	 * @return Migration\MigrationManager 
-	 */
-	public function createServiceMigrationManager()
-	{
-		return new Migration\MigrationManager($this->context);
-	}
-
-
-
-	/**
-	 * @return \Venne\Forms\Mapping\EntityFormMapper
-	 */
-	public function createServiceEntityFormMapper()
-	{
-		return new \Venne\Forms\Mapping\EntityFormMapper($this->entityManager, new \Venne\Doctrine\Mapping\TypeMapper);
-	}
-
-
-
-	/**
-	 *
-	 * @param string $entityName
-	 * @return \Venne\Doctrine\ORM\Repository
-	 */
-	public function getRepository($entityName)
-	{
-		return $this->entityManager->getRepository($entityName);
-	}
-
-
-
 	public function checkConnectionErrorHandler()
 	{
 		
@@ -139,7 +48,7 @@ class Container extends \Nette\DI\Container {
 
 	public function checkConnection()
 	{
-		$connection = $this->entityManager->getConnection();
+		$connection = $this->context->entityManager->getConnection();
 		if (!$connection->isConnected()) {
 			$old = set_error_handler(array($this, 'checkConnectionErrorHandler'));
 			try {

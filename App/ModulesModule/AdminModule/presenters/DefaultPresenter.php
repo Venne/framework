@@ -24,14 +24,6 @@ class DefaultPresenter extends BasePresenter {
 
 
 
-	public function startup()
-	{
-		parent::startup();
-		$this->context->moduleManager->setSection($this->mode);
-	}
-
-
-
 	public function actionDefault()
 	{
 		$this->template->modules = array();
@@ -43,22 +35,11 @@ class DefaultPresenter extends BasePresenter {
 
 
 
-	public function createComponentDefaultForm($name)
-	{
-		$form = new \App\ModulesModule\ModulesDefaultForm;
-		$form->setSuccessLink("default");
-		$form->setSubmitLabel("Save");
-		$form->setFlashMessage("Changes has been saved");
-		return $form;
-	}
-
-
-
 	public function createComponentForm($name)
 	{
 		$module = $this->context->moduleManager->getModuleInstance($this->key);
-		
-		$form = $module->getForm($this->context->configManager);
+
+		$form = $module->getForm($this->context);
 		$form->setSuccessLink("default");
 		$form->setFlashMessage("Changes has been saved");
 		return $form;
@@ -88,14 +69,14 @@ class DefaultPresenter extends BasePresenter {
 	{
 		$moduleManager = $this->context->moduleManager;
 
-		try{
+		try {
 			$moduleManager->installModule($key, $confirm);
 			$this->flashMessage("Module has been installed", "success");
 			$this->redirect("this");
-		}catch(\App\CoreModule\DependencyNotExistsException $ex){
+		} catch (\App\CoreModule\DependencyNotExistsException $ex) {
 			$this->flashMessage($ex->getMessage(), "warning");
 			$this->redirect("this");
-		}catch(\App\CoreModule\DependencyException $ex){
+		} catch (\App\CoreModule\DependencyException $ex) {
 			$this->template->showDialog = $ex->dependencies;
 			$this->template->dialogModule = $key;
 		}
@@ -124,26 +105,15 @@ class DefaultPresenter extends BasePresenter {
 	public function handleUninstall($key, $confirm)
 	{
 		$moduleManager = $this->context->moduleManager;
-		
-		try{
+
+		try {
 			$moduleManager->uninstallModule($key, $confirm);
 			$this->flashMessage("Module has been uninstalled", "success");
 			$this->redirect("this");
-		}catch(\App\CoreModule\DependencyException $ex){
+		} catch (\App\CoreModule\DependencyException $ex) {
 			$this->template->showUninstallDialog = $ex->dependencies;
 			$this->template->dialogModule = $key;
 		}
-		
-	}
-
-
-
-	public function renderDefault()
-	{
-		$this->setTitle("Venne:CMS | Module administration");
-		$this->setKeywords("module administration");
-		$this->setDescription("Module administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

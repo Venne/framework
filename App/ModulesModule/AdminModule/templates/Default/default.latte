@@ -44,7 +44,7 @@
 	<tbody>
 		{foreach $modules as $name=>$module}
 		
-		{var item=>isset($presenter->context->params["modules"][$name]) ? $presenter->context->params["modules"][$name] : NULL}
+		{var item=>isset($presenter->context->parameters["modules"][$name]) ? $presenter->context->parameters["modules"][$name] : NULL}
 		
 				
 		<tr class="screens {if $iterator->getCounter()%2 == 0} even{/if}{if $iterator->isLast()} footer{/if}">
@@ -99,4 +99,4 @@
 
 <h2>Default modules</h2>
 
-{control defaultForm}
+{control modulesDefaultForm}

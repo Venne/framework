@@ -22,9 +22,9 @@ class PageForm extends EntityForm {
 	 * @param object $entity
 	 * @param Mapping\EntityFormMapper $mapper
 	 */
-	public function __construct(\App\CoreModule\BasePageEntity $entity, Mapping\EntityFormMapper $mapper, $entityManager = NULL)
+	public function __construct(Mapping\EntityFormMapper $mapper, \Doctrine\ORM\EntityManager $entityManager, \App\CoreModule\BasePageEntity $entity)
 	{
-		parent::__construct($entity, $mapper, $entityManager);
+		parent::__construct($mapper, $entityManager, $entity);
 		$this->onSave[] = \callback($this, "saveParams");
 	}
 
@@ -36,11 +36,8 @@ class PageForm extends EntityForm {
 	public function startup()
 	{
 		parent::startup();
-		$this->onSave[] = function($form) {
-					$form->presenter->context->doctrineContainer->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onSave, $form->createArgs());
-				};
 
-		$this->addGroup();
+		$this->addGroup("Meta informations");
 		$this->addText("title", "Title")
 				->setRequired('Enter title');
 		$this->addText("keywords", "Keywords");
@@ -51,6 +48,14 @@ class PageForm extends EntityForm {
 			"index, nofollow",
 			"noindex, nofollow",
 				), false);
+
+		$this->addGroup("URL");
+		$this->addManyToOne("parent", "Parent content");
+		$this->addText("localUrl", "URL")
+				->setOption("description", "(example: 'contact')")
+				->addRule(self::REGEXP, "URL can not contain '/'", "/^[a-zA-z0-9._-]*$/")
+				->addConditionOn($this["parent"], ~self::EQUAL, false)
+				->addRule(self::FILLED, "Nesmí být prázdný");
 
 		$this->addGroup("Languages");
 		$this->addManyToMany("languages", "Content is in");
@@ -66,7 +71,6 @@ class PageForm extends EntityForm {
 	public function saveParams()
 	{
 		$this->entity->setParams($this->getParams());
-		//$this->entity->type = "\\\\" . get_class($this->entity);
 	}
 
 
@@ -78,15 +82,19 @@ class PageForm extends EntityForm {
 	{
 		parent::attached($obj);
 
-		$this->presenter->context->doctrineContainer->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onCreate, $this->createArgs());
-		
-		if(!$this->presenter->context->params["website"]["multilang"]){
+		$this->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onCreate, $this->createArgs());
+
+		if (!$this->presenter->context->parameters["website"]["multilang"]) {
 			$this->removeGroup("Languages");
 		}
-			
+
 		if (!$this->isSubmitted()) {
-			$this->presenter->context->doctrineContainer->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onLoad, $this->createArgs());
+			$this->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onLoad, $this->createArgs());
 		}
+
+		$this->onSave[] = function($form) {
+					$form->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onSave, $form->createArgs());
+				};
 	}
 
 
@@ -101,8 +109,9 @@ class PageForm extends EntityForm {
 
 
 
-	public function addContentExtensionContainer($name)
+	public function addContentExtensionContainer($name, $label)
 	{
+		$this->addGroup($label)->setOption('container', \Nette\Utils\Html::el('fieldset')->class('extension')->id('extension-' . $name));
 		return $this->addContainer("_module_" . $name);
 	}
 

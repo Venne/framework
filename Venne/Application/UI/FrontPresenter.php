@@ -48,7 +48,7 @@ class FrontPresenter extends \Venne\Application\UI\Presenter {
 
 	public function startup()
 	{
-		$this->context->doctrineContainer->eventManager->dispatchEvent(Venne\Application\UI\Events::beforeStartup, $this->createArgs());
+		$this->context->eventManager->dispatchEvent(Venne\Application\UI\Events::beforeStartup, $this->createArgs());
 		parent::startup();
 	}
 

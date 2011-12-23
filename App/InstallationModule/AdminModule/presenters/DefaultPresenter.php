@@ -39,11 +39,13 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 		 * Writable
 		 */
 		$paths = array(
-			$this->getContext()->params["wwwDir"] . "/public/",
-			$this->getContext()->params["dataDir"] . "/",
-			$this->getContext()->params["themesDir"] . "/",
-			$this->getContext()->params["appDir"] . "/",
-			$this->getContext()->params["flagsDir"]
+			$this->getContext()->parameters["wwwDir"] . "/public/",
+			$this->getContext()->parameters["dataDir"] . "/",
+			$this->getContext()->parameters["themesDir"] . "/",
+			$this->getContext()->parameters["configDir"] . "/",
+			$this->getContext()->parameters["tempDir"] . "/",
+			$this->getContext()->parameters["appDir"] . "/proxies/",
+			$this->getContext()->parameters["flagsDir"]
 		);
 		foreach ($paths as $item) {
 			if (!is_writable($item)) {
@@ -51,21 +53,20 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 			}
 		}
 
-		if (file_exists($this->getContext()->params["flagsDir"] . "/installed")) {
+		if (file_exists($this->getContext()->parameters["flagsDir"] . "/installed")) {
 			$this->setView("finish");
 		} else {
 			$this->setView("default");
-			if ($this->context->params["admin"]["password"]) {
+			if ($this->context->parameters["admin"]["password"]) {
 				$this->setView("database");
-				if ($this->context->params["database"]["dbname"]) {
+				if ($this->context->parameters["database"]["dbname"]) {
 					$this->setView("website");
 
-					if (count($this->context->doctrineContainer->schemaManager->listTables()) == 0) {
-						$this->context->moduleManager->setSection($this->mode);
+					if (count($this->context->schemaManager->listTables()) == 0) {
 						$this->context->moduleManager->installModule("core");
 					}
 
-					if ($this->context->params["website"]["theme"]) {
+					if ($this->context->parameters["website"]["theme"]) {
 						$this->setView("finish");
 					}
 				}
@@ -75,9 +76,9 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 
 
 
-	public function createComponentFormAccount($name)
+	public function createComponentSystemAccountForm($name)
 	{
-		$form = new \App\SystemModule\SystemAccountForm($this, $name, "common");
+		$form = $this->context->createSystemAccountFormControl();
 		$form->setSuccessLink("this");
 		$form->setSubmitLabel("Next");
 		return $form;
@@ -85,9 +86,10 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 
 
 
-	public function createComponentFormDatabase($name)
+	public function createComponentSystemDatabaseForm($name)
 	{
-		$form = new \App\SystemModule\SystemDatabaseForm(false, true);
+		$form = $this->context->createSystemDatabaseFormControl();
+		$form->setShowTestConnection(false);
 		$form->setSuccessLink("this");
 		$form->setSubmitLabel("Install");
 		return $form;
@@ -105,7 +107,7 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 	public function renderFinish()
 	{
 		umask(0000);
-		@file_put_contents($this->context->params["flagsDir"] . "/installed", "");
+		@file_put_contents($this->context->parameters["flagsDir"] . "/installed", "");
 	}
 
 
@@ -114,13 +116,6 @@ class DefaultPresenter extends \Venne\Application\UI\InstallationPresenter {
 	{
 		parent::beforeRender();
 		$this->template->websiteUrl = $this->getHttpRequest()->getUrl()->getBaseUrl();
-		$this->template->installationMode = true;
-		$this->template->hideMenuItems = true;
-
-		$this->setTitle("Venne:CMS | Installation");
-		$this->setKeywords("installation");
-		$this->setDescription("Installation");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

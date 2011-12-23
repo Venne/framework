@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SystemModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
@@ -18,18 +18,7 @@ use Venne\Forms\Form;
 /**
  * @author Josef Kříž
  */
-class SystemAccountForm extends \Venne\Forms\EditForm {
-
-
-	protected $mode;
-
-
-
-	public function __construct($mode = "common")
-	{
-		$this->mode = $mode;
-		parent::__construct();
-	}
+class SystemAccountForm extends \Venne\Forms\ConfigForm {
 
 
 
@@ -50,25 +39,6 @@ class SystemAccountForm extends \Venne\Forms\EditForm {
 				->addRule(self::MIN_LENGTH, 'Password is short', 5);
 		$this["password_confirm"]
 				->addRule(self::EQUAL, 'Invalid re password', $this['password']);
-	}
-
-
-
-	public function load()
-	{
-		$config = $this->presenter->context->configManager[$this->presenter->mode]["admin"];
-		$this->setDefaults($config);
-	}
-
-
-
-	public function save()
-	{
-		parent::save();
-		$config = $this->presenter->context->configManager;
-		unset($this["password_confirm"]);
-		$config[$this->presenter->mode]["admin"] = $this->getValues();
-		$config->save();
 	}
 
 }

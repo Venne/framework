@@ -127,9 +127,9 @@ class RolesPresenter extends BasePresenter {
 		$repository = $this->context->roleRepository;
 		$parent = $this->context->roleRepository->findAll();
 		$entity = $repository->createNew();
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 		
-		$form = new \App\SecurityModule\RoleForm($entity, new \Venne\Forms\Mapping\EntityFormMapper($this->context->doctrineContainer->entityManager, new \Venne\Doctrine\Mapping\TypeMapper), $em);
+		$form = new \App\SecurityModule\RoleForm($this->context->entityFormMapper, $em, $entity);
 		$form->onSave[] = function($form) use ($repository){
 			$repository->save($form->entity);
 		};
@@ -146,9 +146,9 @@ class RolesPresenter extends BasePresenter {
 		$entity = $this->context->roleRepository->find($this->getParam("id"));
 		$parent = $this->context->roleRepository->findAll();
 		$repository = $this->context->roleRepository;
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 		
-		$form = new \App\SecurityModule\RoleForm($entity, new \Venne\Forms\Mapping\EntityFormMapper($this->context->doctrineContainer->entityManager, new \Venne\Doctrine\Mapping\TypeMapper), $em);
+		$form = new \App\SecurityModule\RoleForm($this->context->entityFormMapper, $em, $entity);
 		$form->onSave[] = function($form) use ($repository){
 			$repository->save($form->entity);
 		};

@@ -1,0 +1,11 @@
+<ul class="menu">
+	
+	<li n:if="$presenter->isAllowed(':System:Admin:Default:default')">
+		<a href="{plink Default:default}"{if $presenter->isLinkCurrent("Default:default")} class="active"{/if}>list</a>
+	</li>
+	<li n:if="$presenter->isAllowed(':System:Admin:Default:create')">
+		<a href="{plink Default:create}"{if $presenter->isLinkCurrent("Default:create")} class="active"{/if}>create</a>
+	</li>
+	
+</ul>
+

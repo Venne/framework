@@ -40,7 +40,7 @@ class EntityForm extends \Venne\Application\UI\Form {
 	 * @param object $entity
 	 * @param Mapping\EntityFormMapper $mapper
 	 */
-	public function __construct($entity, Mapping\EntityFormMapper $mapper, $entityManager = NULL)
+	public function __construct(Mapping\EntityFormMapper $mapper, \Doctrine\ORM\EntityManager $entityManager, $entity)
 	{
 		$this->mapper = $mapper;
 		$this->entity = $entity;
@@ -105,25 +105,17 @@ class EntityForm extends \Venne\Application\UI\Form {
 	{
 		if (!$this->isSubmitted()) {
 			return;
-		}
+		} elseif ($this->isSubmitted() instanceof \Nette\Forms\ISubmitterControl) {
+			 // load data to entity
+			$entities = $this->getMapper()->load();
 
-		// load data to entity
-		$entities = $this->getMapper()->load();
-
-		// ensure all in entity manager
-		foreach ($entities as $entity) {
-			$this->onSave($this, $entity);
+			// ensure all in entity manager
+			foreach ($entities as $entity) {
+				$this->onSave($this, $entity);
+			}
 		}
 
 		parent::fireEvents();
-
-		if ($this->onSaveRestore) {
-			$this->getPresenter()->getApplication()->restoreRequest($this->onSaveRestore);
-		}
-
-		if ($this->successLink && !$this->presenter->isAjax()) {
-			$this->presenter->redirect($this->successLink, $this->successLinkParams);
-		}
 	}
 
 	/* -------------------------- */
@@ -161,14 +153,14 @@ class EntityForm extends \Venne\Application\UI\Form {
 	public function addManyToOne($name, $label = NULL, $items = NULL, $size = NULL, array $criteria = array(), array $orderBy = NULL, $limit = NULL, $offset = NULL)
 	{
 		$ref = $this->entity->getReflection()->getProperty($name);
-		
-		if($ref->hasAnnotation("Form")){
+
+		if ($ref->hasAnnotation("Form")) {
 			$ref = $ref->getAnnotation("Form");
 			$class = $ref["targetEntity"];
 			if (substr($class, 0, 1) != "\\") {
 				$class = "\\" . $this->entity->getReflection()->getNamespaceName() . "\\" . $class;
 			}
-		}else{
+		} else {
 			$ref = $ref->getAnnotation("ManyToOne");
 			$class = $ref["targetEntity"];
 			if (substr($class, 0, 1) != "\\") {
@@ -192,14 +184,14 @@ class EntityForm extends \Venne\Application\UI\Form {
 	public function addManyToMany($name, $label = NULL, $items = NULL, $size = NULL, array $criteria = array(), array $orderBy = NULL, $limit = NULL, $offset = NULL)
 	{
 		$ref = $this->entity->getReflection()->getProperty($name);
-		
-		if($ref->hasAnnotation("Form")){
+
+		if ($ref->hasAnnotation("Form")) {
 			$ref = $ref->getAnnotation("Form");
 			$class = $ref["targetEntity"];
 			if (substr($class, 0, 1) != "\\") {
 				$class = "\\" . $this->entity->getReflection()->getNamespaceName() . "\\" . $class;
 			}
-		}else{
+		} else {
 			$ref = $ref->getAnnotation("ManyToMany");
 			$class = $ref["targetEntity"];
 			if (substr($class, 0, 1) != "\\") {

@@ -127,8 +127,6 @@ class LayoutService extends Object {
 				$entity->moduleName = $moduleName;
 				$entity->regex = "";
 
-				dump($linkParams);
-
 				if (isset($linkParams["module"])) {
 					$entity->regex .= $linkParams["module"];
 					if (isset($linkParams["presenter"])) {

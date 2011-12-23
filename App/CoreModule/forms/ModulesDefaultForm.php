@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\ModulesModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
@@ -18,37 +18,32 @@ use Venne\Application\UI\Form;
 /**
  * @author Josef Kříž
  */
-class ModulesDefaultForm extends \Venne\Forms\EditForm {
+class ModulesDefaultForm extends \Venne\Forms\ConfigForm {
+
+
 
 	public function startup()
 	{
 		parent::startup();
-		
+
 		$this->addGroup("Default modules");
 		$this->addTextWithSelect("defaultPresenter", "Default presenter");
 		$this->addTextWithSelect("errorPresenter", "Error presenter");
 	}
-	
-	public function setup(){
-		$model = $this->presenter->context->scannerService;
-		
-		$this["defaultPresenter"]
-			->setItems($model->getLinksOfModulesPresenters(), false)
-			->setDefaultValue($this->presenter->context->configManager[$this->presenter->mode]["website"]["defaultPresenter"]);
-		
-		$this["errorPresenter"]
-			->setItems($model->getLinksOfModulesPresenters(), false)
-			->setDefaultValue($this->presenter->context->configManager[$this->presenter->mode]["website"]["errorPresenter"]);
-	}
 
-	public function save()
+
+
+	public function setup()
 	{
-		$values = $this->getValues();
+		$model = $this->presenter->context->scannerService;
 
-		$config = $this->presenter->context->configManager;
-		$config[$this->presenter->mode]["website"]["defaultPresenter"] = $values["defaultPresenter"];
-		$config[$this->presenter->mode]["website"]["errorPresenter"] = $values["errorPresenter"];
-		$config->save();
+		$this["defaultPresenter"]
+				->setItems($model->getLinksOfModulesPresenters(), false)
+				->setDefaultValue($this->presenter->context->parameters["website"]["defaultPresenter"]);
+
+		$this["errorPresenter"]
+				->setItems($model->getLinksOfModulesPresenters(), false)
+				->setDefaultValue($this->presenter->context->parameters["website"]["errorPresenter"]);
 	}
 
 }

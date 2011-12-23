@@ -11,6 +11,11 @@
 
 namespace Venne\Module;
 
+use Nette\DI\ContainerBuilder;
+use Nette\DI\Container;
+use Nette\Security\Permission;
+use Nette\Application\Routers\RouteList;
+
 /**
  * @author Josef Kříž
  */
@@ -34,22 +39,26 @@ interface IModule {
 
 
 
-	public function configure(\Venne\DI\Container $container, \App\CoreModule\CmsManager $manager);
+	public function setRoutes(RouteList $router, $prefix = "");
 
 
 
-	public function setPermissions(\Venne\DI\Container $container, \Nette\Security\Permission $permissions);
+	public function loadConfiguration(ContainerBuilder $container, array $config);
 
 
 
-	public function install(\Venne\DI\Container $container);
+	public function setPermissions(Container $container, Permission $permissions);
 
 
 
-	public function uninstall(\Venne\DI\Container $container);
+	public function install(Container $container);
 
 
 
-	public function getForm(\Venne\Config\ConfigBuilder $configManager);
+	public function uninstall(Container $container);
+
+
+
+	public function getForm(Container $container);
 }
 

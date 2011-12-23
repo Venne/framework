@@ -9,31 +9,51 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SystemModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
 use Venne\Forms\Form;
+use Venne\Forms\Mapping\ConfigFormMapper;
 
 /**
  * @author Josef Kříž
  */
-class SystemDatabaseForm extends \Venne\Forms\EditForm {
+class SystemDatabaseForm extends \Venne\Forms\ConfigForm {
 
 
 	/** @var bool */
-	protected $testConnection;
+	protected $testConnection = true;
 
 	/** @var bool */
-	protected $showTestConnection;
+	protected $showTestConnection = true;
 
 
 
-	public function __construct($showTestConnection = true, $testConnection = true)
+	public function getTestConnection()
+	{
+		return $this->testConnection;
+	}
+
+
+
+	public function setTestConnection($testConnection)
 	{
 		$this->testConnection = $testConnection;
+	}
+
+
+
+	public function getShowTestConnection()
+	{
+		return $this->showTestConnection;
+	}
+
+
+
+	public function setShowTestConnection($showTestConnection)
+	{
 		$this->showTestConnection = $showTestConnection;
-		parent::__construct();
 	}
 
 
@@ -41,7 +61,13 @@ class SystemDatabaseForm extends \Venne\Forms\EditForm {
 	public function startup()
 	{
 		parent::startup();
+	}
 
+
+
+	public function setup()
+	{
+		parent::setup();
 		$this->addGroup();
 		if ($this->showTestConnection)
 			$this->addCheckbox("test", "Test connection");
@@ -63,14 +89,6 @@ class SystemDatabaseForm extends \Venne\Forms\EditForm {
 
 
 
-	public function load()
-	{
-		$config = $this->presenter->context->configManager[$this->presenter->mode]["database"];
-		$this->setDefaults($config);
-	}
-
-
-
 	protected function handleError()
 	{
 		
@@ -78,12 +96,13 @@ class SystemDatabaseForm extends \Venne\Forms\EditForm {
 
 
 
-	public function save()
+	public function fireEvents()
 	{
-		parent::save();
-		$values = $this->getValues();
+		if (!$this->isSubmitted()) {
+			return;
+		}
 
-		$config = $this->presenter->context->configManager;
+		$values = $this->getValues();
 
 		/*
 		 * Test
@@ -99,12 +118,7 @@ class SystemDatabaseForm extends \Venne\Forms\EditForm {
 			restore_error_handler();
 		}
 
-		$config[$this->presenter->mode]["database"]["host"] = $values["host"];
-		$config[$this->presenter->mode]["database"]["driver"] = $values["driver"];
-		$config[$this->presenter->mode]["database"]["user"] = $values["user"];
-		$config[$this->presenter->mode]["database"]["password"] = $values["password"];
-		$config[$this->presenter->mode]["database"]["dbname"] = $values["dbname"];
-		$config->save();
+		parent::fireEvents();
 	}
 
 }

@@ -16,22 +16,14 @@ namespace App\SecurityModule\AdminModule;
  * 
  * @secured
  */
-class BasePresenter extends \Venne\Application\UI\AdminPresenter
-{
-	
+class BasePresenter extends \Venne\Application\UI\AdminPresenter {
+
+
+
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("Security", $this->link(":Security:Admin:Default:"));
-	}
-
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | Security administration");
-		$this->setKeywords("security administration");
-		$this->setDescription("Security administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

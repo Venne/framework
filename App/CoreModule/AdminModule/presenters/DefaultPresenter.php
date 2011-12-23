@@ -16,15 +16,6 @@ namespace App\CoreModule\AdminModule;
  * 
  * @secured
  */
-class DefaultPresenter extends \Venne\Application\UI\AdminPresenter
-{
+class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 	
-	public function renderDefault()
-	{
-		$this->setTitle("Venne:CMS");
-		$this->setKeywords("Venne:CMS");
-		$this->setDescription("Venne:CMS");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
-	}
-
 }

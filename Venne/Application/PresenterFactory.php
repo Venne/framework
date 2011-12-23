@@ -42,12 +42,12 @@ class PresenterFactory implements \Nette\Application\IPresenterFactory
 	public function createPresenter($name)
 	{
 		$class = $this->getPresenterClass($name);
-		//$presenter = new $class;
+		$presenter = new $class($this->container);
 		//$presenter->setContext($this->container);
-		$class = str_replace(":", "", $class);
-		$presenter = $this->container->getService($class);
+		//$class = str_replace(":", "", $class);
+		//$presenter = $this->container->getService($class);
 		//$presenter->setDoctrineContainer($this->container->doctrineContainer);
-		$presenter->setContext($this->container);
+		//$presenter->setContext($this->container);
 		return $presenter;
 	}
 
@@ -63,8 +63,8 @@ class PresenterFactory implements \Nette\Application\IPresenterFactory
 	private function formatPresenterClasses($name)
 	{
 		$class = NULL;
-		$namespaces = isset($this->container->params['namespaces'])
-			 ? $this->container->params['namespaces']
+		$namespaces = isset($this->container->parameters['namespaces'])
+			 ? $this->container->parameters['namespaces']
 			 : array(static::DEFAULT_NAMESPACE);
 		foreach ($namespaces as $namespace) {
 			$class = $this->formatPresenterClass($name, $namespace);
@@ -152,8 +152,8 @@ class PresenterFactory implements \Nette\Application\IPresenterFactory
 	public function unformatPresenterClass($class)
 	{
 		$active = "";
-		$namespaces = isset($this->container->params['namespaces'])
-			 ? $this->container->params['namespaces']
+		$namespaces = isset($this->container->parameters['namespaces'])
+			 ? $this->container->parameters['namespaces']
 			 : array(static::DEFAULT_NAMESPACE);
 		foreach ($namespaces as $namespace) {
 			if (Strings::startsWith($class, $namespace)) {

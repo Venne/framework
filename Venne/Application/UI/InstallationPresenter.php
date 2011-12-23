@@ -24,9 +24,17 @@ class InstallationPresenter extends \Venne\Application\UI\Presenter {
 
 
 
+	/**
+	 * Common render method.
+	 * @return void
+	 */
 	public function beforeRender()
 	{
 		parent::beforeRender();
+		
+		$this->setTitle("Venne:CMS");
+		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
+		
 		$this->template->hideMenuItems = true;
 	}
 

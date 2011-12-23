@@ -16,22 +16,14 @@ namespace App\ModulesModule\AdminModule;
  * 
  * @secured
  */
-class BasePresenter extends \Venne\Application\UI\AdminPresenter
-{
-	
+class BasePresenter extends \Venne\Application\UI\AdminPresenter {
+
+
+
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("Modules", $this->link(":Modules:Admin:Default:"));
-	}
-	
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | Modules administration");
-		$this->setKeywords("modules administration");
-		$this->setDescription("Modules administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

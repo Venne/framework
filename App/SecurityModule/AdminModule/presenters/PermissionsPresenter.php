@@ -46,8 +46,8 @@ class PermissionsPresenter extends BasePresenter {
 
 		
 		$permissions = new \App\SecurityModule\Permission;
-		foreach($this->context->modules->getModules() as $module=>$item){
-			$this->context->modules->{$module}->setPermissions($this->context, $permissions);
+		foreach($this->context->findByTag("module") as $module=>$item){
+			$this->context->{$module}->setPermissions($this->context, $permissions);
 		}
 		$this->template->permissions = $permissions->getResources();
 	}

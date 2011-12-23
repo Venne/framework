@@ -13,14 +13,14 @@ namespace Venne;
 
 use Nette\Diagnostics\Debugger,
 	Nette\Application\Routers\SimpleRouter,
-	Nette\Application\Routers\Route;
+	Nette\Application\Routers\Route,
+	Nette\Config\Adapters\NeonAdapter;
 
 /**
  * Load Nette framework
  */
-require_once $params['libsDir'] . "/Nette/loader.php";
-require_once $params['venneDir'] . "/Configurator.php";
-
+require_once $parameters['libsDir'] . "/Nette/loader.php";
+require_once $parameters['venneDir'] . "/Configurator.php";
 /**
  * Load and configure Venne:CMS
  */
@@ -29,21 +29,56 @@ define('VENNE_DIR', __DIR__);
 define('VENNE_VERSION_ID', '2.0000');
 define('VENNE_VERSION_STATE', 'alpha');
 
-require_once $params['venneDir'] . '/DI/Container.php';
-require_once $params['venneDir'] . '/Module/Container.php';
+if(!is_readable($parameters['configDir'] . "/global.neon") OR !is_readable($parameters['configDir'] . "/global.orig.neon")){
+	die("Your config files are not readable");
+}
 
-$configFile = $params['appDir'] . '/config.neon';
-if(!file_exists($configFile)){
-	Debugger::enable(Debugger::DEVELOPMENT);
-	$configOrigFile = $params['appDir'] . '/config.orig.neon';
-	if(!is_writable($params['appDir'])){
-		$configFile = $configOrigFile;
+$configName = $parameters["configDir"] . "/global.neon";
+if(!file_exists($parameters["configDir"] . "/global.neon")){
+	if(is_writable($parameters["configDir"])){
+		umask(0000);
+		copy($parameters["configDir"] . "/global.orig.neon", $parameters["configDir"] . "/global.neon");
 	}else{
-		copy($configOrigFile, $configFile);
+		$configName = $parameters["configDir"] . "/global.orig.neon";
 	}
 }
-$configurator = new Configurator($params);
-$container = $configurator->loadConfig($configFile, $configurator->container->params['mode']);
+
+$adapter = new NeonAdapter();
+$config = $adapter->load($configName);
+
+$modeConfigName = $parameters["configDir"] . "/config." . $config["parameters"]["mode"] . ".neon";
+if(!file_exists($parameters["configDir"] . "/config." . $config["parameters"]["mode"] . ".neon")){
+	if(is_writable($parameters["configDir"])){
+		umask(0000);
+		file_put_contents($modeConfigName, "");
+	}else{
+		$modeConfigName = "";
+	}
+}
+
+if(!is_writable($parameters['tempDir'])){
+	die("Your temporary directory is not writable");
+}
+
+$configurator = new Configurator($config["parameters"]["modules"]);
+$configurator->setTempDirectory($parameters['tempDir']);
+$robotLoader = $configurator->createRobotLoader();
+$robotLoader->addDirectory($parameters["libsDir"])
+		->addDirectory($parameters["appDir"])
+		->addDirectory($parameters["wwwDir"] . "/themes")
+		->register();
+
+$configurator->addParameters($parameters);
+$configurator->addParameters($config);
+$configurator->addConfig($configName, Configurator::NONE);
+if($modeConfigName){
+	if(!is_readable($modeConfigName)){
+		die("Your config files are not readable");
+	}
+	$configurator->addConfig($modeConfigName, Configurator::NONE);
+}
+
+$container = $configurator->createContainer();
+$container->addService("robotLoader", $robotLoader);
 $application = $container->application;
-$application->catchExceptions = (bool) Debugger::$productionMode;
-$application->errorPresenter = $container->params['website']['errorPresenter'];
+$application->run();

@@ -14,7 +14,8 @@ namespace App\CoreModule;
 use Venne;
 use Nette\Object;
 use Venne\Config\ConfigBuilder;
-use Venne\DI\Container;
+use Nette\DI\Container;
+use Nette\Utils\Strings;
 
 /**
  * @author Josef Kříž
@@ -25,11 +26,14 @@ class ModuleManager extends Object {
 	/** @var ConfigBuilder */
 	protected $config;
 
-	/** @var string */
-	protected $section;
-
 	/** @var Container */
 	protected $context;
+
+	/** @var array */
+	protected $_moduleUpdates;
+
+	/** @var array */
+	protected $_modules;
 
 
 
@@ -37,26 +41,6 @@ class ModuleManager extends Object {
 	{
 		$this->context = $context;
 		$this->config = $config;
-	}
-
-
-
-	/**
-	 * @return string
-	 */
-	public function getSection()
-	{
-		return $this->section;
-	}
-
-
-
-	/**
-	 * @param string $section 
-	 */
-	public function setSection($section)
-	{
-		$this->section = $section;
 	}
 
 
@@ -79,10 +63,10 @@ class ModuleManager extends Object {
 	 * @param string $name
 	 * @return array[]string 
 	 */
-	public function getModulesByDependOn($name)
+	public function getActivatedModulesByDependOn($name)
 	{
 		$ret = array();
-		foreach ($this->context->modules->getModules() as $key => $module) {
+		foreach ($this->getActivatedModules() as $key => $module) {
 			$dependencies = $this->getModuleDependencies($key);
 			if (in_array($name, array_keys($dependencies))) {
 				$ret[] = $key;
@@ -146,7 +130,7 @@ class ModuleManager extends Object {
 
 
 	/**
-	 * Check is module exists
+	 * Check if module exists
 	 * @param string $name
 	 * @param string $version
 	 * @param string $operator
@@ -226,15 +210,21 @@ class ModuleManager extends Object {
 			}
 		}
 
-		$this->config[$this->section]["modules"][$name] = array(
+		$this->config["parameters"]["modules"][$name] = \Nette\ArrayHash::from(array(
 			"run" => true,
 			"version" => $module->getVersion()
-		);
+		));
+		
+		foreach($module->getForm($this->context)->getComponents() as $key=>$component){
+			if(!Strings::startsWith($key, "_")){
+				$this->config["parameters"]["modules"][$name][$key] = $component->value;
+			}
+		}
+		
 		$this->config->save();
 		$module->install($this->context);
 
-		$editForm = $module->getForm($this->config);
-		$editForm->save();
+		
 
 		$this->cleanCaches($cleanCache);
 	}
@@ -243,7 +233,7 @@ class ModuleManager extends Object {
 
 	public function uninstallModule($name, $withDependencies = null, $cleanCache = true)
 	{
-		$childrens = $this->getModulesByDependOn($name);
+		$childrens = $this->getActivatedModulesByDependOn($name);
 		if (count($childrens) > 0) {
 			if ($withDependencies) {
 				foreach ($childrens as $children) {
@@ -256,7 +246,7 @@ class ModuleManager extends Object {
 			}
 		}
 
-		unset($this->config[$this->section]["modules"][$name]);
+		unset($this->config["parameters"]["modules"][$name]);
 		$module = $this->getModuleInstance($name);
 		$module->uninstall($this->context);
 		$this->config->save();
@@ -319,7 +309,7 @@ class ModuleManager extends Object {
 	 */
 	public function isModuleInstalled($name, $version = null, $operator = null)
 	{
-		if (!isset($this->config[$this->section]["modules"][$name])) {
+		if (!isset($this->config["parameters"]["modules"][$name])) {
 			return false;
 		}
 
@@ -348,6 +338,41 @@ class ModuleManager extends Object {
 			$this->context->session->getSection("Venne.Security.Authorizator")->remove();
 		}
 	}
+
+
+
+	/**
+	 * @return bool
+	 */
+	public function checkModuleUpgrades()
+	{
+		if (!$this->_moduleUpdates) {
+			$this->_moduleUpdates = false;
+			foreach ($this->getActivatedModules() as $module => $item) {
+				if (!version_compare($this->context->{$module . "Plugin"}->getVersion(), $item["version"], '==')) {
+					$this->_moduleUpdates = true;
+					break;
+				}
+			}
+		}
+		return $this->_moduleUpdates;
+	}
+
+
+
+	public function getActivatedModules()
+	{
+		if (!$this->_modules) {
+			$this->_modules = array();
+			foreach ($this->context->parameters['modules'] as $name => $item) {
+				if (isset($item["run"]) && $item["run"]) {
+					$this->_modules[$name] = $item;
+				}
+			}
+		}
+		return $this->_modules;
+	}
+
 
 }
 

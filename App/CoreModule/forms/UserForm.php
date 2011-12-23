@@ -24,7 +24,7 @@ class UserForm extends \Venne\Forms\EntityForm {
 		parent::startup();
 		$this->addGroup("User");
 		$this->addText("name", "Name");
-		$this->addCheckbox("enable", "Enable");
+		$this->addCheckbox("enable", "Enable")->setDefaultValue(true);
 		$this->addCheckbox("password_new", "Set password");
 		$this->addPassword("password", "Password")
 				->setOption("description", "minimal length is 5 char")
@@ -48,7 +48,7 @@ class UserForm extends \Venne\Forms\EntityForm {
 	 */
 	public static function create($repository, $mapper, $em)
 	{
-		$form = new self($repository->createNew(), $mapper, $em);
+		$form = new self($mapper, $em, $repository->createNew());
 		$form["password_new"]->setDefaultValue(true);
 		$form->onSave[] = function($form) use ($repository){
 			$form->entity->enable = 1;
@@ -60,9 +60,8 @@ class UserForm extends \Venne\Forms\EntityForm {
 	
 	public static function edit($repository, $mapper, $em, $entity)
 	{
-		$form = new self($entity, $mapper, $em);
+		$form = new self($mapper, $em, $entity);
 		$form->onSave[] = function($form) use ($repository){
-			$form->entity->enable = 1;
 			$repository->save($form->entity);
 		};
 		return $form;

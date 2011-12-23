@@ -46,7 +46,7 @@ class UsersPresenter extends BasePresenter {
 	public function handleDelete($id)
 	{
 		$item = $this->context->userRepository->find($id);
-		$em = $this->context->doctrineContainer->entityManager;
+		$em = $this->context->entityManager;
 		$em->remove($item);
 		$em->flush();
 		$this->flashMessage("User has been deleted", "success");
@@ -58,8 +58,8 @@ class UsersPresenter extends BasePresenter {
 	{
 		$repository = $this->context->userRepository;
 		$entity = $this->context->userRepository->createNew();
-		$em = $this->context->doctrineContainer->entityManager;
-		$entityFormMapper = $this->context->doctrineContainer->entityFormMapper;
+		$em = $this->context->entityManager;
+		$entityFormMapper = $this->context->entityFormMapper;
 		$presenter = $this;
 		
 		$form = \App\SecurityModule\UserForm::create($repository, $entityFormMapper, $em);
@@ -77,8 +77,8 @@ class UsersPresenter extends BasePresenter {
 	{
 		$repository = $this->context->userRepository;
 		$entity = $this->context->userRepository->find($this->getParam("id"));
-		$em = $this->context->doctrineContainer->entityManager;
-		$entityFormMapper = $this->context->doctrineContainer->entityFormMapper;
+		$em = $this->context->entityManager;
+		$entityFormMapper = $this->context->entityFormMapper;
 		$presenter = $this;
 		
 		$form = \App\SecurityModule\UserForm::edit($repository, $entityFormMapper, $em, $entity);

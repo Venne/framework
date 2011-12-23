@@ -7,9 +7,6 @@
 				{$item->url}
 			</td>
 			<td>
-				{$item->type}
-			</td>
-			<td>
 				{implode(", ", $item->languages->toArray())}
 			</td>
 			<td class="actions">
@@ -36,9 +33,8 @@
 <table class="table">
 	<thead>
 		<tr>
-			<th style="width: 20%;">{_"Title"}</th>
-			<th style="width: 20%;">{_"URL"}</th>
-			<th style="width: 15%;">{_"Type"}</th>
+			<th style="width: 25%;">{_"Title"}</th>
+			<th style="width: 30%;">{_"URL"}</th>
 			<th style="width: 25%;">{_"Languages"}</th>
 			<th style="width: 20%;"></th>
 		</tr>

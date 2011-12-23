@@ -17,14 +17,14 @@
 
 <h1>{_"Content"}</h1>
 
-<ul class="menu">
+<ul class="toolbar">
 
-	<li n:if="$presenter->isAllowed('Pages:Admin:Default:default')">
-		<a href="{link default type=>null, id=>null}"{if $presenter->isLinkCurrent("default")} class="active"{/if}>list</a>
+	<li n:if="$presenter->isAllowed(':Content:Admin:Default:default')">
+		<a class=" {if $presenter->isLinkCurrent("default")}active{/if}" href="{link default type=>null, id=>null}">list</a>
 	</li>
 	
-	<li n:if="$presenter->isAllowed('Pages:Admin:Default:create')">
-		<a href="{link create!}"{if $presenter->isLinkCurrent("create")} class="active"{/if}>new item</a>
+	<li n:if="$presenter->isAllowed(':Content:Admin:Default:create')">
+		<a class="{if $presenter->isLinkCurrent("create")}active{/if}" href="{link create!}">new item</a>
 	</li>
 
 </ul>

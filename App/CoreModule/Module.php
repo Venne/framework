@@ -11,7 +11,8 @@
 
 namespace App\CoreModule;
 
-use \Venne\Module\Service\IRouteService;
+use Venne\Module\Service\IRouteService;
+use Nette\DI\ContainerBuilder;
 
 /**
  * @author Josef Kříž
@@ -41,94 +42,170 @@ class Module extends \Venne\Module\AutoModule {
 
 
 
-	public function setRoutes(\Nette\Application\Routers\RouteList $router, $prefix = "")
+	public function loadConfiguration(ContainerBuilder $container, array $config)
 	{
-		$router[] = new \Nette\Application\Routers\Route($prefix . "sitemap-<sitemap>.xml", $values + array(
-					'sitemap' => NULL,
-					'module' => 'Core',
-					'presenter' => 'Sitemap',
-					'action' => 'sitemap'
-						)
-		);
+		$container->addDefinition('cmsManager')
+				->setClass('\App\CoreModule\CmsManager', array('@container'));
+		
 
-		$router[] = new \Nette\Application\Routers\Route($prefix . "robots.txt", $values + array(
-					'module' => 'Core',
-					'presenter' => 'Sitemap',
-					'action' => 'robots'
-						)
-		);
+		$container->addDefinition("pageRepository")
+				->setClass("\Venne\Doctrine\ORM\BaseRepository")
+				->setFactory("@entityManager::getRepository", array("\\App\\CoreModule\\PageEntity"))
+				->setAutowired(false);
+
+		$container->addDefinition("panelControl")
+				->setClass("App\CoreModule\PanelControl")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("websiteFormControl")
+				->setClass("App\CoreModule\WebsiteForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Website has been saved")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters.website")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("modulesDefaultFormControl")
+				->setClass("App\CoreModule\ModulesDefaultForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Changes has been saved")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters.website")
+				->setAutowired(false)
+				->setShared(false);
+
+		$container->addDefinition("systemFormControl")
+				->setClass("App\CoreModule\SystemForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Global settings has been updated")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("systemModeFormControl")
+				->setClass("App\CoreModule\SystemModeForm", array("@configManager", "%configDir%", "%mode%"))
+				->setParameters(array("mode"=>NULL))
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "New mode has been saved")
+				->addSetup("setSubmitLabel", "Save")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("systemDebuggerFormControl")
+				->setClass("App\CoreModule\SystemDebuggerForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Debugger settings has been updated")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters.debugger")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("systemDatabaseFormControl")
+				->setClass("App\CoreModule\SystemDatabaseForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Database settings has been updated")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters.database")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("systemAccountFormControl")
+				->setClass("App\CoreModule\SystemAccountForm")
+				->addSetup("setSuccessLink", "default")
+				->addSetup("setFlashMessage", "Account settings has been updated")
+				->addSetup("setSubmitLabel", "Save")
+				->addSetup("setRoot", "parameters.admin")
+				->setAutowired(false)
+				->setShared(false);
+		
+		$container->addDefinition("extensionsControl")
+				->setClass("App\CoreModule\ContentExtensionsControl")
+				->setShared(false)
+				->setAutowired(false)
+				->addTag("element");
+
+		$container->addDefinition("scannerService")
+				->setClass("App\CoreModule\ScannerService", array("@container"))
+				->addTag("service");
+
+		$container->addDefinition("layoutService")
+				->setClass("App\CoreModule\LayoutService", array("@container", "layout", "@entityManager"))
+				->addTag("service");
+
+		$container->addDefinition("userService")
+				->setClass("App\CoreModule\UserService", array("@container", "user", "@entityManager"))
+				->addTag("service");
+
+		$container->addDefinition("roleService")
+				->setClass("App\CoreModule\RoleService", array("@container", "role", "@entityManager"))
+				->addTag("service");
+
+		$container->addDefinition("permissionService")
+				->setClass("App\CoreModule\RoleService", array("@container", "permission", "@entityManager"))
+				->addTag("service");
+
+
+		$container->addDefinition("userRepository")
+				->setClass("Venne\Doctrine\ORM\BaseRepository")
+				->setFactory("@entityManager::getRepository", array("\\App\\CoreModule\\UserEntity"))
+				->addTag("repository")
+				->setAutowired(false);
+
+		$container->addDefinition("roleRepository")
+				->setClass("Venne\Doctrine\ORM\BaseRepository")
+				->setFactory("@entityManager::getRepository", array("\\App\\CoreModule\\RoleEntity"))
+				->addTag("repository")
+				->setAutowired(false);
+
+		$container->addDefinition("permissionRepository")
+				->setClass("Venne\Doctrine\ORM\BaseRepository")
+				->setFactory("@entityManager::getRepository", array("\\App\\CoreModule\\PermissionEntity"))
+				->addTag("repository")
+				->setAutowired(false);
+
+		$container->addDefinition("languageRepository")
+				->setClass("Venne\Doctrine\ORM\BaseRepository")
+				->setFactory("@entityManager::getRepository", array("\\App\\CoreModule\\LanguageEntity"))
+				->addTag("repository")
+				->setAutowired(false);
+
+
+		$container->addDefinition("configManager")
+				->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))
+				->addTag("manager");
+
+		$container->addDefinition("moduleManager")
+				->setClass("App\CoreModule\ModuleManager", array("@container"))
+				->addTag("manager");
+
+
+		
+
+
+		/** ------------------- mappers --------------------- */
+		$container->addDefinition("configFormMapper")
+				->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
+
+		$container->addDefinition("entityFormMapper")
+				->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
 	}
 
 
 
-	public function configure(\Venne\DI\Container $container, \App\CoreModule\CmsManager $manager)
+	public function configure(\Nette\DI\Container $container, \App\CoreModule\CmsManager $manager)
 	{
 		parent::configure($container, $manager);
 
 		$manager->addEventListener(array(\App\CoreModule\Events::onAdminMenu), $this);
 		$manager->addEventSubscriber(new \Venne\Doctrine\Mapping\DiscriminatorMapDiscoveryListener(new \Doctrine\Common\Annotations\AnnotationReader));
-		
-		$manager->addService("scanner", function() use ($container) {
-					return new ScannerService($container);
-				});
-		$manager->addManager("config", function() use ($container) {
-					$class = new \Venne\Config\ConfigBuilder($container->params["appDir"] . "/config.neon");
-					$class->load();
-					return $class;
-				});
-		$manager->addManager("module", function() use ($container) {
-					return new ModuleManager($container, $container->configManager);
-				});
-
-		$manager->addService("user", function() use ($container) {
-					return new UserService($container, "user", $container->doctrineContainer->entityManager);
-				});
-		$manager->addRepository("user", function() use ($container) {
-					return $container->doctrineContainer->entityManager->getRepository("\\App\\CoreModule\\UserEntity");
-				});
-		$manager->addService("role", function() use ($container) {
-					return new RoleService($container, "role", $container->doctrineContainer->entityManager);
-				});
-		$manager->addRepository("role", function() use ($container) {
-					return $container->doctrineContainer->entityManager->getRepository("\\App\\CoreModule\\RoleEntity");
-				});
-		$manager->addService("permission", function() use ($container) {
-					return new RoleService($container, "permission", $container->doctrineContainer->entityManager);
-				});
-		$manager->addRepository("permission", function() use ($container) {
-					return $container->doctrineContainer->entityManager->getRepository("\\App\\CoreModule\\PermissionEntity");
-				});
-		$manager->addRepository("page", function() use ($container) {
-					return $container->doctrineContainer->entityManager->getRepository("\\App\\CoreModule\\PageEntity");
-				});
-		$manager->addRepository("language", function() use ($container) {
-					return $container->doctrineContainer->entityManager->getRepository("\\App\\CoreModule\\LanguageEntity");
-				});
-		$manager->addService("layout", function() use ($container) {
-					return new LayoutService($container, "layout", $container->doctrineContainer->entityManager);
-				});
-
-		$container->addService("websiteForm", function() use ($container) {
-					$form = $container->getAutoWireClassInstance("App\WebsiteModule\WebsiteForm");
-					$form->setSuccessLink("default");
-					$form->setFlashMessage("Website has been saved");
-					$form->setSubmitLabel("Save");
-					return $form;
-				});
-				
-		$manager->addElement("panel", function(){
-			return new \Venne\CoreModule\PanelElement();
-		});
-		$manager->addElement("extensions", function(){
-			return new ContentExtensionsElement;
-		});
-
-		
 	}
 
 
 
-	public function setPermissions(\Venne\DI\Container $container, \Nette\Security\Permission $permissions)
+	public function setPermissions(\Nette\DI\Container $container, \Nette\Security\Permission $permissions)
 	{
 		$permissions->addResource("CoreModule");
 		$permissions->addResource("CoreModule\\Panel", "CoreModule");
@@ -162,6 +239,7 @@ class Module extends \Venne\Module\AutoModule {
 		$permissions->addResource("SystemModule\\AdminModule\\DebuggerPresenter", "SystemModule\\AdminModule");
 		$permissions->addResource("SystemModule\\AdminModule\\AccountPresenter", "SystemModule\\AdminModule");
 		$permissions->addResource("SystemModule\\AdminModule\\DatabasePresenter", "SystemModule\\AdminModule");
+		$permissions->addResource("SystemModule\\AdminModule\\LogPresenter", "SystemModule\\AdminModule");
 
 		$permissions->addResource("ContentModule", "CoreModule");
 		$permissions->addResource("ContentModule\\AdminModule", "ContentModule");
@@ -180,7 +258,7 @@ class Module extends \Venne\Module\AutoModule {
 
 
 
-	public function install(\Venne\DI\Container $container)
+	public function install(\Nette\DI\Container $container)
 	{
 		parent::install($container);
 

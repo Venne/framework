@@ -16,21 +16,56 @@ namespace App\SystemModule\AdminModule;
  * 
  * @secured
  */
-class DefaultPresenter extends BasePresenter
-{
-	
-	public function createComponentFormEdit($name)
+class DefaultPresenter extends BasePresenter {
+
+
+	/** @persistent */
+	public $key;
+
+
+
+	public function handleDelete($key)
 	{
-		$form = new \App\SystemModule\SystemForm($this, $name, true);
+		$key2 = array_search($key, ((array) $this->context->configManager["parameters"]["modes"]));
+		unset($this->context->configManager["parameters"]["modes"][$key2]);
+		unlink($this->context->parameters["configDir"] . "/config." . $key . ".neon");
+
+		if ($key == $this->context->configManager["parameters"]["mode"]) {
+			$this->context->configManager["parameters"]["mode"] = "default";
+
+			$this->mode = "default";
+		}
+
+		$this->context->configManager->save();
+		$this->flashMessage("Mode has been deleted", "success");
+		$this->redirect("this");
+	}
+
+
+
+	public function createComponentSystemModeForm()
+	{
+		$form = $this->context->createSystemModeFormControl();
 		$form->setSuccessLink("default");
-		$form->setFlashMessage("Global settings has been updated");
+		$form->setSubmitLabel("Create");
+		return $form;
+	}
+
+
+
+	public function createComponentSystemModeFormEdit()
+	{
+		$form = $this->context->createSystemModeFormControl($this->getParam("key"));
+		$form->setSuccessLink("default");
 		$form->setSubmitLabel("Update");
 		return $form;
 	}
-	
+
+
+
 	public function renderDefault()
 	{
-
+		$this->template->modes = $this->context->parameters["modes"];
 	}
 
 }

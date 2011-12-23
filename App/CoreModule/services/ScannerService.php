@@ -36,8 +36,8 @@ class ScannerService extends Object {
 	{
 		$arr = array();
 		$paths = array(
-			$this->context->params["appDir"],
-			$this->context->params["libsDir"] . '/App'
+			$this->context->parameters["appDir"],
+			$this->context->parameters["libsDir"] . '/App'
 		);
 		foreach ($paths as $path) {
 			foreach (\Nette\Utils\Finder::findDirectories("*Module")->in($path) as $file) {
@@ -54,7 +54,7 @@ class ScannerService extends Object {
 
 	public function getLinksOfModules()
 	{
-		return $this->getLinksOfModulesRecursion($this->context->params["appDir"]) + $this->getLinksOfModulesRecursion($this->context->params["libsDir"] . '/App');
+		return $this->getLinksOfModulesRecursion($this->context->parameters["appDir"]) + $this->getLinksOfModulesRecursion($this->context->parameters["libsDir"] . '/App');
 	}
 
 
@@ -78,7 +78,7 @@ class ScannerService extends Object {
 	public function getLinksOfPresenters($module)
 	{
 		$data = array();
-		$dir = $this->context->params["appDir"];
+		$dir = $this->context->parameters["appDir"];
 		$module = explode(":", $module);
 		foreach ($module as $item) {
 			$dir .= "/" . $item . "Module";
@@ -111,7 +111,7 @@ class ScannerService extends Object {
 	public function getLinksOfActions($module, $presenter)
 	{
 		$data = array();
-		$dir = $this->context->params["appDir"];
+		$dir = $this->context->parameters["appDir"];
 		$module = explode(":", $module);
 		foreach ($module as $item) {
 			$dir .= "/" . $item . "Module";
@@ -130,7 +130,7 @@ class ScannerService extends Object {
 	public function getLinksOfParams($module, $presenter)
 	{
 		$data = array();
-		$dir = $this->context->params["appDir"];
+		$dir = $this->context->parameters["appDir"];
 		$module = explode(":", $module);
 		foreach ($module as $item) {
 			$dir .= "/" . $item . "Module";
@@ -153,7 +153,7 @@ class ScannerService extends Object {
 	public function getThemes()
 	{
 		$data = array();
-		foreach (\Nette\Utils\Finder::findDirectories("*")->in($this->context->params["wwwDir"] . "/themes/") as $file) {
+		foreach (\Nette\Utils\Finder::findDirectories("*")->in($this->context->parameters["wwwDir"] . "/themes/") as $file) {
 			$data[$file->getBaseName()] = $file->getBaseName();
 		}
 		return $data;
@@ -164,7 +164,7 @@ class ScannerService extends Object {
 	public function getLayouts()
 	{
 		$data = array();
-		foreach (\Nette\Utils\Finder::findFiles("@*.latte")->in($this->context->params["wwwDir"] . "/themes/" . $this->context->params["website"]["theme"] . "/layouts/") as $file) {
+		foreach (\Nette\Utils\Finder::findFiles("@*.latte")->in($this->context->parameters["wwwDir"] . "/themes/" . $this->context->parameters["website"]["theme"] . "/layouts/") as $file) {
 			$data[substr($file->getBaseName(), 1, -6)] = substr($file->getBaseName(), 1, -6);
 		}
 		return $data;

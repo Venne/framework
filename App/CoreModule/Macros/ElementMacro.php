@@ -36,10 +36,14 @@ class ElementMacro extends \Nette\Latte\Macros\MacroSet {
 		if (strpos($node->args, '=>') === FALSE) {
 			$param = substr($param, 6, -1); // removes array()
 		}
-		return ('$_ctrl = $control->getPresenter()->getWidget("element_".' . $name . $method . '); '
-				. 'if ($_ctrl instanceof Nette\Application\UI\IPartiallyRenderable) $_ctrl->validateControl(); '
-				. "\$_ctrl->setParams($param); "
-				. "\$_ctrl->render();");
+		$ret = '$_ctrl = $control->getPresenter()->getComponent("element_".' . $name . $method . '); '
+				. 'if ($_ctrl instanceof Nette\Application\UI\IPartiallyRenderable) $_ctrl->validateControl(); ';
+		if ($param) {
+			$ret .= "\$_ctrl->setParams($param); ";
+		}
+
+		$ret .= "\$_ctrl->render();";
+		return ($ret);
 	}
 
 

@@ -61,7 +61,7 @@ class ManyToOne extends BaseControl {
 
 	public function setValue($value)
 	{
-		if($value instanceof \Venne\Doctrine\ORM\BaseEntity){
+		if ($value instanceof \Venne\Doctrine\ORM\BaseEntity) {
 			return parent::setValue($value->id);
 		}
 	}
@@ -99,7 +99,7 @@ class ManyToOne extends BaseControl {
 	public function getValue()
 	{
 		foreach ($this->items as $item) {
-			if($item instanceof \Venne\Doctrine\ORM\BaseEntity){
+			if ($item instanceof \Venne\Doctrine\ORM\BaseEntity) {
 				if ($item->id == $this->value) {
 					return $item;
 				}
@@ -133,44 +133,44 @@ class ManyToOne extends BaseControl {
 			$control->data('nette-empty-value', key($this->items));
 		}
 
-		$selected = (array)$this->getRawValue();
-		
+		$selected = (array) $this->getRawValue();
+
 		$option = Nette\Utils\Html::el('option');
 
 		foreach ($this->items as $key => $value) {
-				if (!is_array($value)) {
-					
-					if($value instanceof \Venne\Doctrine\ORM\BaseEntity){
-						$value = array($value->id => $value);
-					}else{
-						$value = array($value => $value);	
-					}
-					
-					$dest = $control;
+			if (!is_array($value)) {
+
+				if ($value instanceof \Venne\Doctrine\ORM\BaseEntity) {
+					$value = array($value->id => $value);
 				} else {
-					$dest = $control->create('optgroup')->label($this->translate($key));
+					$value = array($value => $value);
 				}
 
-				foreach ($value as $value2) {
-					if($value2 == $this->getForm()->entity->__toString()){
-						continue;
-					}
+				$dest = $control;
+			} else {
+				$dest = $control->create('optgroup')->label($this->translate($key));
+			}
 
-					if($value2 instanceof \Venne\Doctrine\ORM\BaseEntity){
-						$key2 = $value2->id;
-					}else{
-						$key2 = $value2;	
-					}
-					
-					if ($value2 instanceof Nette\Utils\Html) {
-						$dest->add((string) $value2->selected(isset($selected[$key2])));
-					} else {
-						$value2 = $this->translate((string) $value2);
-						$dest->add((string) $option->value($key2 === $value2 ? NULL : $key2)
-										->selected(in_array($key2, $selected))
-										->setText($value2));
-					}
+			foreach ($value as $value2) {
+				//if ($value2 == $this->getForm()->entity->__toString()) {
+				//	continue;
+				//}
+
+				if ($value2 instanceof \Venne\Doctrine\ORM\BaseEntity) {
+					$key2 = $value2->id;
+				} else {
+					$key2 = $value2;
 				}
+
+				if ($value2 instanceof Nette\Utils\Html) {
+					$dest->add((string) $value2->selected(isset($selected[$key2])));
+				} else {
+					$value2 = $this->translate((string) $value2);
+					$dest->add((string) $option->value($key2 === $value2 ? "" : $key2)
+									->selected(in_array($key2, $selected))
+									->setText($value2));
+				}
+			}
 		}
 		return $control;
 	}

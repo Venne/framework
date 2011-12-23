@@ -108,8 +108,6 @@ class RouteList extends \Nette\Application\Routers\RouteList {
 			}
 		}
 
-		//dump($appRequest->getPresenterName());
-
 		$presenter = strtolower($appRequest->getPresenterName());
 		if (!isset($this->cachedRoutes[$presenter])) {
 			$presenter = '*';
@@ -121,13 +119,9 @@ class RouteList extends \Nette\Application\Routers\RouteList {
 				$module = substr($this->module, 0, -1);
 				$url = str_replace("/{$module}.", "/", $url);
 				$url = str_replace(".{$module}/", "/", $url);
-				//dump($url);
-				//die();
 				return $url;
 			}
 		}
-
-		die(dump($appRequest));
 
 		return NULL;
 	}

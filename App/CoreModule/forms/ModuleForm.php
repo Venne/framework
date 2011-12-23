@@ -14,39 +14,24 @@ namespace App\CoreModule;
 use Venne\ORM\Column;
 use Nette\Utils\Html;
 use Venne\Forms\Form;
+use Venne\Forms\Mapping\ConfigFormMapper;
 
 /**
  * @author Josef Kříž
  */
-class ModuleForm extends \Venne\Forms\EditForm {
+class ModuleForm extends \Venne\Forms\ConfigForm {
 
 
-	protected $key;
-
-	/** @var \Venne\Config\ConfigBuilder */
-	protected $configManager;
-	protected $mode = "default";
-
-
-
-	/**
-	 * Application form constructor.
-	 */
-	public function __construct(\Venne\Config\ConfigBuilder $configManager, $key)
+	public function __construct(ConfigFormMapper $mapper, $moduleName)
 	{
-		$this->configManager = $configManager;
-		$this->key = $key;
-		parent::__construct();
+		parent::__construct($mapper);
+		$this->setModuleName($moduleName);
 	}
+	
 
-
-
-	/**
-	 * @param string $mode 
-	 */
-	public function setMode($mode)
+	public function setModuleName($moduleName)
 	{
-		$this->mode = $mode;
+		$this->setRoot("parameters.modules.$moduleName");
 	}
 
 
@@ -57,27 +42,6 @@ class ModuleForm extends \Venne\Forms\EditForm {
 
 		$this->addGroup("Basic setup");
 		$this->addCheckbox("run", "Run")->setDefaultValue(true);
-	}
-
-
-
-	public function load()
-	{
-		foreach($this->getValues() as $key=>$value){
-			if(isset($this->configManager[$this->mode]["modules"][$this->key][$key])){
-			$this[$key]->setDefaultValue($this->configManager[$this->mode]["modules"][$this->key][$key]);
-			}
-		}
-	}
-
-
-
-	public function save()
-	{
-		foreach($this->getValues() as $key=>$value){
-			$this->configManager[$this->mode]["modules"][$this->key][$key] = $value;			
-		}
-		$this->configManager->save();
 	}
 
 }

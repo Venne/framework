@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\SystemModule;
+namespace App\CoreModule;
 
 use Venne\ORM\Column;
 use Nette\Utils\Html;
@@ -18,7 +18,7 @@ use Venne\Forms\Form;
 /**
  * @author Josef Kříž
  */
-class SystemDebuggerForm extends \Venne\Forms\EditForm {
+class SystemDebuggerForm extends \Venne\Forms\ConfigForm {
 
 
 	protected $testConnection;
@@ -35,35 +35,8 @@ class SystemDebuggerForm extends \Venne\Forms\EditForm {
 		$this->addSelect("mode", "Mode")->setItems(array("production", "development", "detect"), false);
 		$this->addSelect("strict", "Strict mode")->setItems(array("yes", "no"), false);
 		$this->addText("developerIp", "IPs for devel");
-	}
-
-
-
-	public function load()
-	{
-		$config = $this->presenter->context->configManager[$this->presenter->mode]["debugger"];
-		$this->setDefaults($config);
-	}
-
-
-
-	protected function handleError()
-	{
-		
-	}
-
-
-
-	public function save()
-	{
-		parent::save();
-		$values = $this->getValues();
-		$config = $this->presenter->context->configManager;
-
-		$config[$this->presenter->mode]["debugger"]["mode"] = $values["mode"];
-		$config[$this->presenter->mode]["debugger"]["strict"] = $values["strict"];
-		$config[$this->presenter->mode]["debugger"]["developerIp"] = $values["developerIp"];
-		$config->save();
+		$this->addText("logEmail", "E-mail for logs");
+		$this->addText("emailSnooze", "E-mail interval")->addRule(self::NUMERIC, "E-mail interval must be numeric");
 	}
 
 }

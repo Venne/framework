@@ -26,15 +26,4 @@ class BasePresenter extends \Venne\Application\UI\AdminPresenter {
 		$this->addPath("System", $this->link(":System:Admin:Default:"));
 	}
 
-
-
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | System administration");
-		$this->setKeywords("system administration");
-		$this->setDescription("System administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
-	}
-
 }

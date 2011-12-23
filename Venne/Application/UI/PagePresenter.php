@@ -21,22 +21,31 @@ class PagePresenter extends FrontPresenter {
 
 	/** @persistent */
 	public $url = "";
-	
+
 	/** @var Venne\Doctrine\ORM\PageEntity */
 	protected $page;
 
 
 
+	/**
+	 * @return void
+	 */
 	public function startup()
 	{
 		parent::startup();
 		$this->page = $this->getParam("page");
 	}
-	
+
+
+
+	/**
+	 * Common render method.
+	 * @return void
+	 */
 	public function beforeRender()
 	{
 		parent::beforeRender();
-		
+
 		$this->setTitle($this->page->title);
 		$this->setRobots($this->page->robots);
 	}

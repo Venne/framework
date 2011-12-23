@@ -23,9 +23,6 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 
 	/** @persistent */
 	public $id;
-	
-	/** @inject websiteForm */
-	public $websiteForm;
 
 
 
@@ -33,30 +30,6 @@ class DefaultPresenter extends \Venne\Application\UI\AdminPresenter {
 	{
 		parent::startup();
 		$this->addPath("Website setting", $this->link(":Website:Admin:Default:"));
-	}
-
-
-
-	public function createComponentForm($name)
-	{
-//		$form = new \App\WebsiteModule\WebsiteForm;
-//		$form->setSuccessLink("default");
-//		$form->setFlashMessage("Website has been saved");
-//		$form->setSubmitLabel("Save");
-//		return $form;
-		
-		return $this->websiteForm;
-	}
-
-
-
-	public function beforeRender()
-	{
-		parent::beforeRender();
-		$this->setTitle("Venne:CMS | Websites administration");
-		$this->setKeywords("websites administration");
-		$this->setDescription("Websites administration");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 	}
 
 }

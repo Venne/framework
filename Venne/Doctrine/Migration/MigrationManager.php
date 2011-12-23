@@ -40,7 +40,7 @@ class MigrationManager extends Object {
 		if (!$this->migrations) {
 			$this->migrations = array();
 
-			foreach ($this->context->params["modules"] as $module) {
+			foreach ($this->context->parameters["modules"] as $module) {
 				$this->context->modules->{$module}->setMigrations($this);
 			}
 		}
