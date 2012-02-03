@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -21,12 +21,10 @@ use Nette;
 use Nette\Reflection\ClassType;
 
 
-
 /**
  * @author Filip Procházka <filip.prochazka@kdyby.org>
  */
-class DiscriminatorMapDiscoveryListener extends Nette\Object implements Doctrine\Common\EventSubscriber
-{
+class DiscriminatorMapDiscoveryListener extends Nette\Object implements Doctrine\Common\EventSubscriber {
 
 	/** @var \Doctrine\Common\Annotations\Reader */
 	private $reader;
@@ -51,9 +49,7 @@ class DiscriminatorMapDiscoveryListener extends Nette\Object implements Doctrine
 	 */
 	public function getSubscribedEvents()
 	{
-		return array(
-			Events::loadClassMetadata,
-		);
+		return array(Events::loadClassMetadata,);
 	}
 
 
@@ -111,10 +107,7 @@ class DiscriminatorMapDiscoveryListener extends Nette\Object implements Doctrine
 	 */
 	private function getEntryName($className)
 	{
-		return $this->reader->getClassAnnotation(
-			ClassType::from($className),
-			'Doctrine\ORM\Mapping\DiscriminatorEntry'
-		) ? : NULL;
+		return $this->reader->getClassAnnotation(ClassType::from($className), 'Doctrine\ORM\Mapping\DiscriminatorEntry') ? : NULL;
 	}
 
 }

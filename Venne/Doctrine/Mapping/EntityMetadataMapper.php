@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -20,20 +20,16 @@ use Venne\Tools\Mixed;
 use Nette;
 
 
-
 /**
  * @author Filip Procházka
  */
-abstract class EntityMetadataMapper extends Nette\Object
-{
+abstract class EntityMetadataMapper extends Nette\Object {
 
 	/** @var ObjectManager */
 	private $workspace;
 
 	/** @var TypeMapper */
 	private $typeMapper;
-	
-	
 
 
 
@@ -61,8 +57,19 @@ abstract class EntityMetadataMapper extends Nette\Object
 
 
 
-	/************************ fields ************************/
+	/**
+	 * @param string|object $entity
+	 * @return ClassMetadata
+	 */
+	public function getEntityMetadata($entity)
+	{
+		$entity = is_object($entity) ? get_class($entity) : $entity;
+		return $this->workspace->getClassMetadata($entity);
+	}
 
+
+
+	/************************ fields ************************/
 
 
 	/**
@@ -111,90 +118,95 @@ abstract class EntityMetadataMapper extends Nette\Object
 	/************************ associations ************************/
 
 
-
 	/**
 	 * @param object $entity
-	 * @param string $assocation
+	 * @param string $association
 	 * @return bool
 	 */
-	protected function hasAssocation($entity, $assocation)
+	public function hasAssociation($entity, $association)
 	{
-		return $this->getMetadata($entity)->hasAssociation($assocation);
+		return $this->getMetadata($entity)->hasAssociation($association);
 	}
 
 
 
 	/**
 	 * @param object $entity
-	 * @param string $assocation
-	 * @return Collection
+	 * @param string $association
+	 * @return \Doctrine\Common\Collections\Collection
 	 */
-	public function getAssocation($entity, $assocation)
+	public function getAssociation($entity, $association)
 	{
 		$meta = $this->getMetadata($entity);
-		if (!$this->hasAssocation($entity, $assocation)) {
-			throw new Nette\InvalidArgumentException("Entity '" . get_class($entity) . "' has no association '" . $assocation . "'.");
+		if (!$this->hasAssociation($entity, $association)) {
+			throw new Nette\InvalidArgumentException("Entity '" . get_class($entity) . "' has no association '" . $association . "'.");
 		}
 
-		return $meta->getFieldValue($entity, $assocation);
+		return $meta->getFieldValue($entity, $association);
 	}
 
 
 
 	/**
 	 * @param object $entity
-	 * @param string $assocation
+	 * @param string $association
 	 */
-	protected function clearAssociation($entity, $assocation)
+	public function clearAssociation($entity, $association)
 	{
-		$this->getAssocation($entity, $assocation)->clear();
+		$this->getAssociation($entity, $association)->clear();
 	}
 
 
 
 	/**
 	 * @param object $entity
-	 * @param string $assocation
-	 * @param object $data
+	 * @param string $association
+	 * @param object $element
 	 */
-	protected function addAssociationElement($entity, $assocation, $element)
+	public function addAssociationElement($entity, $association, $element)
 	{
 		$meta = $this->getMetadata($entity);
-		$assocMapping = $meta->getAssociationMapping($assocation);
+		$assocMapping = $meta->getAssociationMapping($association);
 
 		if (!$entity instanceof $assocMapping['targetEntity']) {
-			$declaringClass = $meta->getReflectionProperty($assocation)->getDeclaringClass();
-			throw new Nette\InvalidArgumentException("Collection " . $declaringClass->getName() . '::$' . $assocation . " cannot contain entity of type '" . get_class($entity) . "'.");
+			$declaringClass = $meta->getReflectionProperty($association)->getDeclaringClass();
+			throw new Kdyby\InvalidArgumentException("Collection " . $declaringClass->getName() . '::$' . $association . " cannot contain entity of type '" . get_class($entity) . "'.");
 		}
 
-		$this->getAssocation($entity, $assocation)->add($element);
+		$this->getAssociation($entity, $association)->add($element);
 	}
 
 
 
 	/**
 	 * @param object $entity
-	 * @param string $assocation
+	 * @param string $association
 	 * @return array
 	 */
-	protected function getAssociationElements($entity, $assocation)
+	public function getAssociationElements($entity, $association)
 	{
-		$collection = $this->getMetadata($entity)->getFieldValue($entity, $assocation);
+		$collection = $this->getMetadata($entity)->getFieldValue($entity, $association);
 		return $collection->toArray();
 	}
-	
+
+
+
 	/************* MY *************/
-	
+
 	public function hasProperty($entity, $name)
 	{
 		return isset($entity->{$name});
 	}
-	
+
+
+
 	public function loadProperty($entity, $name, $value)
 	{
 		$entity->{$name} = $value;
 	}
-	
+
+
+
 	public function saveProperty($entity, $name)
 	{
 		return $entity->{$name};

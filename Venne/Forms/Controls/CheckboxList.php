@@ -4,27 +4,25 @@
  * checkboxes.
  *
  * @copyright  Copyright (c) 2004, 2009 David Grudl
- * @license    http://nettephp.com/license  Nette license
- * @link       http://addons.nettephp.com/cs/checkboxlist
- * @package    Nette\Extras
+ * @license	http://nettephp.com/license  Nette license
+ * @link	   http://addons.nettephp.com/cs/checkboxlist
+ * @package	Nette\Extras
  */
 
 /**
  * CheckboxList
  *
- * @author    David Grudl, Jan Vlcek
+ * @author	David Grudl, Jan Vlcek
  * @copyright Copyright (c) 2004, 2009 David Grudl
  * @package   Nette\Extras
  */
 
 namespace Venne\Forms\Controls;
 
-use Nette\Utils\Html,
-        Nette\Forms\Form,
-        Nette\Forms\Controls\BaseControl;
+use Nette\Utils\Html, Nette\Forms\Form, Nette\Forms\Controls\BaseControl;
 
-class CheckboxList extends BaseControl
-{
+class CheckboxList extends BaseControl {
+
 	/** @var Nette\Utils\Html  separator element template */
 	protected $separator;
 
@@ -50,6 +48,8 @@ class CheckboxList extends BaseControl
 		return $form[$name] = new self($label, $items);
 	}
 
+
+
 	/**
 	 * Adds addCheckboxList() method to \Nette\Forms\Form
 	 */
@@ -57,6 +57,8 @@ class CheckboxList extends BaseControl
 	{
 		Form::extensionMethod('addCheckboxList', callback(__CLASS__, 'addCheckboxList'));
 	}
+
+
 
 	/**
 	 * @param string $label
@@ -146,7 +148,7 @@ class CheckboxList extends BaseControl
 	{
 		if ($key === NULL) {
 			$container = clone $this->container;
-			$separator = (string) $this->separator;
+			$separator = (string)$this->separator;
 
 		} elseif (!isset($this->items[$key])) {
 			return NULL;
@@ -156,7 +158,7 @@ class CheckboxList extends BaseControl
 		$control->name .= '[]';
 		$id = $control->id;
 		$counter = -1;
-		$values = $this->value === NULL ? NULL : (array) $this->getValue();
+		$values = $this->value === NULL ? NULL : (array)$this->getValue();
 		$label = Html::el('label');
 
 		foreach ($this->items as $k => $val) {
@@ -174,10 +176,10 @@ class CheckboxList extends BaseControl
 			}
 
 			if ($key !== NULL) {
-				return (string) $control . (string) $label;
+				return (string)$control . (string)$label;
 			}
 
-			$container->add((string) $control . (string) $label . $separator);
+			$container->add((string)$control . (string)$label . $separator);
 		}
 
 		return $container;
@@ -196,6 +198,8 @@ class CheckboxList extends BaseControl
 		$label->for = NULL;
 		return $label;
 	}
+
+
 
 	/**
 	 * Filled validator: has been any checkbox checked?

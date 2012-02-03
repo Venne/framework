@@ -3,7 +3,8 @@
 /**
  * This file is part of the Kdyby (http://www.kdyby.org)
  *
- * Copyright (c) 2008, 2011 Filip Procházka (filip.prochazka@kdyby.org)
+ * Copyright (c) 2008, 2011 Filip Procházka (filip.prochazka
+ * @kdyby.org)
  *
  * @license http://www.kdyby.org/license
  */
@@ -14,13 +15,11 @@ use Nette;
 use Nette\Forms\Container;
 
 
-
 /**
  * @author Filip Procházka
  * @author Jan Tvrdík
  */
-class Replicator extends Container
-{
+class Replicator extends Container {
 
 	/** @var callback */
 	private $factoryCallback;
@@ -66,7 +65,7 @@ class Replicator extends Container
 
 		$this->loadHttpData();
 		if (!$this->getForm()->isSubmitted() && $this->createDefault > 0) {
-			foreach (range(0, $this->createDefault-1) as $key) {
+			foreach (range(0, $this->createDefault - 1) as $key) {
 				$this->createComponent($key);
 			}
 		}
@@ -155,9 +154,10 @@ class Replicator extends Container
 			return $this[$name];
 		}
 
-		$buttons = array_map(function ($control) {
-				return $control->getName();
-			}, iterator_to_array($this->getButtons()));
+		$buttons = array_map(function ($control)
+		{
+			return $control->getName();
+		}, iterator_to_array($this->getButtons()));
 
 		$containers = iterator_to_array($this->getContainers());
 		$lastContainer = end($containers);
@@ -270,7 +270,7 @@ class Replicator extends Container
 		$rows = array();
 		$subcomponents = array_flip($subcomponents);
 		foreach ($httpData as $item) {
-			$rows[] = array_filter(array_diff_key($item, $subcomponents)) ?: FALSE;
+			$rows[] = array_filter(array_diff_key($item, $subcomponents)) ? : FALSE;
 		}
 
 		return count(array_filter($rows));
@@ -294,7 +294,8 @@ class Replicator extends Container
 			while (!$parent instanceof Nette\Forms\Form) {
 				$chain[] = $parent->getName();
 				$parent = $parent->getParent();
-			};
+			}
+			;
 
 			while ($chain) {
 				$post = &$post[array_pop($chain)];
@@ -323,7 +324,8 @@ class Replicator extends Container
 	 */
 	public static function register($methodName = 'addDynamic')
 	{
-		Container::extensionMethod($methodName, function ($_this, $name, $factory, $createDefault = 0) {
+		Container::extensionMethod($methodName, function ($_this, $name, $factory, $createDefault = 0)
+		{
 			return $_this[$name] = new Replicator($factory, $createDefault);
 		});
 	}

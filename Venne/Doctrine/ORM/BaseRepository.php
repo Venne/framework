@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -23,7 +23,7 @@ use Nette\ObjectMixin;
 
 /**
  * @author Filip Procházka
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  * @author Patrik Votoček
  *
  * @method Mapping\ClassMetadata getClassMetadata() getClassMetadata()
@@ -87,9 +87,10 @@ class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doct
 
 		if (is_array($entity)) {
 			$repository = $this;
-			$result = array_map(function ($entity) use ($repository) {
-						return $repository->update($entity, $values, BaseRepository::NO_FLUSH);
-					}, $entity);
+			$result = array_map(function ($entity) use ($repository)
+			{
+				return $repository->update($entity, $values, BaseRepository::NO_FLUSH);
+			}, $entity);
 
 			return $result;
 		}
@@ -122,9 +123,10 @@ class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doct
 
 		if (is_array($entity)) {
 			$repository = $this;
-			$result = array_map(function ($entity) use ($repository) {
-						return $repository->save($entity, BaseRepository::NO_FLUSH);
-					}, $entity);
+			$result = array_map(function ($entity) use ($repository)
+			{
+				return $repository->save($entity, BaseRepository::NO_FLUSH);
+			}, $entity);
 
 			$this->flush($withoutFlush);
 
@@ -155,9 +157,10 @@ class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doct
 
 		if (is_array($entity)) {
 			$repository = $this;
-			array_map(function ($entity) use ($repository) {
-						return $repository->delete($entity, BaseRepository::NO_FLUSH);
-					}, $entity);
+			array_map(function ($entity) use ($repository)
+			{
+				return $repository->delete($entity, BaseRepository::NO_FLUSH);
+			}, $entity);
 
 			$this->flush($withoutFlush);
 			return;
@@ -299,9 +302,9 @@ class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doct
 	{
 		$res = $this->createQueryBuilder('uni')->select("uni.$key, uni.$value");
 		foreach ($where as $key2 => $item) {
-			$res->where("uni.$key2 = :$key2")->setParameter($key2, $item);
+			$res->where("uni.$key2 = :param")->setParameter("param", $item);
 		}
-		$res = $res->getQuery()->getResult();
+		$res = $res->getQuery()->getResult(\Doctrine\ORM\AbstractQuery::HYDRATE_ARRAY);
 
 		$arr = array();
 		foreach ($res as $row) {
@@ -354,16 +357,20 @@ class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doct
 		}
 	}
 
-	/*	 * ******************* Nette\Object behaviour ****************d*g* */
 
+
+	/*	 * ******************* Nette\Object behaviour ****************d*g* */
 
 
 	/**
 	 * @return Nette\Reflection\ClassType
 	 */
-	public /**/static/**/ function getReflection()
+	public /**/
+	static /**/
+	function getReflection()
 	{
-		return new Nette\Reflection\ClassType(/* 5.2*$this *//**/get_called_class()/**/);
+		return new Nette\Reflection\ClassType( /* 5.2*$this */ /**/
+			get_called_class() /**/);
 	}
 
 

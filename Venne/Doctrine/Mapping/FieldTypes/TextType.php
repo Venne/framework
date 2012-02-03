@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -16,12 +16,10 @@ use Venne\Doctrine\Mapping;
 use Nette;
 
 
-
 /**
  * @author Filip Procházka
  */
-class TextType extends Nette\Object implements Mapping\IFieldType
-{
+class TextType extends Nette\Object implements Mapping\IFieldType {
 
 	/**
 	 * @param string $value
@@ -30,7 +28,7 @@ class TextType extends Nette\Object implements Mapping\IFieldType
 	 */
 	public function load($value, $current)
 	{
-		return $value ?: NULL;
+		return $value ? : NULL;
 	}
 
 
@@ -41,7 +39,7 @@ class TextType extends Nette\Object implements Mapping\IFieldType
 	 */
 	public function save($value)
 	{
-		return $value ?: NULL;
+		return $value ? : NULL;
 	}
 
 }

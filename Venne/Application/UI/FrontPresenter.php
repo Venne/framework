@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -14,20 +14,24 @@ namespace Venne\Application\UI;
 use Venne;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class FrontPresenter extends \Venne\Application\UI\Presenter {
 
 
 	const MODE_NORMAL = 0;
+
 	const MODE_MODULE = 1;
+
 	const MODE_LAYOUT = 2;
+
 	const MODE_ELEMENTS = 3;
 
 	public $contentExtensionsKey;
 
 	/** @persistent */
 	public $mode = 0;
+
 	protected $_args;
 
 

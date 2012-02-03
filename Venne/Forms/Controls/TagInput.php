@@ -2,6 +2,7 @@
 
 /**
  * Tag Input for html forms
+ *
  * @author Mikulas Dite
  * @copyright Mikulas Dite 2010
  */
@@ -12,25 +13,16 @@ use Nette\Forms\Form;
 use Nette\Forms\IControl;
 use Nette\Forms\Controls\TextBase;
 use Nette\Utils\Strings;
-use Nette\Environment;
 use Nette\Application\Responses\JsonResponse;
 
 
-class TagInput extends \Nette\Forms\Controls\TextInput
-{
+class TagInput extends \Nette\Forms\Controls\TextInput {
 
 	/** @var string rule */
 	const UNIQUE = ':unique';
 
 	/** @var string rule Users cannot create new tags */
 	const ORIGINAL = ':original';
-
-
-
-	/** @var string */
-	private $renderName;
-
-
 
 	/** @var int */
 	protected $payloadLimit = 5;
@@ -43,6 +35,15 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/** @var callback returning array */
 	protected $suggestCallback;
+
+
+	/**
+	 * @return string
+	 */
+	protected function getRenderName()
+	{
+		return 'tagInputSuggest' . ucfirst($this->name);
+	}
 
 
 
@@ -98,6 +99,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Generates control's HTML element.
+	 *
 	 * @return \Nette\Utils\Html
 	 */
 	public function getControl()
@@ -113,13 +115,13 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 		if ($this->joiner !== NULL && Strings::trim($this->joiner) !== '') {
 			$control->attrs['data-tag-joiner'] = $this->joiner;
 		}
-	
+
 		if ($this->suggestCallback !== NULL) {
 			$form = $this->getForm();
 			if (!$form || !$form instanceof Form) {
 				throw new InvalidStateException("TagInput supports only Nette\\Application\\UI\\Form.");
 			}
-			$control->attrs['data-tag-suggest'] = $form->getPresenter()->link($this->renderName, array('word_filter' => '%filter%'));
+			$control->attrs['data-tag-suggest'] = $form->getPresenter()->link($this->getRenderName(), array('word_filter' => '%filter%'));
 		}
 		$container->add($control);
 		$container->add(\Nette\Utils\Html::el('script')->setHtml('TagInput.create("#frm' . $this->form->name . '-' . $this->name . '");'));
@@ -131,6 +133,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Sets control's value.
+	 *
 	 * @param  string
 	 * @return TextBase  provides a fluent interface
 	 */
@@ -166,27 +169,27 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 	 */
 	public function setPayloadLimit($limit)
 	{
-		if ($limit < 0)
-			throw new \Nette\InvalidArgumentException("Invalid limit, expected positive integer.");
+		if ($limit < 0) throw new \Nette\InvalidArgumentException("Invalid limit, expected positive integer.");
 
 		$this->payloadLimit = $limit;
 		return $this;
 	}
 
 
+
 	/**
 	 * Adds a validation rule.
-	 * @param  mixed      rule type
-	 * @param  string     message to display for invalid data
-	 * @param  mixed      optional rule arguments
+	 *
+	 * @param  mixed	  rule type
+	 * @param  string	 message to display for invalid data
+	 * @param  mixed	  optional rule arguments
 	 * @return FormControl  provides a fluent interface
 	 */
 	public function addRule($operation, $message = NULL, $arg = NULL)
 	{
-		switch($operation) {
+		switch ($operation) {
 			case Form::EQUAL:
-				if (!is_array($arg))
-					throw new \Nette\InvalidArgumentException(__METHOD__ . '(' . $operation . ') must be compared to array.');
+				if (!is_array($arg)) throw new \Nette\InvalidArgumentException(__METHOD__ . '(' . $operation . ') must be compared to array.');
 		}
 
 		return parent::addRule($operation, $message, $arg);
@@ -223,50 +226,19 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 			if (count($data) >= $this->payloadLimit) {
 				break;
 			}
-			$data[] = (string) $tag;
+			$data[] = (string)$tag;
 		}
 
 		$presenter->sendResponse(new JsonResponse($data));
 	}
 
 
-
-	/********************* registration *******************/
-
-
-
-	/**
-	 * Adds addTag() method to \Nette\Forms\Form
-	 */
-	public static function register()
-	{
-		Form::extensionMethod('addTag', callback(__CLASS__, 'addTag'));
-	}
-
-
-
-	/**
-	 * @param Form $form
-	 * @param string $name
-	 * @param string $label
-	 * @param array $suggest
-	 * @return TagInput provides fluent interface
-	 */
-	public static function addTag(Form $form, $name, $label = NULL)
-	{
-		$form[$name] = new self($label);
-		$form[$name]->renderName = 'tagInputSuggest' . ucfirst($name);
-		return $form[$name];
-	}
-
-
-
 	/********************* validation *********************/
-
 
 
 	/**
 	 * Equal validator: are control's value and second parameter equal?
+	 *
 	 * @param  IControl
 	 * @param  mixed
 	 * @return bool
@@ -283,6 +255,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Filled validator: is control filled?
+	 *
 	 * @param  IControl
 	 * @return bool
 	 */
@@ -295,6 +268,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Min-length validator: has control's value minimal length?
+	 *
 	 * @param  TextBase
 	 * @param  int  length
 	 * @return bool
@@ -308,6 +282,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Max-length validator: is control's value length in limit?
+	 *
 	 * @param  TextBase
 	 * @param  int  length
 	 * @return bool
@@ -321,6 +296,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Length validator: is control's value length in range?
+	 *
 	 * @param  TextBase
 	 * @param  array  min and max length pair
 	 * @return bool
@@ -338,6 +314,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Email validator: is control's value valid email address?
+	 *
 	 * @param  TextBase
 	 * @return bool
 	 */
@@ -350,6 +327,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * URL validator: is control's value valid URL?
+	 *
 	 * @param  TextBase
 	 * @return bool
 	 */
@@ -370,6 +348,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Regular expression validator: matches control's value regular expression?
+	 *
 	 * @param  TextBase
 	 * @param  string
 	 * @return bool
@@ -383,6 +362,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Integer validator: is each value of tag of control decimal number?
+	 *
 	 * @param  TextBase
 	 * @return bool
 	 */
@@ -400,6 +380,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Float validator: is each value of tag of control value float number?
+	 *
 	 * @param  TextBase
 	 * @return bool
 	 */
@@ -417,6 +398,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Range validator: is a control's value number in specified range?
+	 *
 	 * @param  TextBase
 	 * @param  array  min and max value pair
 	 * @return bool
@@ -430,6 +412,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 
 	/**
 	 * Uniqueness validator: is each value of tag of control unique?
+	 *
 	 * @param  TagInput
 	 * @return bool
 	 */
@@ -439,9 +422,10 @@ class TagInput extends \Nette\Forms\Controls\TextInput
 	}
 
 
-	
+
 	/**
 	 * Are all tags from suggest?
+	 *
 	 * @param  TagInput
 	 * @return bool
 	 */

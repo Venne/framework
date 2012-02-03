@@ -16,45 +16,16 @@ use Venne\Localization\Dictionary;
  *
  * @author	Patrik Votocek
  */
-class Nella extends \Nette\Object implements \Venne\Localization\IFilter
-{
+class Nella extends \Nette\Object implements \Venne\Localization\IFilter {
+
 	public $exts = array("*.php");
 
 	/** @var array	functions map key is function name value is translation position */
-	public $functions = array(
-		// Basic
-		'__' => 1,
-		'translate' => 1,
-		// Forms
-		'addText' => 2,
-		'addPassword' => 2,
-		'addTextArea' => 2,
-		'addFile' => 2,
-		'addHidden' => 2,
-		'addCheckbox' => 2,
-		'addRadioList' => 2,
-		'addSelect' => 2,
-		'addMultiselect' => 2,
-		'addSubmit' => 2,
-		'addButton' => 2,
-		'addImage' => 3,
-		'addEmail' => 2,
-		'addUrl' => 2,
-		'addNumber' => 2,
-		'addRange' => 2,
-		'addDate' => 2,
-		'addDateTime' => 2,
-		'addTime' => 2,
-		'addSearch' => 2,
-		'addEditor' => 2,
-		'addMultipleFile' => 2,
-		'addEmail' => 2,
-		'addProtection' => 1,
-		'addGroup' => 1,
-		'addRule' => 2,
-		'setRequired' => 1,
-		'setOption' => 2,
-	);
+	public $functions = array(// Basic
+		'__' => 1, 'translate' => 1, // Forms
+		'addText' => 2, 'addPassword' => 2, 'addTextArea' => 2, 'addFile' => 2, 'addHidden' => 2, 'addCheckbox' => 2, 'addRadioList' => 2, 'addSelect' => 2, 'addMultiselect' => 2, 'addSubmit' => 2, 'addButton' => 2, 'addImage' => 3, 'addEmail' => 2, 'addUrl' => 2, 'addNumber' => 2, 'addRange' => 2, 'addDate' => 2, 'addDateTime' => 2, 'addTime' => 2, 'addSearch' => 2, 'addEditor' => 2, 'addMultipleFile' => 2, 'addEmail' => 2, 'addProtection' => 1, 'addGroup' => 1, 'addRule' => 2, 'setRequired' => 1, 'setOption' => 2,);
+
+
 
 	/**
 	 * @param \Nella\Localization\Dictionary
@@ -67,7 +38,7 @@ class Nella extends \Nette\Object implements \Venne\Localization\IFilter
 		foreach ($files as $file) {
 			$translations = $this->parse(file_get_contents($file->getRealpath()));
 			foreach ($translations as $message) {
-				$translation = (array) $message;
+				$translation = (array)$message;
 				$message = is_array($message) ? reset($message) : $message;
 
 				if ($dictionary->hasTranslation($message)) {
@@ -78,6 +49,8 @@ class Nella extends \Nette\Object implements \Venne\Localization\IFilter
 			}
 		}
 	}
+
+
 
 	/**
 	 * @param string
@@ -90,17 +63,16 @@ class Nella extends \Nette\Object implements \Venne\Localization\IFilter
 		$next = false;
 		$array = false;
 		$i = 0;
-        foreach (token_get_all($content) as $token)
-        {
-			if(is_array($token)) {
-                if ($token[0] != T_STRING && $token[0] != T_CONSTANT_ENCAPSED_STRING && $token[0] != T_ARRAY) {
+		foreach (token_get_all($content) as $token) {
+			if (is_array($token)) {
+				if ($token[0] != T_STRING && $token[0] != T_CONSTANT_ENCAPSED_STRING && $token[0] != T_ARRAY) {
 					continue;
 				}
 
-                if ($token[0] == T_STRING && isset($this->functions[$token[1]])) {
-                    $next = $this->functions[$token[1]];
-                    continue;
-                }
+				if ($token[0] == T_STRING && isset($this->functions[$token[1]])) {
+					$next = $this->functions[$token[1]];
+					continue;
+				}
 
 				if ($token[0] == T_ARRAY && $next == 1 && !$array) {
 					$array = TRUE;
@@ -118,27 +90,27 @@ class Nella extends \Nette\Object implements \Venne\Localization\IFilter
 					continue;
 				}
 
-                if ($token[0] == T_CONSTANT_ENCAPSED_STRING && $next == 1 && !$array) {
+				if ($token[0] == T_CONSTANT_ENCAPSED_STRING && $next == 1 && !$array) {
 					$s = substr($token[1], 1, -1);
 					if ($s) {
 						$data[$i] = $s;
 					}
-                    $next = FALSE;
+					$next = FALSE;
 					$i++;
-                }
-            } else {
-                if ($token == ")" && !$array) {
+				}
+			} else {
+				if ($token == ")" && !$array) {
 					$next = FALSE;
 				} elseif ($token == ")" && $array) {
 					$array = $next = FALSE;
 					$i++;
 				}
 
-                if ($token == ',' && $next != FALSE && !$array) {
+				if ($token == ',' && $next != FALSE && !$array) {
 					$next -= 1;
 				}
-            }
-        }
+			}
+		}
 
 		return $data;
 	}

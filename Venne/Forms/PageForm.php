@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -11,21 +11,33 @@
 
 namespace Venne\Forms;
 
+use Nette\Application\UI\Presenter;
+
 /**
- * @author     Josef Kříž
+ * @author	 Josef Kříž
  */
 class PageForm extends EntityForm {
 
 
-
 	/**
-	 * @param object $entity
 	 * @param Mapping\EntityFormMapper $mapper
+	 * @param \Doctrine\ORM\EntityManager $entityManager
 	 */
-	public function __construct(Mapping\EntityFormMapper $mapper, \Doctrine\ORM\EntityManager $entityManager, \App\CoreModule\BasePageEntity $entity)
+	public function __construct(Mapping\EntityFormMapper $mapper, \Doctrine\ORM\EntityManager $entityManager)
 	{
-		parent::__construct($mapper, $entityManager, $entity);
-		$this->onSave[] = \callback($this, "saveParams");
+		parent::__construct($mapper, $entityManager);
+		$this->onSuccess[] = \callback($this, "saveParams");
+	}
+
+
+
+	public function setEntity($entity)
+	{
+		if (!$entity instanceof \App\CoreModule\Entities\BasePageEntity) {
+			throw new \Nette\InvalidArgumentException;
+		}
+
+		parent::setEntity($entity);
 	}
 
 
@@ -38,28 +50,49 @@ class PageForm extends EntityForm {
 		parent::startup();
 
 		$this->addGroup("Meta informations");
-		$this->addText("title", "Title")
-				->setRequired('Enter title');
+		$this->addText("title", "Title")->setRequired('Enter title');
+		$this->addSelect("layoutFile", "Layout", $this->presenter->context->core->scannerService->getLayoutFiles());
 		$this->addText("keywords", "Keywords");
 		$this->addText("description", "Description");
-		$this->addSelect("robots", "Robots")->setItems(array(
-			"index, follow",
-			"noindex, follow",
-			"index, nofollow",
-			"noindex, nofollow",
-				), false);
+		$this->addSelect("robots", "Robots")->setItems(array("index, follow", "noindex, follow", "index, nofollow", "noindex, nofollow",), false);
 
 		$this->addGroup("URL");
-		$this->addManyToOne("parent", "Parent content");
-		$this->addText("localUrl", "URL")
-				->setOption("description", "(example: 'contact')")
-				->addRule(self::REGEXP, "URL can not contain '/'", "/^[a-zA-z0-9._-]*$/")
-				->addConditionOn($this["parent"], ~self::EQUAL, false)
-				->addRule(self::FILLED, "Nesmí být prázdný");
+		$this->addCheckbox("mainPage", "Main page");
+		if (!$this->entity->translationFor) {
+			$this->addManyToOne("parent", "Parent content", NULL, NULL, array("translationFor" => NULL));
+		} else {
+			$arr = array();
+			if ($this->entity->parent) {
+				$arr[0] = $this->entity->parent;
+				if ($arr[0]->translationFor) {
+					$arr[] = $arr[0]->translationFor->id;
+				}
+				foreach ($arr[0]->translations as $ent) {
+					$arr[] = $ent->id;
+				}
+			}
+			$arr = count($arr) > 1 ? $arr : NULL;
 
+			$this->addManyToOne("parent", "Parent content", NULL, NULL, array("id" => $arr));
+		}
+		$this->addText("localUrl", "URL")->setOption("description", "(example: 'contact')")->addRule(self::REGEXP, "URL can not contain '/'", "/^[a-zA-z0-9._-]*$/");
+
+
+		/* URL can be empty only on main page */
+		if (!$this->entity->translationFor) {
+			$this["localUrl"]->addConditionOn($this["parent"], ~self::EQUAL, false)->addRule(self::FILLED, "URL can be empty only on main page");
+		} else if ($this->entity->translationFor && $this->entity->translationFor->parent) {
+			$this["localUrl"]->addRule(self::FILLED, "URL can be empty only on main page");
+		}
+
+
+		/* languages */
 		$this->addGroup("Languages");
-		$this->addManyToMany("languages", "Content is in");
-		$this->addManyToOne("translationFor", "Translation for", NULL, NULL, array("translationFor" => NULL));
+		if ($this->entity->translationFor) {
+			$this->addManyToMany("languages", "Content is in");
+			//	$this->addManyToOne("translationFor", "Translation for", NULL, NULL, array("translationFor" => NULL));
+		}
+
 		$this->setCurrentGroup();
 	}
 
@@ -81,20 +114,17 @@ class PageForm extends EntityForm {
 	protected function attached($obj)
 	{
 		parent::attached($obj);
+		$evm = $this->presenter->context->eventManager;
 
-		$this->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onCreate, $this->createArgs());
+		$evm->dispatchEvent(\Venne\ContentExtension\Events::onCreate, $this->createArgs());
 
-		if (!$this->presenter->context->parameters["website"]["multilang"]) {
-			$this->removeGroup("Languages");
+		if ($obj instanceof Presenter) {
+			if (!$this->isSubmitted()) {
+				$evm->dispatchEvent(\Venne\ContentExtension\Events::onLoad, $this->createArgs());
+			} else {
+				$evm->dispatchEvent(\Venne\ContentExtension\Events::onSave, $this->createArgs());
+			}
 		}
-
-		if (!$this->isSubmitted()) {
-			$this->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onLoad, $this->createArgs());
-		}
-
-		$this->onSave[] = function($form) {
-					$form->presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onSave, $form->createArgs());
-				};
 	}
 
 
@@ -126,7 +156,8 @@ class PageForm extends EntityForm {
 
 	/**
 	 * Params for new page
-	 * @return type 
+	 *
+	 * @return type
 	 */
 	protected function getParams()
 	{

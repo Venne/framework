@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -17,7 +17,7 @@ use Venne\Config\Adapters\NeonAdapter;
 use Nette\OutOfRangeException;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \IteratorAggregate {
 
@@ -40,7 +40,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 
 	/**
-	 * @param string $fileName 
+	 * @param string $fileName
 	 */
 	public function __construct($fileName)
 	{
@@ -72,13 +72,12 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 
 
-
 	/* ------------------------------ Interfaces -------------------------------- */
-
 
 
 	/**
 	 * Returns items count.
+	 *
 	 * @return int
 	 */
 	public function count()
@@ -90,6 +89,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 	/**
 	 * Returns an iterator over all items.
+	 *
 	 * @return \RecursiveArrayIterator
 	 */
 	public function getIterator()
@@ -101,6 +101,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 	/**
 	 * Determines whether a item exists.
+	 *
 	 * @param  mixed
 	 * @return bool
 	 */
@@ -113,6 +114,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 	/**
 	 * Returns a item.
+	 *
 	 * @param  mixed
 	 * @return mixed
 	 */
@@ -128,6 +130,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 	/**
 	 * Replaces or appends a item.
+	 *
 	 * @param  mixed
 	 * @param  mixed
 	 * @return void
@@ -145,6 +148,7 @@ class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \Iterato
 
 	/**
 	 * Removes the element from this list.
+	 *
 	 * @param  mixed
 	 * @return void
 	 */

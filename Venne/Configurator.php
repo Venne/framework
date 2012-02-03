@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -11,17 +11,11 @@
 
 namespace Venne;
 
-use Nette,
-	Nette\Caching\Cache,
-	Nette\DI,
-	Nette\Diagnostics\Debugger,
-	Nette\Application\Routers\SimpleRouter,
-	Nette\Application\Routers\Route;
+use Nette, Nette\Caching\Cache, Nette\DI, Nette\Diagnostics\Debugger, Nette\Application\Routers\SimpleRouter, Nette\Application\Routers\Route;
 use Nette\Config\Compiler;
-use Venne\Diagnostics\Logger;
 
 /**
- * @author     Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class Configurator extends \Nette\Config\Configurator {
 
@@ -46,12 +40,7 @@ class Configurator extends \Nette\Config\Configurator {
 		$parameters["venneModeAdmin"] = false;
 		$parameters["venneModeFront"] = false;
 		$parameters["venneModulesNamespace"] = "\\Venne\\Modules\\";
-		$parameters['flashes'] = array(
-			'success' => "success",
-			'error' => "error",
-			'info' => "info",
-			'warning' => "warning",
-		);
+		$parameters['flashes'] = array('success' => "success", 'error' => "error", 'info' => "info", 'warning' => "warning",);
 		return $parameters;
 	}
 
@@ -59,28 +48,32 @@ class Configurator extends \Nette\Config\Configurator {
 
 	/**
 	 * Loads configuration from file and process it.
+	 *
 	 * @return DI\Container
 	 */
 	public function createContainer()
 	{
+		/* create container */
 		\Venne\Panels\Stopwatch::start();
 		$container = parent::createContainer();
 		\Venne\Panels\Stopwatch::stop("generate container");
 		\Venne\Panels\Stopwatch::start();
 
 
-		/* Detect mode */
-		$url = explode("/", substr($container->httpRequest->url->path, strlen($container->httpRequest->url->basePath)), 2);
-		if ($url[0] == "admin") {
-			$container->parameters["venneModeAdmin"] = true;
-		} else if ($url[0] == "installation") {
-			$container->parameters["venneModeInstallation"] = true;
-		} else {
-			$container->parameters["venneModeFront"] = true;
+		/* Register subscribers */
+		$eventManager = $container->eventManager;
+		foreach ($container->findByTag("subscriber") as $module => $par) {
+			$eventManager->addEventSubscriber($container->{$module});
 		}
 
 
-		/* Setup Debugger */
+		/* parameters */
+		$baseUrl = rtrim($container->httpRequest->getUrl()->getBaseUrl(), '/');
+		$container->parameters['baseUrl'] = $baseUrl;
+		$container->parameters['basePath'] = preg_replace('#https?://[^/]+#A', '', $baseUrl);
+
+
+		/* Setup mode */
 		$debugger = $container->parameters["debugger"];
 		if ($debugger["mode"] == "production") {
 			$this->setProductionMode(true);
@@ -89,44 +82,46 @@ class Configurator extends \Nette\Config\Configurator {
 		} else {
 			$this->setProductionMode($this->detectProductionMode());
 		}
-		Debugger::enable(
-				$debugger['developerIp'] && $this->isProductionMode() ? (array) $debugger['developerIp'] : $this->isProductionMode(), $debugger['logDir'], $debugger['logEmail']
-		);
-		Debugger::$strictMode = true;
-		Debugger::$logger->mailer = array("\\Venne\\Diagnostics\\Logger", "venneMailer");
-		\Nette\Diagnostics\Logger::$emailSnooze = $container->parameters["debugger"]["emailSnooze"];
-		Debugger::$logDirectory = $container->parameters["logDir"];
-		Logger::$linkPrefix = "http://" . $container->httpRequest->url->host . $container->httpRequest->url->basePath . "admin/system/log/show?name=";
 
 
 		/* Setup Application */
 		$application = $container->application;
-		$application->catchExceptions = (bool) $this->isProductionMode();
+		$application->catchExceptions = (bool)$this->isProductionMode();
 		$application->errorPresenter = $container->parameters['website']['errorPresenter'];
-		$application->onShutdown[] = function() {
-					\Venne\Panels\Stopwatch::stop("shutdown");
-				};
+		$application->onShutdown[] = function()
+		{
+			\Venne\Panels\Stopwatch::stop("shutdown");
+		};
 
 
 		/* Initialize modules */
 		foreach ($container->findByTag("module") as $module => $par) {
-			$container->{$module}->configure($container, $container->cmsManager);
+			$container->{$module}->configure($container);
 		}
 
 
-		/* Load theme */
-		$theme = $container->parameters['website']['theme'];
-		$class = "\\" . ucfirst($theme) . "Theme\\Theme";
-		$container->addService($theme . "Theme", new $class($container), array(\Nette\DI\Container::TAGS => array("theme" => true)));
+		/* Detect updated flag */
+		if (file_exists($this->parameters['flagsDir'] . "/updated")) {
+			$dirContent = \Nette\Utils\Finder::find('*')->from($this->parameters['tempDir'] . "/cache")->childFirst();
+			foreach ($dirContent as $file) {
+				if ($file->isDir()) @rmdir($file->getPathname()); else
+					@unlink($file->getPathname());
+			}
+			@unlink($directory);
+			@unlink($this->parameters['flagsDir'] . "/updated");
+			$container->eventManager->dispatchEvent(\Venne\Module\Events\Events::onUpdateFlag);
+		}
 
 
 		/* Set timer to router */
-		$container->application->onStartup[] = function() {
-					\Venne\Panels\Stopwatch::start();
-				};
-		$container->application->onRequest[] = function() {
-					\Venne\Panels\Stopwatch::stop("routing");
-				};
+		$container->application->onStartup[] = function()
+		{
+			\Venne\Panels\Stopwatch::start();
+		};
+		$container->application->onRequest[] = function()
+		{
+			\Venne\Panels\Stopwatch::stop("routing");
+		};
 
 
 		\Venne\Panels\Stopwatch::stop("container configuration");
@@ -141,15 +136,12 @@ class Configurator extends \Nette\Config\Configurator {
 	protected function createCompiler()
 	{
 		$compiler = new Compiler;
-		$compiler->addExtension('php', new \Nette\Config\Extensions\PhpExtension())
-				->addExtension('constants', new Nette\Config\Extensions\ConstantsExtension())
-				->addExtension('nette', new Config\NetteExtension())
-				->addExtension('venne', new Config\VenneExtension())
-				->addExtension('doctrine', new Config\DoctrineExtension());
+		$compiler->addExtension('php', new \Nette\Config\Extensions\PhpExtension())->addExtension('constants', new Nette\Config\Extensions\ConstantsExtension())->addExtension('nette', new Config\NetteExtension())->addExtension('venne', new Config\VenneExtension())->addExtension('doctrine', new Config\DoctrineExtension())->addExtension('module', new Config\ModuleExtension())->addExtension('assets', new Config\AssetExtension());
 
 		foreach ($this->modules as $module => $par) {
 			$class = "\\App\\" . ucfirst($module) . "Module\\Module";
-			$compiler->addExtension(ucfirst($module) . "Module", new $class);
+			$instance = new $class;
+			$instance->compile($this, $compiler);
 		}
 
 		return $compiler;
@@ -159,6 +151,7 @@ class Configurator extends \Nette\Config\Configurator {
 
 	/**
 	 * Sets path to temporary directory.
+	 *
 	 * @return Configurator  provides a fluent interface
 	 */
 	public function setTempDirectory($path)

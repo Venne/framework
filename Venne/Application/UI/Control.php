@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -17,7 +17,7 @@ use Nette\Utils\Strings;
 /**
  * Description of Control
  *
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class Control extends \Nette\Application\UI\Control {
 
@@ -61,6 +61,7 @@ class Control extends \Nette\Application\UI\Control {
 
 	/**
 	 * Descendant can override this method to customize template compile-time filters.
+	 *
 	 * @param  Nette\Templating\Template
 	 * @return void
 	 */
@@ -75,7 +76,7 @@ class Control extends \Nette\Application\UI\Control {
 
 	/**
 	 *
-	 * @param \Nette\Application\IPresenter $presenter 
+	 * @param \Nette\Application\IPresenter $presenter
 	 */
 	protected function attached($presenter)
 	{
@@ -100,10 +101,7 @@ class Control extends \Nette\Application\UI\Control {
 	{
 		$theme = $this->presenter->context->parameters["venneModeFront"] ? $this->presenter->context->parameters["website"]["theme"] : "admin";
 		$dir = dirname($this->getReflection()->getFileName());
-		$list = array(
-			$this->presenter->context->parameters["wwwDir"] . "/themes/" . $theme . "/controls/" . ucfirst($this->name) . "/template.latte",
-			$dir . "/$view.latte"
-		);
+		$list = array($this->presenter->context->parameters["wwwDir"] . "/themes/" . $theme . "/controls/" . ucfirst($this->name) . "/template.latte", $dir . "/$view.latte");
 		return $list;
 	}
 
@@ -130,22 +128,23 @@ class Control extends \Nette\Application\UI\Control {
 
 
 
-	public function render($type = NULL, $param = NULL)
+	public function render($param = NULL, $type = NULL)
 	{
 		$this->view = $this->view ? : "default";
 		$viewMethod = "view" . ucfirst($this->view);
-				
+		$this->params = $this->params ? : func_get_args();
+
 		call_user_func_array(array($this, 'beforeRender'), $this->params);
 
 		ob_start();
 		if (method_exists($this, $viewMethod)) {
 			call_user_func_array(array($this, $viewMethod), $this->params);
 		}
-		
+
 		$this->template->setFile($this->formatTemplateFile(lcfirst($this->view)));
-		
+
 		$output = ob_get_clean();
-		$output = (string) $this->template;
+		$output = (string)$this->template;
 		echo $output;
 
 		call_user_func_array(array($this, 'afterRender'), $this->params);
@@ -155,14 +154,14 @@ class Control extends \Nette\Application\UI\Control {
 
 	protected function beforeRender()
 	{
-		
+
 	}
 
 
 
 	protected function afterRender()
 	{
-		
+
 	}
 
 

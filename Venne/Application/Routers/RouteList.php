@@ -16,7 +16,7 @@ use Nette;
 /**
  * The router broker.
  *
- * @author     David Grudl
+ * @author	 David Grudl
  * @author	   Josef Kříž
  */
 class RouteList extends \Nette\Application\Routers\RouteList {
@@ -39,6 +39,7 @@ class RouteList extends \Nette\Application\Routers\RouteList {
 
 	/**
 	 * Maps HTTP request to a Request object.
+	 *
 	 * @param  Nette\Http\IRequest
 	 * @return Nette\Application\Request|NULL
 	 */
@@ -60,6 +61,7 @@ class RouteList extends \Nette\Application\Routers\RouteList {
 
 	/**
 	 * Constructs absolute URL from Request object.
+	 *
 	 * @param  Nette\Application\Request
 	 * @param  Nette\Http\Url
 	 * @return string|NULL
@@ -119,6 +121,7 @@ class RouteList extends \Nette\Application\Routers\RouteList {
 				$module = substr($this->module, 0, -1);
 				$url = str_replace("/{$module}.", "/", $url);
 				$url = str_replace(".{$module}/", "/", $url);
+				$url = str_replace(".{$module}.", ".", $url);
 				return $url;
 			}
 		}

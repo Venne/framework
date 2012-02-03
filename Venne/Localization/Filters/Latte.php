@@ -16,19 +16,23 @@ use Venne\Localization\Dictionary;
  *
  * @author	Patrik Votoček
  */
-class Latte extends \Nette\Object implements \Venne\Localization\IFilter
-{
+class Latte extends \Nette\Object implements \Venne\Localization\IFilter {
+
 	/** @var array */
 	public $exts = array("*.latte");
 
 	/** @var */
 	protected $parser;
-	
+
+
+
 	public function __construct(\Nette\DI\Container $context)
 	{
 		$this->parser = $context->latteEngine->parser;
 	}
-	
+
+
+
 	/**
 	 * @param \Nella\Localization\Dictionary
 	 */
@@ -37,14 +41,14 @@ class Latte extends \Nette\Object implements \Venne\Localization\IFilter
 		$dictionary->freeze();
 
 		$parser = $this->parser;
-		
+
 		$macros = LatteMacros::install($parser);
 
 		$files = \Nette\Utils\Finder::findFiles($this->exts)->from($dictionary->dir);
 		foreach ($files as $file) {
 			$parser->parse(file_get_contents($file->getRealpath()));
 			foreach ($macros->translations as $message) {
-				$translation = (array) $message;
+				$translation = (array)$message;
 				$message = is_array($message) ? reset($message) : $message;
 
 				if ($dictionary->hasTranslation($message)) {

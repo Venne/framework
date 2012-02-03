@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the Venne:CMS (https://github.com/Venne)
+ *
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
+ *
+ * For the full copyright and license information, please view
+ * the file license.txt that was distributed with this source code.
+ */
+
 namespace Venne\Panels;
 
 use Nette;
@@ -8,24 +17,31 @@ use Nette;
  * Timers
  *
  * Bootstrap:	Debug::addPanel(new Stopwatch());
- * 
+ *
  * Usage:	Stopwatch::start(); Stopwatch::stop($name);
  *
  * @copyright Maxipes Fík
  */
-final class Stopwatch implements \Nette\Diagnostics\IBarPanel
-{
+final class Stopwatch implements \Nette\Diagnostics\IBarPanel {
+
+
 	private static $timers = array();
+
+
 
 	public static function start()
 	{
 		\Nette\Diagnostics\Debugger::timer();
 	}
 
+
+
 	public static function stop($name)
 	{
 		self::add(\Nette\Diagnostics\Debugger::timer(), $name);
 	}
+
+
 
 	public static function add($time, $name)
 	{
@@ -33,13 +49,18 @@ final class Stopwatch implements \Nette\Diagnostics\IBarPanel
 		self::$timers[$name] = $time;
 	}
 
-	/*** IDebugPanel ***/
+
+
+	/*	 * * IDebugPanel ** */
+
 
 	public function getTab()
 	{
 		$sum = number_format(round(array_sum(self::$timers) * 1000, 1), 1);
-		return '<span><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACiUlEQVQ4jY2Sy08TYRTFz/fNtDPTMm1hxoKQIg02KUVBBMIjEHXr1sS4cgEhmuCOldsm4iOufEQTWbEy9Q+AhJ0sLdHURSUQXraBaUunzyFDO/O5kkRaEs/q5uTcX27uvQQXaG1tbXR7e3OsVqtDkhxf5+bmE81ytJkZj8cdmaOj2y+fvzp9sfjMMk9qd2OxGNcsyzczXS6XJ184TlOOfiQc5VR/x5NQKCQDKPwXIBKJHEej0a43b9//0A7Tp4QQ/9DQUEPzPwBFUUZs276n6/rTZDIrWyjmchntCqU87/OpX9bXE63T0wP6eQD5WwQCgSWfzzMTjS4uuiTpcdUoK5IogAEolcoo5gul/oHBhampyaWmAABkZWX1U07TZlsVH9oUFZVyGZZVh6r6UTUq+L4RZ+OTt+YnJsY+/G06u0I6nVYcHH+/uyeAcF8EjAGSJMHj8YJ38AgGe3FzZJT8TGy83t/f72wACIL7QSq1L1PKIZPJwu+/BOOkimxWgyRJKBR0CE4BLW7ZVS6XHzYsMZ/LDPu8HiiKihZZhmEYoJSDw+kEIQRtbQryDLgaCiGnHQ43TGCcGE6O55FK/QZjDKIoQhQF8DwHUZRAKUWtdgqe4yCIktAA8Ld3bGqahsudXcjlsgCA7kAPwuF+cBwHXc/DKQioVCto8Xi3GgCmacUYqLWzswVKKEzTBAODZdkwTRO2baNULAKEMIfD9bkBEAx2/Rodn3qXOjhAxahgb28Xuq4jm8ng6OgQej6PulWHW/Yuh8O93xqWCACD1/sWmM3cyWRi1iWJpFDQYVt12CAAI8zXqsZkt/vRRY90puTW7h39+Hgmox0OMgYq+zwJVW1fvnEtvHo++wf3HgDktqhaIgAAAABJRU5ErkJggg=="><strong>Timers</strong> ('.$sum.' ms)</span>';
+		return '<span><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAACiUlEQVQ4jY2Sy08TYRTFz/fNtDPTMm1hxoKQIg02KUVBBMIjEHXr1sS4cgEhmuCOldsm4iOufEQTWbEy9Q+AhJ0sLdHURSUQXraBaUunzyFDO/O5kkRaEs/q5uTcX27uvQQXaG1tbXR7e3OsVqtDkhxf5+bmE81ytJkZj8cdmaOj2y+fvzp9sfjMMk9qd2OxGNcsyzczXS6XJ184TlOOfiQc5VR/x5NQKCQDKPwXIBKJHEej0a43b9//0A7Tp4QQ/9DQUEPzPwBFUUZs276n6/rTZDIrWyjmchntCqU87/OpX9bXE63T0wP6eQD5WwQCgSWfzzMTjS4uuiTpcdUoK5IogAEolcoo5gul/oHBhampyaWmAABkZWX1U07TZlsVH9oUFZVyGZZVh6r6UTUq+L4RZ+OTt+YnJsY+/G06u0I6nVYcHH+/uyeAcF8EjAGSJMHj8YJ38AgGe3FzZJT8TGy83t/f72wACIL7QSq1L1PKIZPJwu+/BOOkimxWgyRJKBR0CE4BLW7ZVS6XHzYsMZ/LDPu8HiiKihZZhmEYoJSDw+kEIQRtbQryDLgaCiGnHQ43TGCcGE6O55FK/QZjDKIoQhQF8DwHUZRAKUWtdgqe4yCIktAA8Ld3bGqahsudXcjlsgCA7kAPwuF+cBwHXc/DKQioVCto8Xi3GgCmacUYqLWzswVKKEzTBAODZdkwTRO2baNULAKEMIfD9bkBEAx2/Rodn3qXOjhAxahgb28Xuq4jm8ng6OgQej6PulWHW/Yuh8O93xqWCACD1/sWmM3cyWRi1iWJpFDQYVt12CAAI8zXqsZkt/vRRY90puTW7h39+Hgmox0OMgYq+zwJVW1fvnEtvHo++wf3HgDktqhaIgAAAABJRU5ErkJggg=="><strong>Timers</strong> (' . $sum . ' ms)</span>';
 	}
+
+
 
 	public function getPanel()
 	{
@@ -48,16 +69,19 @@ final class Stopwatch implements \Nette\Diagnostics\IBarPanel
 		$buff .= '<div>';
 		$buff .= '<table>';
 		foreach (self::$timers as $name => $value) {
-			$buff .= "<tr><th>$name</th><td style='text-align: right;'>" . number_format(round($value * 1000, 1), 1)  . " ms</td></tr>";
+			$buff .= "<tr><th>$name</th><td style='text-align: right;'>" . number_format(round($value * 1000, 1), 1) . " ms</td></tr>";
 		}
-		$buff .= "<tr><th style='color: green;'>&sum;</th><td style='color: green; text-align: right; border-top: 3px double #888;'>" . $sum  . " ms</th></tr>";
+		$buff .= "<tr><th style='color: green;'>&sum;</th><td style='color: green; text-align: right; border-top: 3px double #888;'>" . $sum . " ms</th></tr>";
 		$buff .= '</table>';
 		$buff .= '</div>';
 		return $buff;
 	}
 
+
+
 	public function getId()
 	{
 		return 'Stopwatch';
 	}
+
 }

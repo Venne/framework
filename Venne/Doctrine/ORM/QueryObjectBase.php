@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -19,12 +19,10 @@ use Nette;
 use Nette\Utils\Paginator;
 
 
-
 /**
  * @author Filip Procházka
  */
-abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject
-{
+abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject {
 
 	/** @var Paginator */
 	private $paginator;
@@ -77,9 +75,7 @@ abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject
 		}
 
 		$class = $this->getReflection()->getMethod('doCreateQuery')->getDeclaringClass();
-		throw new Nette\InvalidStateException("Method " . $class . "::doCreateQuery() must return" .
-				" instanceof Doctrine\\ORM\\Query or instaceof Doctrine\\ORM\\QueryBuilder, " .
-				Kdyby\Tools\Mixed::getType($query) . " given.");
+		throw new Nette\InvalidStateException("Method " . $class . "::doCreateQuery() must return" . " instanceof Doctrine\\ORM\\Query or instaceof Doctrine\\ORM\\QueryBuilder, " . Kdyby\Tools\Mixed::getType($query) . " given.");
 	}
 
 
@@ -122,9 +118,7 @@ abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject
 	 */
 	public function fetchOne(IQueryable $repository)
 	{
-		$query = $this->getQuery($repository)
-			->setFirstResult(NULL)
-			->setMaxResults(1);
+		$query = $this->getQuery($repository)->setFirstResult(NULL)->setMaxResults(1);
 
 		$this->lastQuery = $query;
 		return $query->getSingleResult();

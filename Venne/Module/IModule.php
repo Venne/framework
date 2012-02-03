@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -11,16 +11,16 @@
 
 namespace Venne\Module;
 
-use Nette\DI\ContainerBuilder;
 use Nette\DI\Container;
 use Nette\Security\Permission;
 use Nette\Application\Routers\RouteList;
+use Nette\Config\Compiler;
+use Nette\Config\Configurator;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 interface IModule {
-
 
 
 	public function getName();
@@ -39,15 +39,23 @@ interface IModule {
 
 
 
-	public function setRoutes(RouteList $router, $prefix = "");
+	public function getPath();
 
 
 
-	public function loadConfiguration(ContainerBuilder $container, array $config);
+	public function getNamespace();
 
 
 
-	public function setPermissions(Container $container, Permission $permissions);
+	public function compile(Configurator $configurator, Compiler $compiler);
+
+
+
+	public function getForm(Container $container);
+
+
+
+	public function configure(Container $container);
 
 
 
@@ -56,9 +64,5 @@ interface IModule {
 
 
 	public function uninstall(Container $container);
-
-
-
-	public function getForm(Container $container);
 }
 

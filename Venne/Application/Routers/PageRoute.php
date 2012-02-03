@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -17,14 +17,22 @@ use Nette\Application;
 use Venne\Doctrine\ORM\BaseRepository;
 use Nette\Caching\Cache;
 use Nette\Application\Routers\Route;
+use App\CoreModule\Entities\PageEntity;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class PageRoute extends Route {
 
 
+	const DEFAULT_MODULE = "Core";
+
+	const DEFAULT_PRESENTER = "Default";
+
+	const DEFAULT_ACTION = "default";
+
 	const CACHE_MATCH_PREFIX = "match-";
+
 	const CACHE_CONSTRUCT_PREFIX = "construct-";
 
 	/** @var \Venne\Doctrine\ORM\BaseRepository */
@@ -40,48 +48,40 @@ class PageRoute extends Route {
 	protected $cmsManager;
 
 	/** @var bool */
-	protected $multilang;
+	protected $languages;
 
 	/** @var string */
-	protected $defaultLangAlias;
-
+	protected $defaultLanguage;
 
 
 	/**
 	 * Constructor
+	 *
 	 * @param \App\CoreModule\CmsManager $cmsManager
 	 * @param BaseRepository $pageRepository
 	 * @param BaseRepository $langRepository
 	 * @param \Nette\Caching\IStorage $cacheStorage
 	 * @param string $prefix
 	 * @param bool $multilang
-	 * @param string $defaultLangAlias 
+	 * @param string $defaultLangAlias
 	 */
-	public function __construct(\App\CoreModule\CmsManager $cmsManager, BaseRepository $pageRepository, BaseRepository $langRepository, $cacheStorage, $prefix = "", $multilang = false, $defaultLangAlias = false)
+	public function __construct(\App\CoreModule\Managers\CmsManager $cmsManager, BaseRepository $pageRepository, BaseRepository $langRepository, $cacheStorage, $prefix, $parameters, $languages, $defaultLanguage)
 	{
-		$this->multilang = $multilang;
-		$this->defaultLangAlias = $defaultLangAlias;
+		$this->languages = $languages;
+		$this->defaultLanguage = $defaultLanguage;
 		$this->langRepository = $langRepository;
 		$this->pageRepository = $pageRepository;
 		$this->cmsManager = $cmsManager;
 		$this->cache = new Cache($cacheStorage, "Venne.Route");
-		parent::__construct($prefix . "<url .+>[/<module Content>/<presenter Default>]", array(
-			"presenter" => "Default",
-			"module" => "Content",
-			"action" => "default",
-			"lang" => "",
-			"url" => array(
-				self::VALUE => "",
-				self::FILTER_IN => NULL,
-				self::FILTER_OUT => NULL,
-				))
-		);
+
+		parent::__construct($prefix . "<url .+>[/<module Core>/<presenter Default>]", $parameters + array("presenter" => self::DEFAULT_PRESENTER, "module" => self::DEFAULT_MODULE, "action" => self::DEFAULT_ACTION, "url" => array(self::VALUE => "", self::FILTER_IN => NULL, self::FILTER_OUT => NULL,)));
 	}
 
 
 
 	/**
 	 * Maps HTTP request to a Request object.
+	 *
 	 * @param  Nette\Http\IRequest
 	 * @return Nette\Application\Request|NULL
 	 */
@@ -105,28 +105,19 @@ class PageRoute extends Route {
 
 
 		/* Search PageEntity */
-		if ($this->multilang) {
+		if (count($this->languages) > 1) {
 			if (!isset($parameters["lang"])) {
-				$parameters["lang"] = $this->defaultLangAlias;
+				$parameters["lang"] = $this->defaultLanguage;
 			}
 
 			try {
-				$page = $this->pageRepository->createQueryBuilder("a")
-								->leftJoin("a.languages", "p")
-								->where("a.url = :url")
-								->andWhere("p.alias = :lang")
-								->setParameter("lang", $parameters["lang"])
-								->setParameter("url", $parameters["url"])
-								->getQuery()->getSingleResult();
+				$page = $this->pageRepository->createQueryBuilder("a")->leftJoin("a.languages", "p")->where("a.url = :url")->andWhere("p.alias = :lang")->setParameter("lang", $parameters["lang"])->setParameter("url", $parameters["url"])->getQuery()->getSingleResult();
 			} catch (\Doctrine\ORM\NoResultException $e) {
 				return NULL;
 			}
 		} else {
 			try {
-				$page = $this->pageRepository->createQueryBuilder("a")
-								->where("a.url = :url")
-								->setParameter("url", $parameters["url"])
-								->getQuery()->getSingleResult();
+				$page = $this->pageRepository->createQueryBuilder("a")->where("a.url = :url")->setParameter("url", $parameters["url"])->getQuery()->getSingleResult();
 			} catch (\Doctrine\ORM\NoResultException $e) {
 				return NULL;
 			}
@@ -142,24 +133,24 @@ class PageRoute extends Route {
 
 	/**
 	 * Save page with parameters to cache
-	 * @param \App\CoreModule\PageEntity $page
-	 * @param array $parameters 
+	 *
+	 * @param PageEntity $page
+	 * @param array $parameters
 	 */
-	protected function saveMatchCache(\App\CoreModule\PageEntity $page, array $parameters)
+	protected function saveMatchCache(PageEntity $page, array $parameters)
 	{
 		$cacheKey = json_encode($parameters);
 
-		$this->cache->save(self::CACHE_MATCH_PREFIX . $cacheKey, array(
-			"pageId" => $page->id,
-		));
+		$this->cache->save(self::CACHE_MATCH_PREFIX . $cacheKey, array("pageId" => $page->id,));
 	}
 
 
 
 	/**
 	 * Load page by parameters from cache
+	 *
 	 * @param array $parameters
-	 * @return \App\CoreModule\PageEntity
+	 * @return PageEntity
 	 */
 	protected function loadMatchCache(array $parameters)
 	{
@@ -177,11 +168,12 @@ class PageRoute extends Route {
 
 	/**
 	 * Modify request by page
+	 *
 	 * @param \Nette\Application\Request $appRequest
-	 * @param \App\CoreModule\PageEntity $page 
+	 * @param PageEntity $page
 	 * @return \Nette\Application\Request
 	 */
-	protected function modifyMatchRequest(\Nette\Application\Request $appRequest, \App\CoreModule\PageEntity $page, $parameters)
+	protected function modifyMatchRequest(\Nette\Application\Request $appRequest, PageEntity $page, $parameters)
 	{
 		$parameters = $page->params + $parameters;
 		$parameters["page"] = $page;
@@ -199,6 +191,7 @@ class PageRoute extends Route {
 
 	/**
 	 * Constructs absolute URL from Request object.
+	 *
 	 * @param  Nette\Application\Request
 	 * @param  Nette\Http\Url
 	 * @return string|NULL
@@ -206,7 +199,7 @@ class PageRoute extends Route {
 	public function constructUrl(\Nette\Application\Request $appRequest, \Nette\Http\Url $refUrl)
 	{
 		$parameters = $appRequest->getParameters();
-		
+
 		if (!array_key_exists("url", $parameters)) {
 			return NULL;
 		}
@@ -255,33 +248,20 @@ class PageRoute extends Route {
 		//	return parent::constructUrl($appRequest, $refUrl);
 		//}
 
-		
+
 		/* Search PageEntity */
-		if ($this->multilang) {
-			if (!isset($params["lang"])) {
-				$lang = $this->defaultLangAlias;
+		if (count($this->languages) > 1) {
+			if (!isset($parameters["lang"])) {
+				$parameters["lang"] = $this->defaultLanguage;
 			}
 			try {
-				$page = $this->pageRepository->createQueryBuilder("a")
-								->leftJoin("a.languages", "p")
-								->where("a.type = :type")
-								->andWhere("p.alias = :lang")
-								->andWhere("a.params = :params")
-								->setParameter("type", $type)
-								->setParameter("lang", $params["lang"])
-								->setParameter("params", $parametersKey)
-								->getQuery()->getSingleResult();
+				$page = $this->pageRepository->createQueryBuilder("a")->leftJoin("a.languages", "p")->where("a.type = :type")->andWhere("p.alias = :lang")->andWhere("a.params = :params")->setParameter("type", $type)->setParameter("lang", $parameters["lang"])->setParameter("params", $parametersKey)->getQuery()->getSingleResult();
 			} catch (\Doctrine\ORM\NoResultException $e) {
 				return NULL;
 			}
 		} else {
 			try {
-				$page = $this->pageRepository->createQueryBuilder("a")
-								->where("a.type = :type")
-								->andWhere("a.params = :params")
-								->setParameter("type", $type)
-								->setParameter("params", $parametersKey)
-								->getQuery()->getSingleResult();
+				$page = $this->pageRepository->createQueryBuilder("a")->where("a.type = :type")->andWhere("a.params = :params")->setParameter("type", $type)->setParameter("params", $parametersKey)->getQuery()->getSingleResult();
 			} catch (\Doctrine\ORM\NoResultException $e) {
 				return NULL;
 			}
@@ -298,24 +278,24 @@ class PageRoute extends Route {
 
 	/**
 	 * Save page with parameters to cache
-	 * @param \App\CoreModule\PageEntity $page
-	 * @param array $parameters 
+	 *
+	 * @param PageEntity $page
+	 * @param array $parameters
 	 */
-	protected function saveConstructCache(\App\CoreModule\PageEntity $page, array $parameters)
+	protected function saveConstructCache(PageEntity $page, array $parameters)
 	{
 		$cacheKey = json_encode($parameters);
 
-		$this->cache->save(self::CACHE_MATCH_PREFIX . $cacheKey, array(
-			"pageId" => $page->id,
-		));
+		$this->cache->save(self::CACHE_MATCH_PREFIX . $cacheKey, array("pageId" => $page->id,));
 	}
 
 
 
 	/**
 	 * Load page by parameters from cache
+	 *
 	 * @param array $parameters
-	 * @return \App\CoreModule\PageEntity
+	 * @return PageEntity
 	 */
 	protected function loadConstructCache(array $parameters)
 	{
@@ -333,25 +313,26 @@ class PageRoute extends Route {
 
 	/**
 	 * Modify request by page
+	 *
 	 * @param \Nette\Application\Request $request
-	 * @param \App\CoreModule\PageEntity $page 
+	 * @param PageEntity $page
 	 * @return \Nette\Application\Request
 	 */
-	protected function modifyConstructRequest(\Nette\Application\Request $request, \App\CoreModule\PageEntity $page, $parameters)
+	protected function modifyConstructRequest(\Nette\Application\Request $request, PageEntity $page, $parameters)
 	{
-		$parameters = ((array) $page->params) + $parameters;
+		$parameters = ((array)$page->params) + $parameters;
 
 		if (isset($parameters["page"])) {
 			unset($parameters["page"]);
 		}
-		$parameters["module"] = "Content";
-		$parameters["presenter"] = "Default";
+		$parameters["module"] = self::DEFAULT_MODULE;
+		$parameters["presenter"] = self::DEFAULT_PRESENTER;
 		$parameters["url"] = $page->url;
 
 		//dump($parameters);
 		//die();
 
-		$request->setPresenterName("Content:Default");
+		$request->setPresenterName(self::DEFAULT_MODULE . ":" . self::DEFAULT_PRESENTER);
 		$request->setParameters($parameters);
 		return $request;
 	}

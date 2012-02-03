@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -17,16 +17,20 @@ use Nette\Application\UI\InvalidLinkException;
 /**
  * Description of Presenter
  *
- * @author Josef Kříž
- * 
+ * @author Josef Kříž <pepakriz@gmail.com>
+ *
  * @property-read \SystemContainer $context
  */
-class Presenter extends \Nette\Application\UI\Presenter {
+class Presenter extends \Nette\Application\UI\Presenter
+{
 
 
 	const ROBOTS_INDEX = 1;
+
 	const ROBOTS_NOINDEX = 2;
+
 	const ROBOTS_FOLLOW = 4;
+
 	const ROBOTS_NOFOLLOW = 8;
 
 	/** @persistent */
@@ -40,12 +44,6 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/** @var string */
 	public $description;
-
-	/** @var array */
-	public $js = array();
-
-	/** @var array */
-	public $css = array();
 
 	/** @var string */
 	public $robots;
@@ -73,21 +71,38 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
+	 * @return Events\EventArgs
+	 */
+	protected function getEventArgs()
+	{
+		$args = new \Venne\Application\UI\Events\EventArgs();
+		$args->setPresenter($this);
+		return $args;
+	}
+
+
+
+	/**
 	 * @return void
 	 */
 	public function startup()
 	{
 		parent::startup();
 
+
+		/* Startup event */
+		$this->context->eventManager->dispatchEvent(\Venne\Application\UI\Events\Events::onStartup, $this->getEventArgs());
+
+
 		/* Language */
-		if ($this->context->parameters["website"]["multilang"]) {
-			if (!$this->lang) {
+		if (count($this->context->parameters["website"]["languages"]) > 1) {
+			if (!$this->lang && !$this->getParameter("lang")) {
 				$this->lang = $this->getDefaultLanguageAlias();
 			}
-
-			$httpResponse = $this->context->httpResponse;
-			$httpResponse->setCookie("lang", $this->lang, 60 * 60 * 24 * 365);
+		} else {
+			$this->lang = $this->context->parameters["website"]["defaultLanguage"];
 		}
+
 
 		/* Meta */
 		$this->titleTemplate = $this->context->parameters["website"]["title"];
@@ -96,6 +111,8 @@ class Presenter extends \Nette\Application\UI\Presenter {
 		$this->keywords = $this->context->parameters["website"]["keywords"];
 		$this->description = $this->context->parameters["website"]["description"];
 
+
+		/* stopwatch */
 		\Venne\Panels\Stopwatch::stop("base startup");
 		\Venne\Panels\Stopwatch::start();
 	}
@@ -103,19 +120,40 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
-	 * Get theme
-	 * @return \Venne\Templating\ITheme
+	 * @return string
 	 */
-	public function getTheme()
+	protected function getDefaultLanguageAlias()
 	{
-		return $this->context->{$this->context->parameters["website"]["theme"] . "Theme"};
+		$httpRequest = $this->context->httpRequest;
+
+		$lang = $httpRequest->getCookie('lang');
+		if (!$lang) {
+			$lang = $httpRequest->detectLanguage($this->context->parameters["website"]["languages"]);
+			if (!$lang) {
+				$lang = $this->context->parameters["website"]["defaultLanguage"];
+			}
+		}
+		return $lang;
+	}
+
+
+
+	/**
+	 * Redirect to other language.
+	 *
+	 * @param string $alias
+	 */
+	public function handleChangeLanguage($alias)
+	{
+		$this->redirect("this", array("lang" => $alias));
 	}
 
 
 
 	/**
 	 * Get module
-	 * @return \Venne\Module\IModule 
+	 *
+	 * @return \Venne\Module\IModule
 	 */
 	public function getModule()
 	{
@@ -126,6 +164,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Get module name
+	 *
 	 * @return string
 	 */
 	public function getModuleName()
@@ -137,6 +176,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Checks authorization.
+	 *
 	 * @return void
 	 */
 	public function checkRequirements($element)
@@ -160,12 +200,13 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Checks authorization on methods.
+	 *
 	 * @param array $methods
-	 * @return bool 
+	 * @return bool
 	 */
 	protected function isMethodAllowed($methods)
 	{
-		$methods = (array) $methods;
+		$methods = (array)$methods;
 		$ref = $this->getReflection();
 
 		if ($ref->hasAnnotation("secured")) {
@@ -207,19 +248,17 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Common render method.
+	 *
 	 * @return void
 	 */
 	public function beforeRender()
 	{
+		/* stopwatch */
 		\Venne\Panels\Stopwatch::stop("module startup and action");
 		\Venne\Panels\Stopwatch::start();
-		parent::beforeRender();
 
-		$this->template->venneModeAdmin = $this->getContext()->parameters['venneModeAdmin'];
-		$this->template->venneModeFront = $this->getContext()->parameters['venneModeFront'];
-		$this->template->venneModeInstallation = $this->getContext()->parameters['venneModeInstallation'];
-		$this->template->venneVersionId = VENNE_VERSION_ID;
-		$this->template->venneVersionState = VENNE_VERSION_STATE;
+
+		parent::beforeRender();
 	}
 
 
@@ -232,24 +271,31 @@ class Presenter extends \Nette\Application\UI\Presenter {
 	{
 		parent::shutdown($response);
 		\Venne\Panels\Stopwatch::stop("template render");
-		if (\Nette\Diagnostics\Debugger::isEnabled()) {
-			\Nette\Diagnostics\Debugger::addPanel(new \Venne\Panels\Stopwatch());
-		}
 		\Venne\Panels\Stopwatch::start();
 	}
 
 
 
 	/**
-	 * Template factory.
-	 * @param string $class
-	 * @return \Nette\Templating\ITemplate
+	 * @param string|null $class
+	 *
+	 * @return \Nette\Templating\Template
 	 */
 	protected function createTemplate($class = NULL)
 	{
-		$template = $this->getContext()->templateContainer->createTemplate($this, $class);
-		$this->theme->setTemplate($template);
-		$this->theme->setMacros($this->context->latteEngine->parser);
+		$template = parent::createTemplate($class);
+		$latte = new \Nette\Latte\Engine();
+
+		foreach ($this->context->findByTag("macro") as $macro => $item) {
+			$this->context->{"create" . str_replace(".", "_", substr(ucfirst($macro), 0, -7))}($latte->getCompiler());
+		}
+
+
+		/* translator */
+		$template->setTranslator($this->context->translator);
+
+
+		$template->registerFilter($latte);
 		return $template;
 	}
 
@@ -257,7 +303,8 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Component factory. Delegates the creation of components to a createComponent<Name> method.
-	 * @param  string      component name
+	 *
+	 * @param  string	  component name
 	 * @return IComponent  the created component (optionally)
 	 */
 	public function createComponent($name)
@@ -268,32 +315,21 @@ class Presenter extends \Nette\Application\UI\Presenter {
 			return $control;
 		}
 
-		$method = "create" . ucfirst($name) . "Control";
+		$method = "create" . ucfirst($name) . "Widget";
 		if (method_exists($this->context, $method)) {
-			return $this->context->$method();
+			$context = $this->context;
+			return new WidgetMultiplier(function() use ($context, $method)
+			{
+				return $context->$method();
+			});
 		}
 	}
 
 
 
 	/**
-	 * Formats layout template file names.
-	 * @return array
-	 */
-	public function formatLayoutTemplateFiles()
-	{
-		$theme = $this->context->parameters["venneModeFront"] ? $this->context->parameters["website"]["theme"] : "admin";
-		$layout = "layout";
-		$list = array(
-			$this->getContext()->parameters["wwwDir"] . "/themes/$theme/layouts/@$layout.latte"
-		);
-		return $list;
-	}
-
-
-
-	/**
 	 * Formats view template file names.
+	 *
 	 * @return array
 	 */
 	public function formatTemplateFiles()
@@ -310,8 +346,6 @@ class Presenter extends \Nette\Application\UI\Presenter {
 		}
 
 		return array(
-			$this->getContext()->parameters["wwwDir"] . "/themes/$theme/templates/$path$presenter/$this->view.latte",
-			$this->getContext()->parameters["wwwDir"] . "/themes/$theme/templates/$path$presenter.$this->view.latte",
 			"$dir/templates/$presenter/$this->view.latte",
 			"$dir/templates/$presenter.$this->view.latte",
 		);
@@ -320,7 +354,20 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
+	 * Get AssetManager
+	 *
+	 * @return Venne\Assets\AssetManager
+	 */
+	public function getAssetManager()
+	{
+		return $this->getContext()->assets->assetManager;
+	}
+
+
+
+	/**
 	 * Determines whether it links to the current page.
+	 *
 	 * @param  string   destination in format "[[module:]presenter:]action" or "signal!" or "this"
 	 * @param  array|mixed
 	 * @return bool
@@ -345,7 +392,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 				}
 
 				$reg = "/^" . str_replace("*", ".*", str_replace("#", "\/", $destination)) . "$/";
-				return ((bool) preg_match($reg, ":" . $this->name . ":" . $this->view));
+				return ((bool)preg_match($reg, ":" . $this->name . ":" . $this->view));
 			}
 		}
 		return $this->getPresenter()->getLastCreatedRequestFlag('current');
@@ -355,6 +402,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * Determines whether it URL to the current page.
+	 *
 	 * @param  string   $url
 	 * @return bool
 	 */
@@ -390,8 +438,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 	 */
 	public function isAllowed($destination)
 	{
-		if ($this->context->params['venneModeInstallation'])
-			return true;
+		if ($this->context->params['venneModeInstallation']) return true;
 		if ($destination == "this") {
 			$action = "action" . ucfirst($this->action);
 			$class = $this->name;
@@ -422,7 +469,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 					$class = substr($class, 1);
 				} else {
 					$name = explode(":", $this->name);
-					unset($name[count($name)-1]);
+					unset($name[count($name) - 1]);
 					unset($destination[count($destination) - 1]);
 					$name = implode(":", $name);
 					$class = str_replace(":", "Module\\", $name) . "Module\\";
@@ -445,7 +492,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
-	 * @param string $text 
+	 * @param string $text
 	 */
 	public function setKeywords($text)
 	{
@@ -455,7 +502,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
-	 * @param string $text 
+	 * @param string $text
 	 */
 	public function setDescription($text)
 	{
@@ -465,7 +512,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
-	 * @param string $text 
+	 * @param string $text
 	 */
 	public function setTitle($text)
 	{
@@ -475,31 +522,11 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 
 	/**
-	 * @param string $text 
+	 * @param string $text
 	 */
 	public function setAuthor($text)
 	{
 		$this->author = $text;
-	}
-
-
-
-	/**
-	 * @param string $content 
-	 */
-	public function addCss($content)
-	{
-		$this->css[$content] = $content;
-	}
-
-
-
-	/**
-	 * @param string $content
-	 */
-	public function addJs($content)
-	{
-		$this->js[$content] = $content;
 	}
 
 
@@ -511,16 +538,12 @@ class Presenter extends \Nette\Application\UI\Presenter {
 	{
 		if (is_numeric($robots)) {
 			$arr = array();
-			if ($robots & self::ROBOTS_INDEX)
-				$arr[] = "index";
-			if ($robots & self::ROBOTS_NOINDEX)
-				$arr[] = "noindex";
-			if ($robots & self::ROBOTS_FOLLOW)
-				$arr[] = "follow";
-			if ($robots & self::ROBOTS_NOFOLLOW)
-				$arr[] = "nofollow";
+			if ($robots & self::ROBOTS_INDEX) $arr[] = "index";
+			if ($robots & self::ROBOTS_NOINDEX) $arr[] = "noindex";
+			if ($robots & self::ROBOTS_FOLLOW) $arr[] = "follow";
+			if ($robots & self::ROBOTS_NOFOLLOW) $arr[] = "nofollow";
 			$this->robots = implode(", ", $arr);
-		}else {
+		} else {
 			$this->robots = $robots;
 		}
 	}
@@ -529,7 +552,7 @@ class Presenter extends \Nette\Application\UI\Presenter {
 
 	/**
 	 * @param string $name
-	 * @param string $url 
+	 * @param string $url
 	 */
 	public function addPath($name, $url)
 	{
@@ -544,6 +567,64 @@ class Presenter extends \Nette\Application\UI\Presenter {
 	public function getPaths()
 	{
 		return $this->paths;
+	}
+
+
+
+	/**
+	 * @return \App\CoreModule\Components\Head\HeadControl
+	 */
+	public function createComponentHead()
+	{
+		$head = $this->context->core->createHeadControl();
+		return $head;
+	}
+
+
+
+	/**
+	 * @return \App\CoreModule\Components\Panel\PanelControl
+	 */
+	public function createComponentVennePanel()
+	{
+		$head = $this->context->core->createPanelControl();
+		return $head;
+	}
+
+
+
+	/**
+	 * Is this presenter part of administration
+	 *
+	 * @return bool
+	 */
+	public function isAdminPresenter()
+	{
+		return (bool)($this instanceof AdminPresenter);
+	}
+
+
+
+	/**
+	 * Is this presenter part of installation
+	 *
+	 * @return bool
+	 */
+	public function isInstallationPresenter()
+	{
+		return (bool)($this instanceof InstallationPresenter);
+	}
+
+
+
+	/**
+	 * Is this presenter part of frontend
+	 *
+	 * @return bool
+	 */
+	public function isFrontPresenter()
+	{
+		return (bool)($this instanceof FrontPresenter);
 	}
 
 }

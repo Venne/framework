@@ -17,14 +17,14 @@ use Nette\Forms\Controls\MultiSelectBox;
 /**
  * Select box control that allows multiple item selection.
  *
- * @author     David Grudl
+ * @author	 David Grudl
  */
 class ManyToMany extends ManyToOne {
 
 
-
 	/**
 	 * Returns selected keys.
+	 *
 	 * @return array
 	 */
 	public function getValue()
@@ -47,6 +47,7 @@ class ManyToMany extends ManyToOne {
 
 	/**
 	 * Returns selected keys (not checked).
+	 *
 	 * @return array
 	 */
 	public function getRawValue()
@@ -72,6 +73,7 @@ class ManyToMany extends ManyToOne {
 
 	/**
 	 * Returns selected values.
+	 *
 	 * @return array
 	 */
 	public function getSelectedItem()
@@ -91,6 +93,7 @@ class ManyToMany extends ManyToOne {
 
 	/**
 	 * Returns HTML name of control.
+	 *
 	 * @return string
 	 */
 	public function getHtmlName()
@@ -102,6 +105,7 @@ class ManyToMany extends ManyToOne {
 
 	/**
 	 * Generates control's HTML element.
+	 *
 	 * @return Nette\Utils\Html
 	 */
 	public function getControl()

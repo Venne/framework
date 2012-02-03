@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -17,12 +17,10 @@ use Venne\Doctrine\IQueryable;
 use Nette;
 
 
-
 /**
  * @author Filip Procházka
  */
-interface IQueryObject
-{
+interface IQueryObject {
 
 	/**
 	 * @param IQueryable $repository
@@ -31,11 +29,13 @@ interface IQueryObject
 	function count(IQueryable $repository);
 
 
+
 	/**
 	 * @param IQueryable $repository
 	 * @return mixed
 	 */
 	function fetch(IQueryable $repository);
+
 
 
 	/**

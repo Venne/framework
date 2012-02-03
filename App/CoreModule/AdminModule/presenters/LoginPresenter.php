@@ -4,19 +4,18 @@
  * My Application
  *
  * @copyright  Copyright (c) 2010 John Doe
- * @package    MyApplication
+ * @package	MyApplication
  */
 
 namespace App\CoreModule\AdminModule;
 
-use Nette\Application\UI,
-	Nette\Security;
+use Nette\Application\UI, Nette\Security;
 
 /**
  * Sign in/out presenters.
  *
- * @author     John Doe
- * @package    MyApplication
+ * @author	 John Doe
+ * @package	MyApplication
  */
 class LoginPresenter extends \Venne\Application\UI\AdminPresenter {
 
@@ -38,13 +37,12 @@ class LoginPresenter extends \Venne\Application\UI\AdminPresenter {
 
 	/**
 	 * Sign in form component factory.
+	 *
 	 * @return Nette\Application\UI\Form
 	 */
 	protected function createComponentSignInForm($name)
 	{
-		$form = new \App\CoreModule\LoginForm;
-		$form->setSubmitLabel("Login");
-
+		$form = new \App\CoreModule\Forms\LoginForm;
 		return $form;
 	}
 

@@ -17,11 +17,12 @@ namespace Venne\Localization\Filters;
  * @internal
  *
  * @property-read array $translations
- */
-class LatteMacros extends \Nette\Latte\Macros\MacroSet
-{
+ */ class LatteMacros extends \Nette\Latte\Macros\MacroSet {
+
 	/** @var array */
 	private $translations = array();
+
+
 
 	/**
 	 * @param \Nette\Latte\Parser
@@ -36,6 +37,8 @@ class LatteMacros extends \Nette\Latte\Macros\MacroSet
 		return $me;
 	}
 
+
+
 	/**
 	 * @param \Nette\Latte\MacroNode
 	 * @param mixed
@@ -48,6 +51,8 @@ class LatteMacros extends \Nette\Latte\Macros\MacroSet
 		eval($x); // please don't slap me
 	}
 
+
+
 	/**
 	 * @param string|array
 	 * @param int
@@ -56,6 +61,8 @@ class LatteMacros extends \Nette\Latte\Macros\MacroSet
 	{
 		$this->translations[] = $message;
 	}
+
+
 
 	/**
 	 * @return array

@@ -1,0 +1,22 @@
+<h1>{_"System settings"}</h1>
+
+<ul class="toolbar">
+	
+	<li n:if="$presenter->isAllowed('Default:default')">
+		<a href="{plink Default:}"{if $presenter->isLinkCurrent("Default:*")} class="active"{/if}>general</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Application:default')">
+		<a href="{plink Application:}"{if $presenter->isLinkCurrent("Application:*")} class="active"{/if}>application</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Database:default')">
+		<a href="{plink Database:}"{if $presenter->isLinkCurrent("Database:*")} class="active"{/if}>database</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Account:default')">
+		<a href="{plink Account:}"{if $presenter->isLinkCurrent("Account:*")} class="active"{/if}>account</a>
+	</li>
+	<li n:if="$presenter->isAllowed('Log:default')">
+		<a href="{plink Log:}"{if $presenter->isLinkCurrent("Log:*")} class="active"{/if}>logs</a>
+	</li>
+	
+</ul>
+

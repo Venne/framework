@@ -8,10 +8,10 @@
  * For more information please see http://extras.nettephp.com
  *
  * @copyright  Copyright (c) 2009 David Grudl
- * @license    New BSD License
- * @link       http://extras.nettephp.com
- * @package    Nette Extras
- * @version    $Id: VisualPaginator.php 4 2009-07-14 15:22:02Z david@grudl.com $
+ * @license	New BSD License
+ * @link	   http://extras.nettephp.com
+ * @package	Nette Extras
+ * @version	$Id: VisualPaginator.php 4 2009-07-14 15:22:02Z david@grudl.com $
  */
 
 namespace Venne\Utils;
@@ -20,16 +20,15 @@ use Nette\Application\UI\Control;
 use Nette\Utils\Paginator;
 
 
-
 /**
  * Visual paginator control.
  *
- * @author     David Grudl
+ * @author	 David Grudl
  * @copyright  Copyright (c) 2009 David Grudl
- * @package    Nette Extras
+ * @package	Nette Extras
  */
-class VisualPaginator extends Control
-{
+class VisualPaginator extends Control {
+
 	/** @var Paginator */
 	private $paginator;
 
@@ -53,6 +52,7 @@ class VisualPaginator extends Control
 
 	/**
 	 * Renders paginator.
+	 *
 	 * @return void
 	 */
 	public function render()
@@ -83,6 +83,7 @@ class VisualPaginator extends Control
 
 	/**
 	 * Loads state informations.
+	 *
 	 * @param  array
 	 * @return void
 	 */

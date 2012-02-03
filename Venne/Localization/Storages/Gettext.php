@@ -9,8 +9,7 @@
 
 namespace Venne\Localization\Storages;
 
-use Nette\Utils\Strings,
-	Venne\Localization\Dictionary;
+use Nette\Utils\Strings, Venne\Localization\Dictionary;
 
 /**
  * Gettext localization storage
@@ -20,10 +19,12 @@ use Nette\Utils\Strings,
  * @copyright  Copyright (c) 2005, 2009 Zend Technologies USA Inc.
  * @author	Patrik Votoček
  */
-class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
-{
+class Gettext extends \Nette\Object implements \Venne\Localization\IStorage {
+
 	/** @var string */
 	private $fileMask;
+
+
 
 	/**
 	 * @param string
@@ -33,6 +34,8 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 		$this->fileMask = $fileMask;
 	}
 
+
+
 	/**
 	 * Process gettext metadata array
 	 *
@@ -41,48 +44,31 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 	private function processMetadata($metadata)
 	{
 		$result = array();
-		if (isset($metadata['Project-Id-Version']))
-			$result[] = "Project-Id-Version: ".$metadata['Project-Id-Version'];
-		else
+		if (isset($metadata['Project-Id-Version'])) $result[] = "Project-Id-Version: " . $metadata['Project-Id-Version']; else
 			$result[] = "Project-Id-Version: ";
-		if (isset($metadata['Report-Msgid-Bugs-To']))
-			$result[] = "Report-Msgid-Bugs-To: ".$metadata['Report-Msgid-Bugs-To'];
-		if (isset($metadata['POT-Creation-Date']))
-			$result[] = "POT-Creation-Date: ".$metadata['POT-Creation-Date'];
-		else
+		if (isset($metadata['Report-Msgid-Bugs-To'])) $result[] = "Report-Msgid-Bugs-To: " . $metadata['Report-Msgid-Bugs-To'];
+		if (isset($metadata['POT-Creation-Date'])) $result[] = "POT-Creation-Date: " . $metadata['POT-Creation-Date']; else
 			$result[] = "POT-Creation-Date: ";
-		$result[] = "PO-Revision-Date: ".date("Y-m-d H:iO");
-		if (isset($metadata['Last-Translator']))
-			$result[] = "Last-Translator: ".$metadata['Last-Translator'];
-		if (isset($metadata['Language-Team']))
-			$result[] = "Language-Team: ".$metadata['Language-Team'];
-		if (isset($metadata['MIME-Version']))
-			$result[] = "MIME-Version: ".$metadata['MIME-Version'];
-		else
+		$result[] = "PO-Revision-Date: " . date("Y-m-d H:iO");
+		if (isset($metadata['Last-Translator'])) $result[] = "Last-Translator: " . $metadata['Last-Translator'];
+		if (isset($metadata['Language-Team'])) $result[] = "Language-Team: " . $metadata['Language-Team'];
+		if (isset($metadata['MIME-Version'])) $result[] = "MIME-Version: " . $metadata['MIME-Version']; else
 			$result[] = "MIME-Version: 1.0";
-		if (isset($metadata['Content-Type']))
-			$result[] = "Content-Type: ".$metadata['Content-Type'];
-		else
+		if (isset($metadata['Content-Type'])) $result[] = "Content-Type: " . $metadata['Content-Type']; else
 			$result[] = "Content-Type: text/plain; charset=UTF-8";
-		if (isset($metadata['Content-Transfer-Encoding']))
-			$result[] = "Content-Transfer-Encoding: ".$metadata['Content-Transfer-Encoding'];
-		else
+		if (isset($metadata['Content-Transfer-Encoding'])) $result[] = "Content-Transfer-Encoding: " . $metadata['Content-Transfer-Encoding']; else
 			$result[] = "Content-Transfer-Encoding: 8bit";
-		if (isset($metadata['Plural-Forms']))
-			$result[] = "Plural-Forms: ".$metadata['Plural-Forms'];
-		else
+		if (isset($metadata['Plural-Forms'])) $result[] = "Plural-Forms: " . $metadata['Plural-Forms']; else
 			$result[] = "Plural-Forms: ";
-		if (isset($metadata['X-Poedit-Language']))
-			$result[] = "X-Poedit-Language: ".$metadata['X-Poedit-Language'];
-		if (isset($metadata['X-Poedit-Country']))
-			$result[] = "X-Poedit-Country: ".$metadata['X-Poedit-Country'];
-		if (isset($metadata['X-Poedit-SourceCharset']))
-			$result[] = "X-Poedit-SourceCharset: ".$metadata['X-Poedit-SourceCharset'];
-		if (isset($metadata['X-Poedit-KeywordsList']))
-			$result[] = "X-Poedit-KeywordsList: ".$metadata['X-Poedit-KeywordsList'];
+		if (isset($metadata['X-Poedit-Language'])) $result[] = "X-Poedit-Language: " . $metadata['X-Poedit-Language'];
+		if (isset($metadata['X-Poedit-Country'])) $result[] = "X-Poedit-Country: " . $metadata['X-Poedit-Country'];
+		if (isset($metadata['X-Poedit-SourceCharset'])) $result[] = "X-Poedit-SourceCharset: " . $metadata['X-Poedit-SourceCharset'];
+		if (isset($metadata['X-Poedit-KeywordsList'])) $result[] = "X-Poedit-KeywordsList: " . $metadata['X-Poedit-KeywordsList'];
 
 		return $result;
 	}
+
+
 
 	/**
 	 * @param \Nella\Localization\Dictionary
@@ -105,7 +91,7 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 		ksort($translations);
 		$items = count($translations) + 1;
 		$ids = Strings::chr(0x00);
-		$strings = $metadata.Strings::chr(0x00);
+		$strings = $metadata . Strings::chr(0x00);
 		$idsOffsets = array(0, 28 + $items * 16);
 		$stringsOffsets = array(array(0, strlen($metadata)));
 
@@ -115,8 +101,8 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 			$idsOffsets[] = strlen($id);
 			$idsOffsets[] = strlen($ids) + 28 + $items * 16;
 			$stringsOffsets[] = array(strlen($strings), strlen($string));
-			$ids .= $id.Strings::chr(0x00);
-			$strings .= $string.Strings::chr(0x00);
+			$ids .= $id . Strings::chr(0x00);
+			$strings .= $string . Strings::chr(0x00);
 		}
 
 		$valuesOffsets = array();
@@ -125,18 +111,19 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 			$valuesOffsets[] = $one;
 			$valuesOffsets[] = $all + strlen($ids) + 28 + $items * 16;
 		}
-		$offsets= array_merge($idsOffsets, $valuesOffsets);
+		$offsets = array_merge($idsOffsets, $valuesOffsets);
 
 		$mo = pack('Iiiiiii', 0x950412de, 0, $items, 28, 28 + $items * 8, 0, 28 + $items * 16);
-		foreach ($offsets as $offset)
-			$mo .= pack('i', $offset);
+		foreach ($offsets as $offset) $mo .= pack('i', $offset);
 
 		$path = str_replace(array('%dir%', '%lang%'), array($dictionary->dir, $lang), $this->fileMask);
 		$dir = str_replace(array('%dir%', '%lang%.mo'), array($dictionary->dir, ""), $this->fileMask);
 		umask(0000);
 		@mkdir($dir);
-		file_put_contents($path, $mo.$ids.$strings);
+		file_put_contents($path, $mo . $ids . $strings);
 	}
+
+
 
 	/**
 	 * @param string
@@ -156,9 +143,10 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 		$handle = @fopen($path, "rb");
 
 		$endian = FALSE;
-		$read = function($bytes) use ($handle, $endian) {
+		$read = function($bytes) use ($handle, $endian)
+		{
 			$data = fread($handle, 4 * $bytes);
-			return $endian === FALSE ? unpack('V'.$bytes, $data) : unpack('N'.$bytes, $data);
+			return $endian === FALSE ? unpack('V' . $bytes, $data) : unpack('N' . $bytes, $data);
 		};
 
 		$input = $read(1);
@@ -216,6 +204,8 @@ class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
 			$dictionary->pluralForm = $metadata['Plural-Forms'];
 		}
 	}
+
+
 
 	/**
 	 * Header metadata parser

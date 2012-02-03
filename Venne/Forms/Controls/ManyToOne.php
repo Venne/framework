@@ -18,7 +18,7 @@ use Nette;
 /**
  * Select box control that allows single item selection.
  *
- * @author     David Grudl
+ * @author	 David Grudl
  *
  * @property-read mixed $rawValue
  * @property   array $items
@@ -45,13 +45,13 @@ class ManyToOne extends BaseControl {
 	/**
 	 * @param  string  label
 	 * @param  array   items from which to choose
-	 * @param  int     number of rows that should be visible
+	 * @param  int	 number of rows that should be visible
 	 */
 	public function __construct($label = NULL, array $items = NULL, $size = NULL)
 	{
 		parent::__construct($label);
 		$this->control->setName('select');
-		$this->control->size = $size > 1 ? (int) $size : NULL;
+		$this->control->size = $size > 1 ? (int)$size : NULL;
 		if ($items !== NULL) {
 			$this->setItems($items);
 		}
@@ -70,6 +70,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Loads HTTP data.
+	 *
 	 * @return void
 	 */
 	public function loadHttpData()
@@ -82,6 +83,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Sets control's default value.
+	 *
 	 * @param  mixed
 	 * @return BaseControl  provides a fluent interface
 	 */
@@ -112,6 +114,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Returns selected item key (not checked).
+	 *
 	 * @return mixed
 	 */
 	public function getRawValue()
@@ -123,6 +126,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Generates control's HTML element.
+	 *
 	 * @return Nette\Utils\Html
 	 */
 	public function getControl()
@@ -133,7 +137,7 @@ class ManyToOne extends BaseControl {
 			$control->data('nette-empty-value', key($this->items));
 		}
 
-		$selected = (array) $this->getRawValue();
+		$selected = (array)$this->getRawValue();
 
 		$option = Nette\Utils\Html::el('option');
 
@@ -156,19 +160,17 @@ class ManyToOne extends BaseControl {
 				//	continue;
 				//}
 
-				if ($value2 instanceof \Venne\Doctrine\ORM\BaseEntity) {
+				if ($value2 instanceof Venne\Doctrine\ORM\IEntity) {
 					$key2 = $value2->id;
 				} else {
 					$key2 = $value2;
 				}
 
 				if ($value2 instanceof Nette\Utils\Html) {
-					$dest->add((string) $value2->selected(isset($selected[$key2])));
+					$dest->add((string)$value2->selected(isset($selected[$key2])));
 				} else {
-					$value2 = $this->translate((string) $value2);
-					$dest->add((string) $option->value($key2 === $value2 ? "" : $key2)
-									->selected(in_array($key2, $selected))
-									->setText($value2));
+					$value2 = $this->translate((string)$value2);
+					$dest->add((string)$option->value($key2 === $value2 ? "" : $key2)->selected(in_array($key2, $selected))->setText($value2));
 				}
 			}
 		}
@@ -179,6 +181,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Has been any item selected?
+	 *
 	 * @return bool
 	 */
 	public function isFilled()
@@ -191,6 +194,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Ignores the first item in select box.
+	 *
 	 * @param  string
 	 * @return SelectBox  provides a fluent interface
 	 */
@@ -221,6 +225,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Is first item in select box ignored?
+	 *
 	 * @return bool
 	 */
 	final public function getPrompt()
@@ -232,6 +237,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Are the keys used?
+	 *
 	 * @return bool
 	 */
 	final public function areKeysUsed()
@@ -243,6 +249,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Sets items from which to choose.
+	 *
 	 * @param  array
 	 * @return SelectBox  provides a fluent interface
 	 */
@@ -250,7 +257,7 @@ class ManyToOne extends BaseControl {
 	{
 		$this->items = $items;
 		$this->allowed = array();
-		$this->useKeys = (bool) $useKeys;
+		$this->useKeys = (bool)$useKeys;
 
 		foreach ($items as $key => $value) {
 			if (!is_array($value)) {
@@ -279,6 +286,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Returns items from which to choose.
+	 *
 	 * @return array
 	 */
 	final public function getItems()
@@ -290,6 +298,7 @@ class ManyToOne extends BaseControl {
 
 	/**
 	 * Returns selected value.
+	 *
 	 * @return string
 	 */
 	public function getSelectedItem()

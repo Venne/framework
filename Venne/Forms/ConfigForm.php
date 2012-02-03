@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -12,9 +12,10 @@
 namespace Venne\Forms;
 
 use Nette\Application\UI;
+use Nette\Application\UI\Presenter;
 
 /**
- * @author     Josef Kříž
+ * @author	 Josef Kříž
  */
 class ConfigForm extends \Venne\Application\UI\Form {
 
@@ -38,9 +39,7 @@ class ConfigForm extends \Venne\Application\UI\Form {
 	{
 		$this->mapper = $mapper;
 		$this->mapper->setContainer($this);
-
 		parent::__construct();
-		$this->addSubmit("_submit")->onClick;
 	}
 
 
@@ -59,13 +58,6 @@ class ConfigForm extends \Venne\Application\UI\Form {
 
 
 
-	public function setSubmitLabel($label)
-	{
-		$this["_submit"]->caption = $label;
-	}
-
-
-
 	/**
 	 * @return Mapping\EntityFormMapper
 	 */
@@ -77,60 +69,24 @@ class ConfigForm extends \Venne\Application\UI\Form {
 
 
 	/**
-	 * @return object
-	 */
-	public function getData()
-	{
-		return $this->data;
-	}
-
-
-
-	/**
 	 * @param Nette\ComponentModel\Container $obj
 	 */
 	protected function attached($obj)
 	{
-		if ($obj instanceof UI\Presenter) {
-			$this->getMapper()->save();
-		}
-
 		parent::attached($obj);
-	}
 
-
-
-	/**
-	 * Fires submit/click events.
-	 *
-	 * @todo mapper->assignResult()
-	 *
-	 * @return void
-	 */
-	public function fireEvents()
-	{
-		if (!$this->isSubmitted()) {
-			return;
-		}
-
-		// load data to entity
-		$entities = $this->getMapper()->load();
-
-		parent::fireEvents();
-
-		if ($this->onSaveRestore) {
-			$this->getPresenter()->getApplication()->restoreRequest($this->onSaveRestore);
-		}
-
-		if ($this["_submit"]->isSubmittedBy()) {
-			if ($this->successLink && !$this->presenter->isAjax()) {
-				$this->presenter->redirect($this->successLink, $this->successLinkParams);
+		if ($obj instanceof Presenter) {
+			if (!$this->isSubmitted()) {
+				$this->getMapper()->load();
+			} else {
+				$this->getMapper()->save();
 			}
 		}
 	}
 
-	/* -------------------------- */
 
+
+	/* -------------------------- */
 
 
 	/**

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Venne\Application\UI;
 use Venne;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class AdminPresenter extends \Venne\Application\UI\Presenter {
 
@@ -30,7 +30,7 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 	public function startup()
 	{
 		/* Check database */
-		if (!$this->context->doctrineContainer->checkConnection()) {
+		if (!$this->context->createCheckConnection()) {
 			if (substr($this->getName(), 0, 13) != "System:Admin:" && $this->getName() != "Core:Admin:Login") {
 				$this->redirect(":System:Admin:Database:");
 			}
@@ -40,8 +40,8 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 		/* Check updates */
 		foreach ($this->context->findByTag("module") as $module => $item) {
 			if (!version_compare($this->context->{$module}->getVersion(), $this->context->parameters["modules"][lcfirst(substr($module, 0, -6))]["version"], '==')) {
-				if ($this->getName() != "Modules:Admin:Default" && $this->getName() != "Core:Admin:Login") {
-					$this->redirect(":Modules:Admin:Default:");
+				if ($this->getName() != "Core:Admin:Modules:Default" && $this->getName() != "Core:Admin:Login") {
+					$this->redirect(":Core:Admin:Modules:Default:");
 				}
 				$this->flashMessage("Some modules need update or downgrade own database. Please fix it.", "warning");
 			}
@@ -53,12 +53,12 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 
 
 	/**
-	 * @param \Nette\Application\UI\PresenterComponentReflection $element 
+	 * @param \Nette\Application\UI\PresenterComponentReflection $element
 	 */
 	public function checkRequirements($element)
 	{
 		if (!$this->getUser()->loggedIn && $this->getName() != "Core:Admin:Login") {
-			if ($this->getUser()->logoutReason === \Nette\Http\User::INACTIVITY) {
+			if ($this->getUser()->logoutReason === \Nette\Security\User::INACTIVITY) {
 				$this->flashMessage(_("You have been logged out due to inactivity. Please login again."), 'info');
 			}
 
@@ -71,7 +71,20 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 
 
 	/**
+	 * Formats layout template file names.
+	 *
+	 * @return array
+	 */
+	public function formatLayoutTemplateFiles()
+	{
+		return array($this->getContext()->parameters["libsDir"] . "/App/CoreModule/layouts/administration.latte");
+	}
+
+
+
+	/**
 	 * Common render method.
+	 *
 	 * @return void
 	 */
 	public function beforeRender()
@@ -81,8 +94,8 @@ class AdminPresenter extends \Venne\Application\UI\Presenter {
 		$this->setTitle("Venne:CMS");
 		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
 
-		$this->template->adminMenu = new \App\CoreModule\Event\EventArgs;
-		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events::onAdminMenu, $this->template->adminMenu);
+		$this->template->adminMenu = new \App\CoreModule\Events\AdminEventArgs;
+		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events\AdminEvents::onAdminMenu, $this->template->adminMenu);
 		$this->template->adminMenu = $this->template->adminMenu->getNavigations();
 	}
 

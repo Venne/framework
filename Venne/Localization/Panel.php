@@ -14,22 +14,21 @@ namespace Venne\Localization;
  * Translator panel
  *
  * @author	Patrik Votoček
- */
-class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPanel {
+ */ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPanel {
 
 
-	const VERSION = "2.0",
-	XHR_HEADER = "X-Translation-Client";
+	const VERSION = "2.0", XHR_HEADER = "X-Translation-Client";
 
 	/** @var ITranslator */
 	private $translator;
 
 	/** @var Extractor */
 	private $extractor;
-	
+
 	/** @var \Nette\DI\Container */
 	protected $context;
-	
+
+
 
 	/**
 	 * @param \Nette\DI\IContainer
@@ -51,6 +50,7 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 	}
 
 
+
 	/**
 	 * @return Extractor
 	 */
@@ -60,22 +60,24 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 	}
 
 
+
 	/**
 	 * @param bool|array
 	 * @return array
 	 */
 	protected function getDictionaries($data = FALSE)
 	{
-		$convert = function($s) {
-					$s = strtolower($s);
-					if ($s == 'null') {
-						return NULL;
-					} elseif ($s == 'false') {
-						return FALSE;
-					} else {
-						return TRUE;
-					}
-				};
+		$convert = function($s)
+		{
+			$s = strtolower($s);
+			if ($s == 'null') {
+				return NULL;
+			} elseif ($s == 'false') {
+				return FALSE;
+			} else {
+				return TRUE;
+			}
+		};
 
 		$dictionaries = array();
 		foreach ($this->translator->dictionaries as $name => $dictionary) {
@@ -86,22 +88,17 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 				$dictionary->pluralForm = $data[$dictionary->dir]['pluralForm'];
 				if (isset($data[$dictionary->dir]['translations'])) {
 					foreach ($data[$dictionary->dir]['translations'] as $message => $translation) {
-						$dictionary->addTranslation(
-								$message, $translation['translation'], isset($translation['status']) ? $convert($translation['status']) : NULL
-						);
+						$dictionary->addTranslation($message, $translation['translation'], isset($translation['status']) ? $convert($translation['status']) : NULL);
 					}
 					$dictionary->save();
 				}
 			}
 
-			$current = $dictionaries[$dictionary->dir] = array(
-				'name' => $name,
-				'pluralForm' => $dictionary->pluralForm,
-				'translations' => $dictionary->iterator->getArrayCopy(),
-			);
+			$current = $dictionaries[$dictionary->dir] = array('name' => $name, 'pluralForm' => $dictionary->pluralForm, 'translations' => $dictionary->iterator->getArrayCopy(),);
 		}
 		return $dictionaries;
 	}
+
 
 
 	/**
@@ -130,11 +127,7 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 
 			$dictionaries = $this->getDictionaries($data);
 
-			$response = new \Nette\Application\Responses\JsonResponse(array(
-						'status' => "OK",
-						'lang' => $this->translator->dictionaries,
-						'data' => $dictionaries,
-					));
+			$response = new \Nette\Application\Responses\JsonResponse(array('status' => "OK", 'lang' => $this->translator->dictionaries, 'data' => $dictionaries,));
 
 			$response->send($httpRequest, $httpResponse);
 			exit(255);
@@ -142,6 +135,7 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 
 		$this->freeze();
 	}
+
 
 
 	/**
@@ -154,6 +148,7 @@ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPan
 		translations
 		</span>';
 	}
+
 
 
 	/**

@@ -28,22 +28,16 @@
 
 namespace Venne\Forms\Controls;
 
-use Nette\Forms\IControl,
-	Nette\Forms\Controls\BaseControl;
+use Nette\Forms\IControl, Nette\Forms\Controls\BaseControl;
 
 /**
  * @author Ondřej Vodáček <ondrej.vodacek@gamil.com>
  * @copyright 2011, Ondřej Vodáček
  * @license New BSD License
  */
-class DateInput extends BaseControl  {
+class DateInput extends BaseControl {
 
-	const TYPE_DATETIME = 'datetime',
-			TYPE_DATETIME_LOCAL = 'datetime-local',
-			TYPE_DATE = 'date',
-			TYPE_MONTH = 'month',
-			TYPE_TIME = 'time',
-			TYPE_WEEK = 'week';
+	const TYPE_DATETIME = 'datetime', TYPE_DATETIME_LOCAL = 'datetime-local', TYPE_DATE = 'date', TYPE_MONTH = 'month', TYPE_TIME = 'time', TYPE_WEEK = 'week';
 
 	/** @var string */
 	protected $type;
@@ -54,25 +48,25 @@ class DateInput extends BaseControl  {
 	/** @var mixed */
 	protected $submitedValue = null;
 
-	private static $formats = array(
-		self::TYPE_DATETIME => 'Y-m-d\TH:i:se',
-		self::TYPE_DATETIME_LOCAL => 'Y-m-d\TH:i:s',
-		self::TYPE_DATE => 'Y-m-d',
-		self::TYPE_MONTH => 'Y-m',
-		self::TYPE_TIME => 'H:i:s',
-		self::TYPE_WEEK => 'Y-\WW'
-	);
+	private static $formats = array(self::TYPE_DATETIME => 'Y-m-d\TH:i:se', self::TYPE_DATETIME_LOCAL => 'Y-m-d\TH:i:s', self::TYPE_DATE => 'Y-m-d', self::TYPE_MONTH => 'Y-m', self::TYPE_TIME => 'H:i:s', self::TYPE_WEEK => 'Y-\WW');
 
-	public static function register() {
+
+
+	public static function register()
+	{
 		$class = __CLASS__;
-		\Nette\Forms\Container::extensionMethod('addDate', function (\Nette\Forms\Container $form, $name, $label = null, $type = 'datetime-local') use ($class) {
+		\Nette\Forms\Container::extensionMethod('addDate', function (\Nette\Forms\Container $form, $name, $label = null, $type = 'datetime-local') use ($class)
+		{
 			$component = new $class($label, $type);
 			$form->addComponent($component, $name);
 			return $component;
 		});
 	}
 
-	public function __construct($label = null, $type = self::TYPE_DATETIME_LOCAL) {
+
+
+	public function __construct($label = null, $type = self::TYPE_DATETIME_LOCAL)
+	{
 		if (!isset(self::$formats[$type])) {
 			throw new \InvalidArgumentException("invalid type '$type' given.");
 		}
@@ -81,12 +75,16 @@ class DateInput extends BaseControl  {
 		$this->control->data('dateinput-type', $type);
 	}
 
+
+
 	/**
 	 * Sets control's value.
+	 *
 	 * @param  mixed
 	 * @return BaseControl  provides a fluent interface
 	 */
-	public function setValue($value = null) {
+	public function setValue($value = null)
+	{
 		if ($value === null || $value instanceof \DateTime) {
 			$this->value = $value;
 			$this->submitedValue = null;
@@ -110,11 +108,15 @@ class DateInput extends BaseControl  {
 		return $this;
 	}
 
+
+
 	/**
 	 * Returns control's value.
+	 *
 	 * @return mixed
 	 */
-	public function getControl() {
+	public function getControl()
+	{
 		$control = parent::getControl();
 		$format = self::$formats[$this->type];
 		if ($this->value !== null) {
@@ -132,14 +134,18 @@ class DateInput extends BaseControl  {
 		return $control;
 	}
 
+
+
 	/**
 	 * Adds a validation rule.
-	 * @param  mixed      rule type
-	 * @param  string     message to display for invalid data
-	 * @param  mixed      optional rule arguments
+	 *
+	 * @param  mixed	  rule type
+	 * @param  string	 message to display for invalid data
+	 * @param  mixed	  optional rule arguments
 	 * @return BaseControl  provides a fluent interface
 	 */
-	public function addRule($operation, $message = NULL, $arg = NULL) {
+	public function addRule($operation, $message = NULL, $arg = NULL)
+	{
 		if ($operation === \Nette\Forms\Form::RANGE) {
 			$this->range['min'] = $arg[0];
 			$this->range['max'] = $arg[1];
@@ -152,45 +158,60 @@ class DateInput extends BaseControl  {
 		return parent::addRule($operation, $message, $arg);
 	}
 
+
+
 	/**
 	 * Filled validator: is control filled?
+	 *
 	 * @param  IControl
 	 * @return bool
 	 */
-	public static function validateFilled(IControl $control) {
+	public static function validateFilled(IControl $control)
+	{
 		if (!$control instanceof self) {
-			throw new \InvalidArgumentException("Cant't validate control '".\get_class($control)."'.");
+			throw new \InvalidArgumentException("Cant't validate control '" . \get_class($control) . "'.");
 		}
 		return ($control->value !== null || $control->submitedValue !== null);
 	}
 
-	/**
-	 * Valid validator: is control valid?
-	 * @param  IControl
-	 * @return bool
-	 */
-	public static function validateDateInputValid(IControl $control) {
-		return self::validateValid($control);
-	}
+
 
 	/**
 	 * Valid validator: is control valid?
+	 *
 	 * @param  IControl
 	 * @return bool
 	 */
-	public static function validateValid(IControl $control) {
+	public static function validateDateInputValid(IControl $control)
+	{
+		return self::validateValid($control);
+	}
+
+
+
+	/**
+	 * Valid validator: is control valid?
+	 *
+	 * @param  IControl
+	 * @return bool
+	 */
+	public static function validateValid(IControl $control)
+	{
 		if (!$control instanceof self) {
-			throw new \InvalidArgumentException("Cant't validate control '".\get_class($control)."'.");
+			throw new \InvalidArgumentException("Cant't validate control '" . \get_class($control) . "'.");
 		}
 		return $control->submitedValue === null;
 	}
+
+
 
 	/**
 	 * @param self $control
 	 * @param array $args
 	 * @return bool
 	 */
-	public static function validateDateInputRange(self $control) {
+	public static function validateDateInputRange(self $control)
+	{
 		if ($control->range['min'] !== null) {
 			if ($control->range['min'] >= $control->value) {
 				return false;
@@ -204,31 +225,37 @@ class DateInput extends BaseControl  {
 		return true;
 	}
 
+
+
 	/**
 	 *
 	 * @param string $value
 	 * @return \DateTime
 	 */
-	private function parseValue($value) {
+	private function parseValue($value)
+	{
 		$date = null;
 		if ($this->type === self::TYPE_WEEK) {
 			try {
-				$date = new \DateTime($value."1");
+				$date = new \DateTime($value . "1");
 			} catch (\Exception $e) {
 				$date = false;
 			}
 		} else {
-			$date = \DateTime::createFromFormat('!'.self::$formats[$this->type], $value);
+			$date = \DateTime::createFromFormat('!' . self::$formats[$this->type], $value);
 		}
 		return $date;
 	}
+
+
 
 	/**
 	 *
 	 * @param \DateTime $value
 	 * @return string
 	 */
-	private function formatDate(\DateTime $value = null) {
+	private function formatDate(\DateTime $value = null)
+	{
 		if ($value) {
 			$value = $value->format(self::$formats[$this->type]);
 		}

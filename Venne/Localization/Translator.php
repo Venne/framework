@@ -16,18 +16,21 @@ namespace Venne\Localization;
  *
  * @property string $lang
  * @property-read array $dictionaries
- */
-class Translator extends \Nette\FreezableObject implements ITranslator
-{
+ */ class Translator extends \Nette\FreezableObject implements ITranslator {
+
 	/** @var array */
 	protected $dictionaries = array();
+
 	/** @var IStorage */
 	private $storage;
+
 	/** @var \Nette\Caching\Cache */
 	private $cache = NULL;
 
 	/** @var string */
 	private $lang = "en";
+
+
 
 	/**
 	 * @param \Nette\Caching\IStorage
@@ -38,6 +41,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 			$this->cache = new \Nette\Caching\Cache($cacheStorage, "Nella.Translator");
 		}
 	}
+
+
 
 	/**
 	 * @return IStorage
@@ -50,6 +55,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 		return $this->storage;
 	}
 
+
+
 	/**
 	 * @param IStorage
 	 * @return Translator
@@ -60,6 +67,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 		$this->storage = $storage;
 		return $this;
 	}
+
+
 
 	/**
 	 * @param string
@@ -75,10 +84,12 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 
 		$dir = realpath($dir);
 
-		$storage = $storage ?: $this->getStorage();
+		$storage = $storage ? : $this->getStorage();
 		$this->dictionaries[$name] = new Dictionary($dir, $storage);
 		return $this;
 	}
+
+
 
 	/**
 	 * @internal
@@ -89,6 +100,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 		return $this->dictionaries;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -96,6 +109,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 	{
 		return $this->lang;
 	}
+
+
 
 	/**
 	 * @param string
@@ -109,6 +124,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 		$this->lang = $lang;
 		return $this;
 	}
+
+
 
 	/**
 	 * @throws \Nette\InvalidStateException
@@ -124,6 +141,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 		$this->freeze();
 	}
 
+
+
 	/**
 	 * @param string
 	 * @param int
@@ -135,8 +154,8 @@ class Translator extends \Nette\FreezableObject implements ITranslator
 			$this->init();
 		}
 
-		$messages = (array) $message;
-		$args = (array) $count;
+		$messages = (array)$message;
+		$args = (array)$count;
 		$form = $args ? reset($args) : NULL;
 		$form = $form === NULL ? 1 : (is_int($form) ? $form : 0);
 		$plural = $form == 1 ? 0 : 1;

@@ -1,0 +1,145 @@
+form.venne-form {
+    float: left;
+    width: 100%;
+}
+
+form.venne-form table {
+    width: 100%;
+}
+
+form.venne-form th {
+    font-size: 12px;
+}
+
+form.venne-form fieldset tr {
+    width: 100%;
+}
+
+form.venne-form.big fieldset th {
+    margin: 10px 0 0 0;
+    text-align: left;
+    /*width: 200px;*/
+    width: 100%;
+    float: left;
+}
+
+form.venne-form fieldset th {
+    text-align: right;
+    width: 20%;
+}
+
+form.venne-form.big fieldset td {
+    width: 100%;
+    float: left;
+}
+
+form.venne-form fieldset td {
+    width: 80%;
+}
+
+form.venne-form fieldset td td {
+    /* for CKEditor */
+    width: auto;
+    float: none;
+}
+
+form.venne-form fieldset th th {
+    /* for CKEditor */
+    width: auto;
+    float: none;
+}
+
+form.venne-form td small {
+    margin-left: 10px;
+    color: #aaaaaa;
+}
+
+form.venne-form label {
+    margin-right: 5px;
+}
+
+form.venne-form flash.error {
+    background: #ffaaaa url('../img/flash/warning.png') no-repeat;
+    background-position: 25px 8px;
+    border: 1px solid #ff0000;
+    padding: 15px 15px 15px 90px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+form.venne-form.big textarea {
+    width: 720px;
+}
+
+form.venne-form textarea {
+    width: 300px;
+}
+
+form.venne-form input {
+    font: 12px "Trebuchet MS", "Geneva CE", lucida, sans-serif;
+}
+
+form.venne-form input[type=text], form.venne-form input[type=password] {
+    border: 1px solid #aaaaaa;
+    border-radius: 3px;
+    margin: 0;
+    -moz-border-radius: 3px;
+    background-color: #ffffff;
+    font-size: 12px;
+    width: 300px;
+}
+form.venne-form .tag-container input[type=text]{
+    border: 0;
+}
+
+form.venne-form.big input[type=text], form.venne-form.big input[type=password] {
+    width: 320px;
+}
+
+form.venne-form input[type=submit] {
+    border: 0;
+    padding: 3px;
+    margin: 0;
+    background: transparent url('../img/button.png') no-repeat;
+    width: 102px;
+    height: 27px;
+    color: #ffffff;
+    text-shadow: #000000 0px -1px 0px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+form.venne-form input[type=submit].grey {
+    background: transparent url('../img/button-grey.png') no-repeat;
+    color: #000000;
+    text-shadow: #ffffff 0px 1px 0px;
+}
+
+form.venne-form select {
+    min-width: 150px;
+}
+
+form.venne-form fieldset {
+    margin: 10px 0 10px 0;
+    border: 1px solid #dddddd;;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+}
+
+form.venne-form fieldset legend {
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #007700;
+}
+
+form.venne-form fieldset.collapsible legend {
+    background: transparent url('../img/fieldset-arrow.png') no-repeat;
+    background-position: 10px bottom;
+    padding: 2px 10px 2px 30px;
+}
+
+form.venne-form fieldset.collapsed legend {
+    background: transparent url('../img/fieldset-arrow-collapsed.png') no-repeat;
+    background-position: 10px center;
+}

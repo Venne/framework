@@ -1,23 +1,22 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\CoreModule;
+namespace App\CoreModule\Macros;
 
 use Venne;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class DialogMacro extends \Nette\Latte\Macros\MacroSet {
-
 
 
 	public static function make($type = null, $args = array())
@@ -30,7 +29,7 @@ class DialogMacro extends \Nette\Latte\Macros\MacroSet {
 
 	public function start(\Nette\Latte\MacroNode $node, $writer)
 	{
-		return $writer->write('echo \App\CoreModule\DialogMacro::make(%node.word, %node.array?)');
+		return $writer->write('echo \App\CoreModule\Macros\DialogMacro::make(%node.word, %node.array?)');
 	}
 
 
@@ -42,9 +41,9 @@ class DialogMacro extends \Nette\Latte\Macros\MacroSet {
 
 
 
-	public static function install(\Nette\Latte\Parser $parser)
+	public static function install(\Nette\Latte\Compiler $compiler)
 	{
-		$me = new static($parser);
+		$me = new static($compiler);
 		$me->addMacro('dialog', array($me, "start"), array($me, "stop"));
 	}
 

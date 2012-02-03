@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -14,7 +14,7 @@ namespace Venne\Forms\Controls;
 use Nette\Utils\Html;
 
 /**
- * @author     Josef Kříž
+ * @author	 Josef Kříž
  */
 class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
@@ -27,7 +27,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
 	/** @var array */
 	protected $allowed = array();
-	
+
 	/** @var bool */
 	private $prompt = FALSE;
 
@@ -47,6 +47,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
 	/**
 	 * Sets items from which to choose.
+	 *
 	 * @param  array
 	 * @return SelectBox  provides a fluent interface
 	 */
@@ -54,7 +55,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 	{
 		$this->items = $items;
 		$this->allowed = array();
-		$this->useKeys = (bool) $useKeys;
+		$this->useKeys = (bool)$useKeys;
 
 		foreach ($items as $key => $value) {
 			if (!is_array($value)) {
@@ -83,6 +84,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
 	/**
 	 * Returns items from which to choose.
+	 *
 	 * @return array
 	 */
 	final public function getItems()
@@ -94,6 +96,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
 	/**
 	 * Generates control's HTML element.
+	 *
 	 * @return Nette\Utils\Html
 	 */
 	public function getControl()
@@ -105,7 +108,7 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 		$text = Html::el("select");
 		$text->attrs["data-venne-form-textwithselect"] = true;
 		$option = Html::el('option');
-		$text->add((string) $option->value("")->setText("----------"));
+		$text->add((string)$option->value("")->setText("----------"));
 		$text->data('nette-empty-value', $this->useKeys ? key($this->items) : current($this->items));
 		foreach ($this->items as $key => $value) {
 			if (!is_array($value)) {
@@ -118,14 +121,12 @@ class TextWithSelect extends \Nette\Forms\Controls\TextInput {
 
 			foreach ($value as $key2 => $value2) {
 				if ($value2 instanceof Nette\Utils\Html) {
-					$dest->add((string) $value2->selected(isset($selected[$key2])));
+					$dest->add((string)$value2->selected(isset($selected[$key2])));
 
 				} else {
 					$key2 = $this->useKeys ? $key2 : $value2;
-					$value2 = $this->translate((string) $value2);
-					$text->add((string) $option->value($key2 === $value2 ? NULL : $key2)
-						->selected($key2 == $this->value)
-						->setText($value2));
+					$value2 = $this->translate((string)$value2);
+					$text->add((string)$option->value($key2 === $value2 ? NULL : $key2)->selected($key2 == $this->value)->setText($value2));
 				}
 			}
 		}

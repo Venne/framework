@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -14,25 +14,29 @@ namespace Venne\Doctrine\Event;
 use Venne;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class EventArgs extends \Doctrine\Common\EventArgs {
 
 
-
 	/**
 	 * Access to reflection.
+	 *
 	 * @return Nette\Reflection\ClassType
 	 */
-	public /**/static/**/ function getReflection()
+	public /**/
+	static /**/
+	function getReflection()
 	{
-		return new Reflection\ClassType(/* 5.2*$this *//**/get_called_class()/**/);
+		return new Reflection\ClassType( /* 5.2*$this */ /**/
+			get_called_class() /**/);
 	}
 
 
 
 	/**
 	 * Call to undefined method.
+	 *
 	 * @param  string  method name
 	 * @param  array   arguments
 	 * @return mixed
@@ -47,6 +51,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Call to undefined static method.
+	 *
 	 * @param  string  method name (in lower case!)
 	 * @param  array   arguments
 	 * @return mixed
@@ -61,6 +66,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Adding method to class.
+	 *
 	 * @param  string  method name
 	 * @param  mixed   callback or closure
 	 * @return mixed
@@ -84,6 +90,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Returns property value. Do not call directly.
+	 *
 	 * @param  string  property name
 	 * @return mixed   property value
 	 * @throws MemberAccessException if the property is not defined.
@@ -97,6 +104,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Sets value of a property. Do not call directly.
+	 *
 	 * @param  string  property name
 	 * @param  mixed   property value
 	 * @return void
@@ -111,6 +119,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Is property defined?
+	 *
 	 * @param  string  property name
 	 * @return bool
 	 */
@@ -123,6 +132,7 @@ class EventArgs extends \Doctrine\Common\EventArgs {
 
 	/**
 	 * Access to undeclared property.
+	 *
 	 * @param  string  property name
 	 * @return void
 	 * @throws MemberAccessException

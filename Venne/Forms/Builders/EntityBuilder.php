@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -15,53 +15,52 @@ use Nette\Object;
 use Nette\Reflection\ClassType;
 
 /**
- * @author     Josef Kříž
+ * @author	 Josef Kříž
  */
 class EntityBuilder extends Object {
-
 
 
 	public function build(\Venne\Forms\Form $form, $entityName)
 	{
 		$ref = new ClassType($entityName);
-		foreach($ref->getProperties() as $property){
-			if($property->hasAnnotation("Form")){
+		foreach ($ref->getProperties() as $property) {
+			if ($property->hasAnnotation("Form")) {
 				$anot = $property->getAnnotation("Form");
-				
+
 				$type = isset($anot["type"]) ? $anot["type"] : $property->getAnnotation("Column")->type;
 				$name = isset($anot["name"]) ? $anot["name"] : $property->getName();
 				$label = isset($anot["label"]) ? $anot["label"] : ucfirst($property->getName());
-				
-				if(isset($anot["group"])){
+
+				if (isset($anot["group"])) {
 					$form->addGroup($anot["group"]);
 				}
-				
-				if($type == "string"){
+
+				if ($type == "string") {
 					$form->addText($name, $label);
 					continue;
 				}
-				
-				if($type == "datetime"){
+
+				if ($type == "datetime") {
 					$form->addDateTime($name, $label);
 					continue;
 				}
-				
-				if($type == "text"){
+
+				if ($type == "text") {
 					$form->addTextArea($name, $label);
 					continue;
 				}
-				
-				if($type == "editor"){
+
+				if ($type == "editor") {
 					$form->addEditor($name, $label);
 					continue;
 				}
-				
-				if($type == "selectbox"){
+
+				if ($type == "selectbox") {
 					$form->addSelect($name, $label);
 					continue;
 				}
-				
-				if($type == "boolean"){
+
+				if ($type == "boolean") {
 					$form->addCheckbox($name, $label);
 					continue;
 				}

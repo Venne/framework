@@ -18,25 +18,29 @@ namespace Venne\Localization;
  * @property string $pluralForm
  * @property array $metadata
  * @property-read \ArrayIterator $iterator
- */
-class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \Serializable
-{
-	const STATUS_SAVED = TRUE,
-		STATUS_TRANSLATED = FALSE,
-		STATUS_UNTRANSLATED = NULL;
+ */ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \Serializable {
+
+	const STATUS_SAVED = TRUE, STATUS_TRANSLATED = FALSE, STATUS_UNTRANSLATED = NULL;
 
 	/** @var string */
 	private $dir;
+
 	/** @var IStorage */
 	private $storage;
+
 	/** @var string */
 	private $lang;
+
 	/** @var string */
 	private $pluralForm;
+
 	/** @var array */
 	private $metadata;
+
 	/** @var array */
 	private $dictionary;
+
+
 
 	/**
 	 * @param string
@@ -49,6 +53,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		$this->metadata = $this->dictionary = array();
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -57,6 +63,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return $this->dir;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -64,6 +72,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 	{
 		return $this->pluralForm;
 	}
+
+
 
 	/**
 	 * @param string
@@ -75,6 +85,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return $this;
 	}
 
+
+
 	/**
 	 * @internal
 	 * @return array
@@ -83,6 +95,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 	{
 		return $this->metadata;
 	}
+
+
 
 	/**
 	 * @internal
@@ -97,6 +111,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return $this;
 	}
 
+
+
 	/**
 	 * @param string
 	 * @param array
@@ -105,13 +121,12 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 	 */
 	public function addTranslation($message, array $translation = array(), $status = self::STATUS_SAVED)
 	{
-		$this->dictionary[$message] = array(
-			'status' => $status,
-			'translation' => $translation,
-		);
+		$this->dictionary[$message] = array('status' => $status, 'translation' => $translation,);
 
 		return $this;
 	}
+
+
 
 	/**
 	 * @param string
@@ -122,6 +137,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return isset($this->dictionary[$message]);
 	}
 
+
+
 	/**
 	 * @return \ArrayIterator
 	 */
@@ -129,6 +146,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 	{
 		return new \ArrayIterator($this->dictionary);
 	}
+
+
 
 	/**
 	 * @param string
@@ -143,6 +162,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 
 		$this->freeze();
 	}
+
+
 
 	/**
 	 * @param string
@@ -166,6 +187,8 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return isset($translation[$plural]) ? $translation[$plural] : $translation[0];
 	}
 
+
+
 	/**
 	 * @param int
 	 * @return int
@@ -176,10 +199,12 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 			return 0;
 		}
 
-		eval($x = preg_replace('/([a-z]+)/', '$$1', "n=$form;".$this->pluralForm.";"));
+		eval($x = preg_replace('/([a-z]+)/', '$$1', "n=$form;" . $this->pluralForm . ";"));
 
 		return $plural;
 	}
+
+
 
 	/**
 	 * @return Dictionary
@@ -190,17 +215,17 @@ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \
 		return $this;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
 	public function serialize()
 	{
-		return serialize(array(
-			'metadata' => $this->metadata,
-			'pluralForm' => $this->pluralForm,
-			'dicionary' => $this->dictionary,
-		));
+		return serialize(array('metadata' => $this->metadata, 'pluralForm' => $this->pluralForm, 'dicionary' => $this->dictionary,));
 	}
+
+
 
 	/**
 	 * @param string

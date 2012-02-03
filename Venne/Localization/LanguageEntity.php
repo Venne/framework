@@ -20,24 +20,27 @@ namespace Venne\Localization;
  * @property string $name
  * @property string $nativeName
  * @property string $short
- */
-class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
-{
+ */ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity {
+
 	/**
 	 * @column
 	 * @var string
 	 */
 	private $name;
+
 	/**
 	 * @column
 	 * @var string
 	 */
 	private $nativeName;
+
 	/**
 	 * @column(length=5)
 	 * @var string
 	 */
 	private $short;
+
+
 
 	/**
 	 * @return string
@@ -46,6 +49,8 @@ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
 	{
 		return $this->name;
 	}
+
+
 
 	/**
 	 * @param string
@@ -58,6 +63,8 @@ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
 		return $this;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -65,6 +72,8 @@ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
 	{
 		return $this->nativeName;
 	}
+
+
 
 	/**
 	 * @param string
@@ -77,6 +86,8 @@ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
 		return $this;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -84,6 +95,8 @@ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
 	{
 		return $this->short;
 	}
+
+
 
 	/**
 	 * @param string

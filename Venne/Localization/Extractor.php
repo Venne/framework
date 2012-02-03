@@ -13,15 +13,18 @@ namespace Venne\Localization;
  * Translation extractor
  *
  * @author	Patrik Votoček
- */
-class Extractor extends \Venne\FreezableObject
-{
+ */ class Extractor extends \Venne\FreezableObject {
+
 	/** @var Translator */
 	protected $translator;
+
 	/** @var array */
 	protected $filters = array();
+
 	/** @var \Nette\DI\Container */
 	protected $context;
+
+
 
 	/**
 	 * @param Translator
@@ -32,6 +35,8 @@ class Extractor extends \Venne\FreezableObject
 		$this->translator = $translator;
 		$this->addFilter(new Filters\Latte($this->context));
 	}
+
+
 
 	/**
 	 * @param IFilter

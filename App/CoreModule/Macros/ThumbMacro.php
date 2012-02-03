@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\CoreModule;
+namespace App\CoreModule\Macros;
 
 use Venne;
 
 /**
- * @author Josef Kříž
+ * @author Josef Kříž <pepakriz@gmail.com>
  */
 class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
-	
+
 	public static function filter(\Nette\Latte\MacroNode $node, $writer)
 	{
 		$param = $writer->formatArray();
@@ -27,18 +27,22 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 		$param = explode(" ", $param);
 		$name = $param[0];
 		unset($param[0]);
-		if(!count($param)){
+		if (!count($param)) {
 			return $writer->write('?>src="<?php echo $basePath;?>' . $name . '"<?php');
 		}
-		return $writer->write('?>src="<?php echo \App\CoreModule\ThumbMacro::thumb($presenter, "' . $name . '", ' . implode(", ", $param) . '); ?>"<?php');
+		return $writer->write('?>src="<?php echo \App\CoreModule\Macros\ThumbMacro::thumb($presenter, "' . $name . '", ' . implode(", ", $param) . '); ?>"<?php');
 	}
-	
-	public static function install(\Nette\Latte\Parser $parser)
+
+
+
+	public static function install(\Nette\Latte\Compiler $compiler)
 	{
-		$me = new static($parser);
-		$me->addMacro('@src', array($me, "filter"));
+		$me = new static($compiler);
+		$me->addMacro('src', NULL, NULL, array($me, "filter"));
 	}
-	
+
+
+
 	/**
 	 * Vytvoreni miniatury obrazku a vraceni jeho URI
 	 *
@@ -50,44 +54,44 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 	public static function thumb($presenter, $origName, $width = NULL, $height = NULL, $flags = \Nette\Image::FIT, $crop = false, $tag = false)
 	{
 		$flags = $flags | \Nette\Image::ENLARGE;
-	
-		if(!$width){
+
+		if (!$width) {
 			$width = NULL;
 		}
-		if(!$height){
+		if (!$height) {
 			$height = NULL;
 		}
-		
+
 		$basePath = $presenter->context->httpRequest->url->basePath;
 		$path = $basePath . "cache/thumbs/";
 		$wwwDir = $presenter->context->parameters["wwwDir"];
 		$dir = $wwwDir . "/cache/thumbs";
-		
-		if(!$width && !$height){
+
+		if (!$width && !$height) {
 			return $basePath . $origName;
 		}
-		
-		if($tag){
+
+		if ($tag) {
 			$tagWeb = \str_replace("-", "/", \Nette\Utils\Strings::webalize($tag));
 			$thumbDirPath = $dir . '/' . $tagWeb;
-		}else{
+		} else {
 			$thumbDirPath = $dir . '/';
 		}
 		$origPath = $wwwDir . '/' . $origName;
 
-		if (!\file_exists($thumbDirPath)){
+		if (!\file_exists($thumbDirPath)) {
 			\mkdir($thumbDirPath, 0777, true);
 		}
-		
-		if (($width === NULL && $height === NULL) || !is_file($origPath) || !is_dir($thumbDirPath) || !is_writable($thumbDirPath)){
+
+		if (($width === NULL && $height === NULL) || !is_file($origPath) || !is_dir($thumbDirPath) || !is_writable($thumbDirPath)) {
 			return $basePath . "/" . $origName;
 		}
 
 		$thumbName = self::getThumbName($origName, $width, $height, filemtime($origPath), $flags, $crop);
 
-		if($tag){
-			$thumbUri = $tagWeb . '/' .$thumbName;
-		}else{
+		if ($tag) {
+			$thumbUri = $tagWeb . '/' . $thumbName;
+		} else {
 			$thumbUri = $thumbName;
 		}
 
@@ -114,7 +118,7 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 			$newWidth = $image->getWidth();
 			$newHeight = $image->getHeight();
 
-			if($crop){
+			if ($crop) {
 				$image->crop('50%', '50%', $width, $height);
 			}
 
@@ -136,6 +140,8 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 		}
 	}
 
+
+
 	/**
 	 * Vytvori jmeno generovane miniatury
 	 *
@@ -155,7 +161,7 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 		$relPath = implode($sep, $tmp);
 
 		// pripojime rozmery a mtime
-		$relPath .= $width . 'x' . $height . '-' . $mtime . '.' . $flags. '.' . $crop;
+		$relPath .= $width . 'x' . $height . '-' . $mtime . '.' . $flags . '.' . $crop;
 
 		// zahashujeme a vratime priponu
 		$relPath = md5($relPath) . $sep . $ext;
@@ -163,9 +169,12 @@ class ThumbMacro extends \Nette\Latte\Macros\MacroSet {
 		return $relPath;
 	}
 
-	public static function deleteThumbsByTag($tag){
-		\Benne\File::rmdir(WWW_DIR . '/' . trim(self::$thumbDirUri, '/\\').'/'. \str_replace("-", "/", \Nette\String::webalize($tag)));
+
+
+	public static function deleteThumbsByTag($tag)
+	{
+		\Benne\File::rmdir(WWW_DIR . '/' . trim(self::$thumbDirUri, '/\\') . '/' . \str_replace("-", "/", \Nette\String::webalize($tag)));
 	}
-	
+
 }
 

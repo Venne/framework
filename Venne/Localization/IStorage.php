@@ -13,15 +13,16 @@ namespace Venne\Localization;
  * Localization storage interface
  *
  * @author	Patrik Votoček
- */
-interface IStorage
-{
+ */ interface IStorage {
+
 	/**
 	 * @param Dictionary
 	 * @param string
 	 */
 	public function save(Dictionary $dictionary, $lang);
-	
+
+
+
 	/**
 	 * @param string
 	 * @return Dictionary

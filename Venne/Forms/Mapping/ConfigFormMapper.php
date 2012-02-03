@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -65,7 +65,7 @@ class ConfigFormMapper extends \Nette\Object {
 
 	public function setRoot($root)
 	{
-		$this->root = $this->root = explode(".", $root);
+		$this->root = $this->root = $root ? explode(".", $root) : array();
 	}
 
 
@@ -92,6 +92,7 @@ class ConfigFormMapper extends \Nette\Object {
 		foreach ($this->root as $item) {
 			$data = $data[$item];
 		}
+
 		return $data;
 	}
 
@@ -99,6 +100,7 @@ class ConfigFormMapper extends \Nette\Object {
 
 	protected function saveConfig($values)
 	{
+		$this->loadConfig();
 		$data = & $this->data;
 
 		foreach ($this->root as $item) {
@@ -115,18 +117,31 @@ class ConfigFormMapper extends \Nette\Object {
 	/**
 	 * @return array
 	 */
-	public function load()
+	public function save($container = NULL, $rec = false, $values = NULL)
 	{
-		$valuesOld = $this->loadConfig();
-		$values = array();
+		$container = $container ? : $this->container;
 
-		foreach ($this->container->getControls() as $control) {
-			if (key_exists($control->name, $valuesOld)) {
-				$values[$control->name] = $control->value;
+		if (!$rec) {
+			$values = $this->loadConfig();
+		} else {
+			$values = $values[$rec];
+		}
+
+		foreach ($container->getComponents() as $key => $control) {
+			if (!Nette\Utils\Strings::startsWith($key, "_")) {
+				if ($control instanceof \Nette\Forms\Container) {
+					$values[$key] = $this->save($control, $key, $values);
+				} else if ($control instanceof \Nette\Forms\IControl) {
+					$values[$key] = $control->value;
+				}
 			}
 		}
 
-		$this->saveConfig($values);
+		if (!$rec) {
+			$this->saveConfig($values);
+		} else {
+			return $values;
+		}
 	}
 
 
@@ -134,13 +149,21 @@ class ConfigFormMapper extends \Nette\Object {
 	/**
 	 * @return array
 	 */
-	public function save()
+	public function load($container = NULL, $rec = false, $values = NULL)
 	{
-		$values = $this->loadConfig();
+		$container = $container ? : $this->container;
 
-		foreach ($this->container->getControls() as $control) {
-			if (key_exists($control->name, $values)) {
-				$control->value = $values[$control->name];
+		if (!$rec) {
+			$values = $this->loadConfig();
+		}
+
+		foreach ($container->getComponents() as $key => $control) {
+			if (!Nette\Utils\Strings::startsWith($key, "_")) {
+				if ($control instanceof \Nette\Forms\Container) {
+					$this->load($control, true, $values[$key]);
+				} else if ($control instanceof \Nette\Forms\IControl) {
+					$control->value = isset($values[$key]) ? $values[$key] : "";
+				}
 			}
 		}
 	}

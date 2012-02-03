@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Venne:CMS (version 2.0-dev released on $WCDATE$)
+ * This file is part of the Venne:CMS (https://github.com/Venne)
  *
- * Copyright (c) 2011 Josef Kříž pepakriz@gmail.com
+ * Copyright (c) 2011, 2012 Josef Kříž (http://www.josef-kriz.cz)
  *
  * For the full copyright and license information, please view
  * the file license.txt that was distributed with this source code.
@@ -20,12 +20,10 @@ use Nette\ComponentModel\IComponent;
 use SplObjectStorage;
 
 
-
 /**
  * @author Filip Procházka
  */
-class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper
-{
+class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper {
 
 	/** @var SplObjectStorage */
 	private $assignment;
@@ -85,11 +83,10 @@ class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper
 	/************************ load & save to component ************************/
 
 
-
 	/**
 	 * @return array
 	 */
-	public function load()
+	public function save()
 	{
 		$entities = array();
 		foreach ($this->getAssignment() as $entity) {
@@ -112,7 +109,7 @@ class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper
 	/**
 	 * @return array
 	 */
-	public function save()
+	public function load()
 	{
 		$entities = array();
 		foreach ($this->getAssignment() as $entity) {
@@ -133,7 +130,6 @@ class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper
 
 
 	/************************ validation ************************/
-
 
 
 	/**
