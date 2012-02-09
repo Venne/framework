@@ -24,7 +24,7 @@ class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	const USER_ADMIN = NULL;
 
 	/**
-	 * @ManyToOne(targetEntity="userEntity", inversedBy="id")
+	 * @ManyToOne(targetEntity="UserEntity", inversedBy="id")
 	 * @JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
 	 */
 	protected $user;

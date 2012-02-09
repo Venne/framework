@@ -122,6 +122,7 @@ class Loader {
 		/* Load Nette */
 		require_once $this->parameters['netteDir'] . "/loader.php";
 		require_once $this->parameters['venneDir'] . "/Configurator.php";
+		Debugger::enable(Debugger::DEVELOPMENT);
 
 
 		/* Detect and prepare configuration files */

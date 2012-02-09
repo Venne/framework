@@ -62,8 +62,8 @@ class PageEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	/**
 	 * @ManyToMany(targetEntity="LanguageEntity")
 	 * @JoinTable(name="pageLanguageLink",
-	 *	  joinColumns={@JoinColumn(name="`from`", referencedColumnName="id", onDelete="CASCADE")},
-	 *	  inverseJoinColumns={@JoinColumn(name="`to`", referencedColumnName="id", onDelete="CASCADE")}
+	 *	  joinColumns={@JoinColumn(name="page_id", referencedColumnName="id", onDelete="CASCADE")},
+	 *	  inverseJoinColumns={@JoinColumn(name="language_id", referencedColumnName="id", onDelete="CASCADE")}
 	 *	  )
 	 */
 	protected $languages;

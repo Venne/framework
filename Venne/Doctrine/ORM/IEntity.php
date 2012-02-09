@@ -11,8 +11,11 @@
 
 namespace Venne\Doctrine\ORM;
 
+use Venne;
+
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ interface IEntity {
+ */
+interface IEntity {
 
 }

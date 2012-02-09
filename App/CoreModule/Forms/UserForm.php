@@ -31,35 +31,7 @@ class UserForm extends \Venne\Forms\EntityForm {
 		$this->addPassword("password_confirm", "Confirm password")->addRule(\Nette\Forms\Form::EQUAL, 'Invalid re password', $this['password']);
 
 		$this->addGroup("Next informations");
-		$this->addManyToMany("roles");
+		$this->addManyToMany("roleEntities");
 	}
-
-
-//	/**
-//	 * @param \Venne\Doctrine\ORM\BaseRepository $repository
-//	 * @param \Venne\Forms\Mapping\EntityFormMapper $mapper
-//	 * @param \Doctrine\ORM\EntityManager $em
-//	 * @return UserForm
-//	 */
-//	public static function create($repository, $mapper, $em)
-//	{
-//		$form = new self($mapper, $em, $repository->createNew());
-//		$form["password_new"]->setDefaultValue(true);
-//		$form->onSave[] = function($form) use ($repository){
-//			$form->entity->enable = 1;
-//			$repository->save($form->entity);
-//		};
-//		return $form;
-//	}
-//
-//	
-//	public static function edit($repository, $mapper, $em, $entity)
-//	{
-//		$form = new self($mapper, $em, $entity);
-//		$form->onSave[] = function($form) use ($repository){
-//			$repository->save($form->entity);
-//		};
-//		return $form;
-//	}
 
 }

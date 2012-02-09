@@ -57,7 +57,7 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 
 			$entity = $this->context->core->userRepository->createNew();
 			$entity->name = "admin";
-			$entity->addRole($role);
+			$entity->setRoleEntities(array($role));
 			return $entity;
 		}
 
@@ -65,11 +65,8 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 		/* Login from DB */
 		if ($this->context->createCheckConnection()) {
 			$user = $this->context->core->userRepository->findOneBy(array("email" => $username, "enable" => 1));
-			if ($user) {
-				$hash = md5($user->salt . $password);
-				if ($user->password == $hash) {
-					return $user;
-				}
+			if ($user->verifyPassword($password)) {
+				return $user;
 			}
 		}
 

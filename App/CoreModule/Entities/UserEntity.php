@@ -16,53 +16,33 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  * @Entity(repositoryClass="\App\CoreModule\Repositories\UserRepository")
- * @Table(name="user")
+ * @Table(name="`user`")
  *
- * @property string $name
+ * @property-read integer $id
  * @property string $email
- * @property string $password
- * @property string $salt
- * @property array $roles
+ * @property-write string $password
+ * @property-read array $roles
+ * @property string $key
  */
-class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM\IEntity {
-
-
-	protected $roleNames;
-
-	protected $data = array();
-
-
-
-	public function __construct()
-	{
-		$this->roles = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->login = "";
-		$this->password = "";
-		$this->email = "";
-		$this->invalid = true;
-
-		$this->salt = \Nette\Utils\Strings::random(8);
-		$this->key = \Nette\Utils\Strings::random(30);
-	}
-
-
+class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM\IEntity
+{
 
 	/**
 	 * @id
 	 * @generatedValue
 	 * @column(type="integer")
 	 */
-	public $id;
+	protected $id;
 
 	/**
 	 * @Column(type="boolean")
 	 */
-	public $enable;
+	protected $enable;
 
 	/**
 	 * @Column(type="string")
 	 */
-	public $email;
+	protected $email;
 
 	/**
 	 * @Column(type="string")
@@ -70,14 +50,14 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	protected $password;
 
 	/**
-	 * @Column(type="string", name="`key`")
+	 * @Column(type="string", name="`key`", nullable=true)
 	 */
-	public $key;
+	protected $key;
 
 	/**
 	 * @Column(type="string")
 	 */
-	public $salt;
+	protected $salt;
 
 	/**
 	 * @var \Doctrine\Common\Collections\ArrayCollection
@@ -87,21 +67,122 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	 *	  inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
 	 *	  )
 	 */
-	public $roles;
+	protected $roles;
 
 
 	/**
-	 * @OneToMany(targetEntity="loginEntity", mappedBy="user")
+	 * @OneToMany(targetEntity="loginEntity", mappedBy="`user`")
 	 */
 	protected $logins;
 
 
+	/**
+	 * @Form(type="manyToMany", targetEntity="\App\CoreModule\Entities\RoleEntity")
+	 */
+	protected $roleEntities;
 
+
+
+	public function __construct()
+	{
+		$this->roles = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->logins = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->login = "";
+		$this->password = "";
+		$this->email = "";
+		$this->generateNewSalt();
+	}
+
+
+
+	/**
+	 * Invalidate all user logins.
+	 */
 	public function invalidateLogins()
 	{
 		foreach ($this->logins as $login) {
 			$user->valid = false;
 		}
+	}
+
+
+
+	/**
+	 * Set password.
+	 *
+	 * @param $password
+	 */
+	public function setPassword($password)
+	{
+		if(strlen($password) < 5){
+			throw new \Nette\InvalidArgumentException('Minimal length of password is 5 chars.');
+		}
+
+		$this->password = $this->getHash($password);
+	}
+
+
+
+	/**
+	 * Verify the password.
+	 *
+	 * @param $password
+	 * @return bool
+	 */
+	public function verifyByPassword($password)
+	{
+		if (!$this->isEnable()) {
+			return false;
+		}
+
+		if ($this->password == $this->getHash($password)) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+
+	/**
+	 * Disable user and verify by key.
+	 *
+	 * @param $key
+	 */
+	public function disableByKey()
+	{
+		$this->generateNewKey();
+	}
+
+
+
+	/**
+	 * Verify user by key.
+	 *
+	 * @param $key
+	 */
+	public function enableByKey($key)
+	{
+		if ($this->key == $key) {
+			$this->key = NULL;
+			return true;
+		}
+		return false;
+	}
+
+
+
+	/**
+	 * Check if user is enable.
+	 *
+	 * @return bool
+	 */
+	public function isEnable()
+	{
+		if (!$this->key && $this->enable) {
+			return true;
+		}
+		return false;
 	}
 
 
@@ -116,22 +197,28 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 
 
 
-	/**
-	 * @param type \Venne\Modules\Role
-	 */
-	public function addRole($role)
+	/******************************** Getters and setters **************************************/
+
+
+	public function getId()
 	{
-		$this->roles[] = $role;
+		return $this->id;
 	}
 
 
 
 	/**
-	 * @param type \Venne\Modules\Role
+	 * Returns a list of roles that the user is a member of.
+	 *
+	 * @return array
 	 */
-	public function removeRole($role)
+	public function getRoles()
 	{
-		$this->roles->removeElement($role);
+		$ret = array();
+		foreach ($this->roles as $entity) {
+			$ret[] = $entity->name;
+		}
+		return $ret;
 	}
 
 
@@ -147,98 +234,18 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	 * Sets a list of roles that the user is a member of.
 	 *
 	 * @param  array
-	 * @return Identity  provides a fluent interface
 	 */
-	public function setRoles(array $roles)
+	public function setRoleEntities($roles)
 	{
-		$this->roleNames = $roles;
-		$this->invalid = true;
-		return $this;
+		$this->roles = $roles;
+		$this->invalidateLogins();
 	}
 
 
 
-	/**
-	 * Returns a list of roles that the user is a member of.
-	 *
-	 * @return array
-	 */
-	public function getRoles()
+	public function setLogins($logins)
 	{
-		if (!$this->roleNames) {
-			$ret = array();
-			foreach ($this->roles as $role) {
-				$ret[] = $role->name;
-			}
-			$this->roleNames = $ret;
-		}
-		return $this->roleNames;
-	}
-
-
-
-	/**
-	 * Returns a user data.
-	 *
-	 * @return array
-	 */
-	public function getData()
-	{
-		return array("name" => $this->name, "email" => $this->email, "salt" => $this->salt, "id" => $this->id);
-	}
-
-
-
-	/**
-	 * Returns a user data.
-	 *
-	 * @return array
-	 */
-	public function setData($array)
-	{
-		$this->name = $array["name"];
-		$this->email = $array["email"];
-		$this->salt = $array["salt"];
-		$this->id = $array["id"];
-	}
-
-
-
-	public function getId()
-	{
-		return $this->name;
-	}
-
-
-
-	public function setPassword($password)
-	{
-		if (!$this->salt) {
-			$this->salt = \Nette\Utils\Strings::random(8);
-		}
-
-		$this->password = md5($this->salt . $password);
-	}
-
-
-
-	public function getPassword()
-	{
-		return $this->password;
-	}
-
-
-
-	public function setInvalid($invalid)
-	{
-		$this->invalid = $invalid;
-	}
-
-
-
-	public function getInvalid()
-	{
-		return $this->invalid;
+		$this->logins = $logins;
 	}
 
 
@@ -246,6 +253,85 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	public function getLogins()
 	{
 		return $this->logins;
+	}
+
+
+
+	public function setEnable($enable)
+	{
+		$this->enable = $enable;
+		$this->invalidateLogins();
+	}
+
+
+
+	public function getEnable()
+	{
+		return $this->enable;
+	}
+
+
+
+	public function setKey($key)
+	{
+		$this->key = $key;
+
+	}
+
+
+
+	public function getKey()
+	{
+		return $this->key;
+	}
+
+
+
+	public function setEmail($email)
+	{
+		$this->email = $email;
+	}
+
+
+
+	public function getEmail()
+	{
+		return $this->email;
+	}
+
+
+
+	/******************************** protected function ***************************************/
+
+	/**
+	 * Generate random salt.
+	 */
+	protected function generateNewSalt()
+	{
+		$this->salt = \Nette\Utils\Strings::random(8);
+	}
+
+
+
+	/**
+	 * Generate random key.
+	 */
+	protected function generateNewKey()
+	{
+		$this->key = \Nette\Utils\Strings::random(30);
+	}
+
+
+
+	/**
+	 * Get hash of password.
+	 *
+	 * @param $password
+	 * @return string
+	 */
+	protected function getHash($password)
+	{
+		return md5($this->salt . $password);
 	}
 
 
