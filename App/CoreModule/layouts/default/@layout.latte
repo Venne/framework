@@ -67,10 +67,10 @@
 		<div id="path">
 			{if $presenter->context->hasService("navigationModule")}{control navigation:path}{/if}
 		</div>
-		<div id="content" class="module-{*$website->module|lower*}">
-			{foreach $flashes as $flash}<div class="flash {$flash->type}">{$flash->message}</div>{/foreach}
-			{include #content}
-			{*control extensions*}
+		<div id="content">
+			{control flashes}
+			{content}
+			{extensions}
 		</div>
 
 	</div>
