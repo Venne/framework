@@ -9,8 +9,8 @@ Requirements
 
 - PHP 5.3+
 - MySQL 5+
-- Nette Framework 2.0 beta+
-- Doctrine 2.1+
+- Nette Framework 2.0
+- Doctrine 2.2+
 
 
 Uses
@@ -44,6 +44,9 @@ If you want to use some modules you can look for someone on https://github.com/V
 
 - **Static pages:** https://github.com/Venne/PagesModule
 - **Blog module:** https://github.com/Venne/BlogModule
+- **CkEditor:** https://github.com/Venne/CkeditorModule
+- **Tinymce editor:** https://github.com/Venne/TinymceModule
+- **Kcfinder (filemanager):** https://github.com/Venne/KcfinderModule
 - **Navigation:** https://github.com/Venne/NavigationModule
 - **Collection of tools for developers:** https://github.com/Venne/ToolsModule
 - **Extension for commenting of content:** https://github.com/Venne/CommentsModule
