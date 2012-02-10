@@ -214,10 +214,10 @@ class ModuleManager extends Object {
 		}
 
 		$config = array("run" => true, "version" => $module->getVersion());
-		$config += $this->getValuesFromContainer($module->getForm($this->context)->getComponents());
-
+		$form = $module->getForm($this->context);
+		$form->startup();
+		$config += $this->getValuesFromContainer($form->getComponents());
 		$this->config["parameters"]["modules"][$name] = \Nette\ArrayHash::from($config, true);
-
 		$this->config->save();
 
 		$module->install($this->context);
