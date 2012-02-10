@@ -148,6 +148,21 @@ class PagePresenter extends FrontPresenter
 	}
 
 
+	/**
+	 * Component factory. Delegates the creation of components to a createComponent<Name> method.
+	 *
+	 * @param  string	  component name
+	 * @return IComponent  the created component (optionally)
+	 */
+	public function createComponent($name)
+	{
+		if(substr($name, 0, 17) == "contentExtension_"){
+			$this->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onRender);
+		}else{
+			return parent::createComponent($name);
+		}
+	}
+
 
 	/**
 	 * Common render method.
