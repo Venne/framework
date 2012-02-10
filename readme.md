@@ -51,6 +51,8 @@ If you want to use some modules you can look for someone on https://github.com/V
 - **Collection of tools for developers:** https://github.com/Venne/ToolsModule
 - **Extension for commenting of content:** https://github.com/Venne/CommentsModule
 - **Module for connection to google analytics:** https://github.com/Venne/GooglestatModule
+- **Lightbox with FancyBox:** https://github.com/Venne/FancyboxModule
+- **Lightbox with PrettyPhoto:** https://github.com/Venne/PrettyphotoModule
 
 For automatic connection you can use script:
 
