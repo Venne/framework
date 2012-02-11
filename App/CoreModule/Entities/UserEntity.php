@@ -40,7 +40,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	protected $enable;
 
 	/**
-	 * @Column(type="string")
+	 * @Column(type="string", unique=true)
 	 */
 	protected $email;
 
@@ -114,11 +114,23 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	 */
 	public function setPassword($password)
 	{
-		if(strlen($password) < 5){
+		if (strlen($password) < 5) {
 			throw new \Nette\InvalidArgumentException('Minimal length of password is 5 chars.');
 		}
 
 		$this->password = $this->getHash($password);
+	}
+
+
+
+	/**
+	 * Get hash of password.
+	 *
+	 * @return string
+	 */
+	public function getPassword()
+	{
+		return $this->password;
 	}
 
 
