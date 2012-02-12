@@ -65,7 +65,7 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 		/* Login from DB */
 		if ($this->context->createCheckConnection()) {
 			$user = $this->context->core->userRepository->findOneBy(array("email" => $username, "enable" => 1));
-			if ($user->verifyPassword($password)) {
+			if ($user->verifyByPassword($password)) {
 				return $user;
 			}
 		}
