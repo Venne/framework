@@ -220,6 +220,14 @@ class ModuleManager extends Object {
 		$this->config["parameters"]["modules"][$name] = \Nette\ArrayHash::from($config, true);
 		$this->config->save();
 
+		/* config */
+		$config = new \Nette\Config\Adapters\NeonAdapter();
+		$modules = $config->load($this->context->parameters["configDir"] . "/modules.neon");
+		if(!array_search($name, $modules)){
+			$modules[] = $name;
+		}
+		file_put_contents($this->context->parameters["configDir"] . "/modules.neon", $config->dump($modules));
+
 		$module->install($this->context);
 
 		touch($this->context->parameters["flagsDir"] . "/updated");
@@ -264,6 +272,15 @@ class ModuleManager extends Object {
 		$module = $this->getModuleInstance($name);
 		$module->uninstall($this->context);
 		$this->config->save();
+
+		/* config */
+		$config = new \Nette\Config\Adapters\NeonAdapter();
+		$modules = $config->load($this->context->parameters["configDir"] . "/modules.neon");
+		if($key = array_search($name, $modules)){
+			unset($modules[$key]);
+			$modules = array_merge($modules);
+		}
+		file_put_contents($this->context->parameters["configDir"] . "/modules.neon", $config->dump($modules));
 
 		touch($this->context->parameters["flagsDir"] . "/updated");
 		$this->cleanCaches($cleanCache);
