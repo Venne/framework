@@ -87,6 +87,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	{
 		$this->roles = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->logins = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->enable = false;
 		$this->login = "";
 		$this->password = "";
 		$this->email = "";
