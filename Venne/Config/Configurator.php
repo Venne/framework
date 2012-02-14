@@ -316,16 +316,18 @@ class Configurator extends \Nette\Config\Configurator
 
 
 
-	public function enableDebugger()
+	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
-		$this->parameters["debugger"] = true;
+		$this->parameters["logDir"] = $logDirectory;
+		$this->parameters["debugger"] = array();
+		$this->parameters["debugger"]["emailSnooze"] = $email;
 	}
 
 
 
 	protected function runDebugger($container)
 	{
-		if ($this->parameters["debugger"]) {
+		if (isset($this->parameters["debugger"]) && $this->parameters["debugger"]) {
 			$debugger = $container->parameters["debugger"];
 
 			$this->setProductionMode($debugger["mode"] == "production");
@@ -333,7 +335,7 @@ class Configurator extends \Nette\Config\Configurator
 			Debugger::$strictMode = true;
 			Debugger::enable($debugger['developerIp'] && $this->isProductionMode() ? (array)$debugger['developerIp'] : $this->isProductionMode(), $debugger['logDir'], $debugger['logEmail']);
 			Debugger::$logger->mailer = array("\\Venne\\Diagnostics\\Logger", "venneMailer");
-			\Nette\Diagnostics\Logger::$emailSnooze = $container->parameters["debugger"]["emailSnooze"];
+			\Nette\Diagnostics\Logger::$emailSnooze = $this->parameters["debugger"]["emailSnooze"] ?: $container->parameters["debugger"]["emailSnooze"];
 			Debugger::$logDirectory = $container->parameters["logDir"];
 			\Venne\Diagnostics\Logger::$linkPrefix = "http://" . $container->httpRequest->url->host . $container->httpRequest->url->basePath . "admin/system/log/show?name=";
 		}
