@@ -12,12 +12,12 @@
 namespace App\CoreModule\Widgets;
 
 use Venne;
-use Venne\Application\UI\Widget;
+use Venne\Application\UI\Control;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class FlashesWidget extends Widget {
+class FlashesWidget extends Control {
 
 
 

@@ -21,7 +21,8 @@ use Nette\ComponentModel\IContainer;
  *
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalReceiver, \Nette\Application\UI\IStatePersistent, \ArrayAccess, IContainer {
+class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalReceiver, \Nette\Application\UI\IStatePersistent, \ArrayAccess, IContainer
+{
 
 	/** @var \Nette\Application\UI\Multiplier */
 	protected $multiplier;
@@ -36,10 +37,12 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	protected $name;
 
 
+
 	public function __construct($factory)
 	{
 		$this->multiplier = new \Nette\Application\UI\Multiplier($factory);
 	}
+
 
 
 	public function __call($name, $args)
@@ -48,10 +51,12 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
+
 	public function offsetExists($offset)
 	{
 		return (bool)$this->getComponent($offset);
 	}
+
 
 
 	public function offsetGet($offset)
@@ -65,6 +70,8 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	{
 		$this->addComponent($component, $name);
 	}
+
+
 
 	public function offsetUnset($offset)
 	{
@@ -145,10 +152,10 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	 */
 	public function getComponent($name)
 	{
-		if(is_numeric($name)){
+		if (is_numeric($name)) {
 			return $this->multiplier->getComponent($name);
 		}
-		if($name == $this->name){
+		if ($name == $this->name) {
 			return $this->multiplier->getComponent(0);
 		}
 		$component = $this->multiplier->getComponent(0);
