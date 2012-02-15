@@ -23,7 +23,8 @@ use Nette\Security\User;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AuthorizatorFactory extends Object {
+class AuthorizatorFactory extends Object
+{
 
 
 	const SESSION_SECTION = "Venne.Security.Authorizator";
@@ -94,6 +95,7 @@ class AuthorizatorFactory extends Object {
 	public function getPermissionsByRoles(array $roles)
 	{
 		$permission = $this->getRawPermissions();
+
 
 		foreach ($roles as $role) {
 			$this->setPermissionsByRole($permission, $role);

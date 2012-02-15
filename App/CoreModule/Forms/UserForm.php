@@ -11,7 +11,6 @@
 
 namespace App\CoreModule\Forms;
 
-use Venne\ORM\Column;
 use Nette\Utils\Html;
 
 /**
@@ -29,6 +28,7 @@ class UserForm extends \Venne\Forms\EntityForm {
 		$this->addCheckbox("password_new", "Set password");
 		$this->addPassword("password", "Password")->setOption("description", "minimal length is 5 char")->addConditionOn($this['password_new'], \Nette\Forms\Form::FILLED)->addRule(\Nette\Forms\Form::FILLED, 'Enter password')->addRule(\Nette\Forms\Form::MIN_LENGTH, 'Password is short', 5);
 		$this->addPassword("password_confirm", "Confirm password")->addRule(\Nette\Forms\Form::EQUAL, 'Invalid re password', $this['password']);
+		$this->addText("key", "Authentization key")->setOption("description", "If is set user cannot log in.");
 
 		$this->addGroup("Next informations");
 		$this->addManyToMany("roleEntities");

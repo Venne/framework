@@ -50,13 +50,12 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 
 
 		/* Login from config file */
-		if ($this->context->parameters["administration"]["login"]["name"] == $username && $this->context->parameters["administration"]["login"]["password"] == $password
-		) {
+		if ($this->context->parameters["administration"]["login"]["name"] == $username && $this->context->parameters["administration"]["login"]["password"] == $password) {
 			$role = $this->context->core->roleRepository->createNew();
 			$role->name = "admin";
 
 			$entity = $this->context->core->userRepository->createNew();
-			$entity->name = "admin";
+			$entity->id = -1;
 			$entity->setRoleEntities(array($role));
 			return $entity;
 		}

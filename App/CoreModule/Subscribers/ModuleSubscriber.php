@@ -61,7 +61,7 @@ class ModuleSubscriber implements EventSubscriber {
 
 		/* invalidate all users */
 		foreach($this->context->core->loginRepository->findAll() as $entity){
-			$entity->valid = false;
+			$entity->reload = true;
 		}
 		$this->context->entityManager->flush();
 	}

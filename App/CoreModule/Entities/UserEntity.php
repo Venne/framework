@@ -71,7 +71,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 
 
 	/**
-	 * @OneToMany(targetEntity="loginEntity", mappedBy="`user`")
+	 * @OneToMany(targetEntity="LoginEntity", mappedBy="user")
 	 */
 	protected $logins;
 
@@ -216,6 +216,13 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	public function getId()
 	{
 		return $this->id;
+	}
+
+
+
+	public function setId($id)
+	{
+		$this->id = $id;
 	}
 
 

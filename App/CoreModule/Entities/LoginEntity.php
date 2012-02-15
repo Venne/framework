@@ -33,7 +33,7 @@ class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	protected $sessionId;
 
 	/** @Column(type="boolean") */
-	protected $valid;
+	protected $reload;
 
 	/** @Column(type="datetime") */
 	protected $created;
@@ -49,7 +49,7 @@ class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
 		$this->user = $user;
 		$this->sessionId = $sessionId;
 		$this->created = new \DateTime;
-		$this->valid = true;
+		$this->reload = false;
 	}
 
 
@@ -93,21 +93,30 @@ class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
 
 
 
-	/**
-	 * @param $valid
-	 */
-	public function setValid($valid)
+	public function setCreated($created)
 	{
-		$this->valid = $valid;
+		$this->created = $created;
 	}
 
 
 
-	/**
-	 * @return mixed
-	 */
-	public function getValid()
+	public function getCreated()
 	{
-		return $this->valid;
+		return $this->created;
 	}
+
+
+
+	public function setReload($reload)
+	{
+		$this->reload = $reload;
+	}
+
+
+
+	public function getReload()
+	{
+		return $this->reload;
+	}
+
 }

@@ -88,7 +88,7 @@ class UsersPresenter extends BasePresenter {
 	public function createComponentFormEdit()
 	{
 		$repository = $this->userRepository;
-		$entity = $this->userRepository->find($this->getParam("id"));
+		$entity = $this->userRepository->find($this->getParameter("id"));
 
 		$form = $this->context->core->createUserForm();
 		$form->setEntity($entity);

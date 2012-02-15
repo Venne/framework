@@ -30,14 +30,18 @@ class NetteExtension extends \Nette\Config\Extensions\NetteExtension {
 		$config = $this->getConfig($this->defaults);
 
 
-		$container->getDefinition($this->prefix('presenterFactory'))->setClass('Venne\Application\PresenterFactory', array("@container"));
+		$container->getDefinition($this->prefix('presenterFactory'))
+			->setClass('Venne\Application\PresenterFactory', array("@container"));
 
-		$container->getDefinition('router')->setFactory("Venne\Application\Routers\CmsRouter", array("@container"));
+		$container->getDefinition('router')
+			->setFactory("Venne\Application\Routers\CmsRouter", array("@container"));
 
-		$container->getDefinition('session')->addSetup("setSavePath", '%tempDir%/sessions');
+		$container->getDefinition('session')
+			->addSetup("setSavePath", '%tempDir%/sessions');
 
-		$container->getDefinition('user')
-					->setClass('Venne\Security\User');
+		$container->getDefinition($this->prefix('userStorage'))
+			->setClass('Venne\Security\UserStorage')
+			->setArguments(array("@session", "@core.loginRepository"));
 	}
 
 
