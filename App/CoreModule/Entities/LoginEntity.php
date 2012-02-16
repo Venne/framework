@@ -16,9 +16,10 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  * @Entity(repositoryClass="\Venne\Doctrine\ORM\BaseRepository")
- * @Table(name="login")
+ * @Table(name="login",indexes={@index(name="search_idx", columns={"sessionId"})})
  */
-class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
+class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity
+{
 
 
 	const USER_ADMIN = NULL;
@@ -51,6 +52,7 @@ class LoginEntity extends \Venne\Doctrine\ORM\BaseEntity {
 		$this->created = new \DateTime;
 		$this->reload = false;
 	}
+
 
 
 	/**
