@@ -11,9 +11,13 @@
 
 namespace Venne\Diagnostics;
 
+use Venne;
+
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class Logger extends \Nette\Diagnostics\Logger {
+ */
+class Logger extends \Nette\Diagnostics\Logger
+{
 
 	/** @var string */
 	public static $linkPrefix;
@@ -40,7 +44,7 @@ namespace Venne\Diagnostics;
 		$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '');
 
 		$parts = str_replace(array("\r\n", "\n"), array("\n", PHP_EOL), array('headers' => "From: noreply@$host\nX-Mailer: Nette Framework\n", 'subject' => "PHP: An error occurred on the server $host", 'body' => "[" . @date('Y-m-d H:i:s') . "] $message", // @ - timezone may not be set
-			));
+		));
 
 		mail($email, $parts['subject'], $parts['body'], $parts['headers']);
 	}

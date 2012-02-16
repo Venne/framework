@@ -17,7 +17,8 @@ use Nette\Reflection\ClassType;
 /**
  * @author	 Josef Kříž
  */
-class EntityBuilder extends Object {
+class EntityBuilder extends Object
+{
 
 
 	public function build(\Venne\Forms\Form $form, $entityName)

@@ -22,7 +22,8 @@ use App\CoreModule\Entities\PageEntity;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class PageRoute extends Route {
+class PageRoute extends Route
+{
 
 
 	const DEFAULT_MODULE = "Core";
@@ -52,6 +53,7 @@ class PageRoute extends Route {
 
 	/** @var string */
 	protected $defaultLanguage;
+
 
 
 	/**

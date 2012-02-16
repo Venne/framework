@@ -20,7 +20,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IQueryObject {
+interface IQueryObject
+{
 
 	/**
 	 * @param IQueryable $repository

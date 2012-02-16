@@ -20,7 +20,8 @@ namespace Venne\Localization;
  * @property string $name
  * @property string $nativeName
  * @property string $short
- */ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity {
+ */ class LanguageEntity extends \Venne\Doctrine\ORM\BaseEntity
+{
 
 	/**
 	 * @column

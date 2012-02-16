@@ -19,7 +19,8 @@ use Nette;
  * @author	 David Grudl
  * @author	   Josef Kříž
  */
-class RouteList extends \Nette\Application\Routers\RouteList {
+class RouteList extends \Nette\Application\Routers\RouteList
+{
 
 
 	/** @var array */

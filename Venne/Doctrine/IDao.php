@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IDao extends IQueryExecutor {
+interface IDao extends IQueryExecutor
+{
 
 	const FLUSH = FALSE;
 

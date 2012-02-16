@@ -17,7 +17,8 @@ use Nette\DI\ContainerBuilder;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class DoctrineExtension extends CompilerExtension {
+class DoctrineExtension extends CompilerExtension
+{
 
 
 	public $defaults = array('debugger' => TRUE,);
@@ -30,38 +31,72 @@ class DoctrineExtension extends CompilerExtension {
 		$config = $this->getConfig();
 
 
-		$container->addDefinition("doctrineCache")->setClass("Doctrine\Common\Cache\ArrayCache")->setInternal(true);
+		$container->addDefinition("doctrineCache")
+			->setClass("Doctrine\Common\Cache\ArrayCache")
+			->setInternal(true);
 
-		$container->addDefinition("doctrineAnnotationRegistry")->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/Doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))->setShared(false)->setInternal(true);
+		$container->addDefinition("doctrineAnnotationRegistry")
+			->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/Doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))
+			->setShared(false)
+			->setInternal(true);
 
-		$container->addDefinition("doctrineAnnotationReader")->setClass('Doctrine\Common\Annotations\SimpleAnnotationReader', array("@doctrineAnnotationRegistry"))->addSetup("addNamespace", 'Doctrine\\ORM\\Mapping')->setInternal(true);
+		$container->addDefinition("doctrineAnnotationReader")
+			->setClass('Doctrine\Common\Annotations\SimpleAnnotationReader', array("@doctrineAnnotationRegistry"))
+			->addSetup("addNamespace", 'Doctrine\\ORM\\Mapping')
+			->setInternal(true);
 
-		$container->addDefinition("doctrineCachedAnnotationReader")->setClass("Doctrine\Common\Annotations\CachedReader", array("@doctrineAnnotationReader", "@doctrineCache"))->setInternal(true);
+		$container->addDefinition("doctrineCachedAnnotationReader")
+			->setClass("Doctrine\Common\Annotations\CachedReader", array("@doctrineAnnotationReader", "@doctrineCache"))
+			->setInternal(true);
 
-		$container->addDefinition("doctrineAnnotationDriver")->setClass("Doctrine\ORM\Mapping\Driver\AnnotationDriver", array("@doctrineCachedAnnotationReader", array($container->parameters["appDir"], $container->parameters["venneDir"])))->setInternal(true);
+		$container->addDefinition("doctrineAnnotationDriver")
+			->setClass("Doctrine\ORM\Mapping\Driver\AnnotationDriver", array("@doctrineCachedAnnotationReader", array($container->parameters["appDir"], $container->parameters["venneDir"])))
+			->setInternal(true);
 
-		$container->addDefinition("entityManagerConfig")->setClass("Doctrine\ORM\Configuration")->addSetup('setMetadataCacheImpl', "@doctrineCache")->addSetup("setQueryCacheImpl", "@doctrineCache")->addSetup("setMetadataDriverImpl", "@doctrineAnnotationDriver")->addSetup("setProxyDir", $container->parameters["appDir"] . '/proxies')->addSetup("setProxyNamespace", 'App\Proxies')->setInternal(true);
+		$container->addDefinition("entityManagerConfig")
+			->setClass("Doctrine\ORM\Configuration")
+			->addSetup('setMetadataCacheImpl', "@doctrineCache")
+			->addSetup("setQueryCacheImpl", "@doctrineCache")
+			->addSetup("setMetadataDriverImpl", "@doctrineAnnotationDriver")
+			->addSetup("setProxyDir", $container->parameters["appDir"] . '/proxies')
+			->addSetup("setProxyNamespace", 'App\Proxies')
+			->setInternal(true);
 
 		if ($container->parameters["debugger"]["mode"] == "development") {
-			$container->getDefinition("entityManagerConfig")->addSetup("setAutoGenerateProxyClasses", true);
+			$container->getDefinition("entityManagerConfig")
+				->addSetup("setAutoGenerateProxyClasses", true);
 		}
 
-		$container->addDefinition("doctrinePanel")->setClass("Venne\Doctrine\Diagnostics\Panel")->setFactory("Venne\Doctrine\Diagnostics\Panel::register")->setShared(false)->setAutowired(false);
+		$container->addDefinition("doctrinePanel")
+			->setClass("Venne\Doctrine\Diagnostics\Panel")
+			->setFactory("Venne\Doctrine\Diagnostics\Panel::register")
+			->setShared(false)
+			->setAutowired(false);
 
 		if ($config["debugger"] == "development") {
-			$container->getDefinition("entityManagerConfig")->addSetup("setSQLLogger", "@doctrinePanel");
+			$container->getDefinition("entityManagerConfig")
+				->addSetup("setSQLLogger", "@doctrinePanel");
 		}
 
-		$container->addDefinition('eventManager')->setClass("\Doctrine\Common\EventManager");
+		$container->addDefinition('eventManager')
+			->setClass("\Doctrine\Common\EventManager");
 
-		$container->addDefinition('entityManager')->setClass("Doctrine\ORM\EntityManager")->setFactory("\Doctrine\ORM\EntityManager::create", array("%database%", "@entityManagerConfig", "@eventManager"));
+		$container->addDefinition('entityManager')
+			->setClass("Doctrine\ORM\EntityManager")
+			->setFactory("\Doctrine\ORM\EntityManager::create", array("%database%", "@entityManagerConfig", "@eventManager"));
 
 
-		$container->addDefinition("doctrineConnection")->setClass("Doctrine\DBAL\Connection")->setFactory("Doctrine\DBAL\DriverManager::getConnection", array("%database%"));
+		$container->addDefinition("doctrineConnection")
+			->setClass("Doctrine\DBAL\Connection")
+			->setFactory("Doctrine\DBAL\DriverManager::getConnection", array("%database%"));
 
-		$container->addDefinition("schemaManager")->setClass("Doctrine\DBAL\Schema\AbstractSchemaManager")->setFactory("@doctrineConnection::getSchemaManager");
+		$container->addDefinition("schemaManager")
+			->setClass("Doctrine\DBAL\Schema\AbstractSchemaManager")
+			->setFactory("@doctrineConnection::getSchemaManager");
 
-		$container->addDefinition('checkConnection')->setFactory("Venne\Config\DoctrineExtension::checkConnection")->setShared(false);
+		$container->addDefinition('checkConnection')
+			->setFactory("Venne\Config\DoctrineExtension::checkConnection")
+			->setShared(false);
 	}
 
 
@@ -75,7 +110,7 @@ class DoctrineExtension extends CompilerExtension {
 
 	public static function checkConnection(\Nette\DI\Container $context, \Doctrine\ORM\EntityManager $entityManager)
 	{
-		if(!$context->parameters["database"]["dbname"]){
+		if (!$context->parameters["database"]["dbname"]) {
 			return false;
 		}
 
@@ -87,7 +122,7 @@ class DoctrineExtension extends CompilerExtension {
 		$old = set_error_handler("Venne\Config\DoctrineExtension::checkConnectionErrorHandler");
 		try {
 			$connection->connect();
-			if($connection->isConnected()){
+			if ($connection->isConnected()) {
 				set_error_handler($old);
 				return true;
 			}

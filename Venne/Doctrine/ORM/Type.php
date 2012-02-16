@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-abstract class Type extends Doctrine\DBAL\Types\Type {
+abstract class Type extends Doctrine\DBAL\Types\Type
+{
 
 	const CALLBACK = 'callback';
 

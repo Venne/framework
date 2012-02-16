@@ -13,7 +13,8 @@ namespace Venne\Localization;
  * Translation extractor
  *
  * @author	Patrik Votoček
- */ class Extractor extends \Venne\FreezableObject {
+ */ class Extractor extends \Venne\FreezableObject
+{
 
 	/** @var Translator */
 	protected $translator;

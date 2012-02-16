@@ -19,7 +19,8 @@ use Nette\Caching\Cache;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AssetManager extends Object {
+class AssetManager extends Object
+{
 
 
 	const PARAM_MEDIA = "media";
@@ -166,7 +167,7 @@ class AssetManager extends Object {
 			return $this->container->parameters["basePath"] . "/resources/" . lcfirst($moduleName) . "/" . substr($path, $pos + 1);
 		}
 
-		if(substr($path, 0, 7) == "http://" || substr($path, 0, 8) == "https://"){
+		if (substr($path, 0, 7) == "http://" || substr($path, 0, 8) == "https://") {
 			return $path;
 		}
 

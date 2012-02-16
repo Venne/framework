@@ -13,7 +13,8 @@ namespace Venne\Module;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ interface IResourceFilter {
+ */ interface IResourceFilter
+{
 
 
 	/**

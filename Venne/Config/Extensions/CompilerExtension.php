@@ -17,7 +17,8 @@ use Nette\DI\ContainerBuilder;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class CompilerExtension extends \Nette\Config\CompilerExtension {
+class CompilerExtension extends \Nette\Config\CompilerExtension
+{
 
 
 	const CONTROL = "control";

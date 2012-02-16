@@ -17,7 +17,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class EntityValuesMapper extends EntityMetadataMapper {
+class EntityValuesMapper extends EntityMetadataMapper
+{
 
 
 	/**

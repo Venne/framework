@@ -13,7 +13,8 @@ namespace Venne\Doctrine\Migration;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class MigrationEntity extends \Venne\Doctrine\ORM\BaseEntity {
+ */ class MigrationEntity extends \Venne\Doctrine\ORM\BaseEntity
+{
 
 
 	public function __construct()

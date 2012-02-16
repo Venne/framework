@@ -16,12 +16,13 @@ use Venne\Localization\Dictionary;
  *
  * @author	Patrik Votocek
  */
-class Nella extends \Nette\Object implements \Venne\Localization\IFilter {
+class Nella extends \Nette\Object implements \Venne\Localization\IFilter
+{
 
 	public $exts = array("*.php");
 
 	/** @var array	functions map key is function name value is translation position */
-	public $functions = array(// Basic
+	public $functions = array( // Basic
 		'__' => 1, 'translate' => 1, // Forms
 		'addText' => 2, 'addPassword' => 2, 'addTextArea' => 2, 'addFile' => 2, 'addHidden' => 2, 'addCheckbox' => 2, 'addRadioList' => 2, 'addSelect' => 2, 'addMultiselect' => 2, 'addSubmit' => 2, 'addButton' => 2, 'addImage' => 3, 'addEmail' => 2, 'addUrl' => 2, 'addNumber' => 2, 'addRange' => 2, 'addDate' => 2, 'addDateTime' => 2, 'addTime' => 2, 'addSearch' => 2, 'addEditor' => 2, 'addMultipleFile' => 2, 'addEmail' => 2, 'addProtection' => 1, 'addGroup' => 1, 'addRule' => 2, 'setRequired' => 1, 'setOption' => 2,);
 

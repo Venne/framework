@@ -25,7 +25,8 @@ use Nette;
  * @property-read mixed $selectedItem
  * @property-read bool $firstSkipped
  */
-class ManyToOne extends BaseControl {
+class ManyToOne extends BaseControl
+{
 
 
 	/** @var array */

@@ -23,7 +23,8 @@ use SplObjectStorage;
 /**
  * @author Filip Procházka
  */
-class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper {
+class EntityFormMapper extends Venne\Doctrine\Mapping\EntityMetadataMapper
+{
 
 	/** @var SplObjectStorage */
 	private $assignment;

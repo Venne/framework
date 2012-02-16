@@ -19,7 +19,8 @@ use Nette\Forms\Controls\MultiSelectBox;
  *
  * @author	 David Grudl
  */
-class ManyToMany extends ManyToOne {
+class ManyToMany extends ManyToOne
+{
 
 
 	/**

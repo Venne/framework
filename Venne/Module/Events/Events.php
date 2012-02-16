@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class Events {
+class Events
+{
 
 	const onUpdateFlag = 'onUpdateFlag';
 

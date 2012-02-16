@@ -28,7 +28,8 @@ use Nette\ObjectMixin;
  *
  * @method Mapping\ClassMetadata getClassMetadata() getClassMetadata()
  */
-class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doctrine\IDao, Venne\Doctrine\IQueryable, Venne\Doctrine\IObjectFactory {
+class BaseRepository extends Doctrine\ORM\EntityRepository implements Venne\Doctrine\IDao, Venne\Doctrine\IQueryable, Venne\Doctrine\IObjectFactory
+{
 
 
 	/** @var EntityValuesMapper */

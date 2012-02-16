@@ -13,7 +13,8 @@ namespace Venne\Localization;
  * Localization storage interface
  *
  * @author	Patrik Votoček
- */ interface IStorage {
+ */ interface IStorage
+{
 
 	/**
 	 * @param Dictionary

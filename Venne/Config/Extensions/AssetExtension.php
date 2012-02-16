@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AssetExtension extends CompilerExtension {
+class AssetExtension extends CompilerExtension
+{
 
 
 	public function loadConfiguration()

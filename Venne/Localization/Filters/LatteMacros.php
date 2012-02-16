@@ -17,7 +17,8 @@ namespace Venne\Localization\Filters;
  * @internal
  *
  * @property-read array $translations
- */ class LatteMacros extends \Nette\Latte\Macros\MacroSet {
+ */ class LatteMacros extends \Nette\Latte\Macros\MacroSet
+{
 
 	/** @var array */
 	private $translations = array();

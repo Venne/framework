@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class FloatType extends Nette\Object implements Mapping\IFieldType {
+class FloatType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param float $value

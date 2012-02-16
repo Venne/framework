@@ -17,7 +17,8 @@ use PDOException;
 /**
  * @author Filip Procházka
  */
-class SqlException extends \Exception {
+class SqlException extends \Exception
+{
 
 
 	/** @var Query */

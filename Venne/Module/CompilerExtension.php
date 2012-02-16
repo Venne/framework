@@ -18,7 +18,8 @@ use Nette\Utils\Finder;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class CompilerExtension extends Venne\Config\CompilerExtension {
+class CompilerExtension extends Venne\Config\CompilerExtension
+{
 
 
 	/** @var array */
@@ -40,7 +41,7 @@ class CompilerExtension extends Venne\Config\CompilerExtension {
 			$class = $moduleNamespace . '\\' . ltrim(substr($relative, 0, -4), '\\');
 			$class = str_replace("presenters\\", "", $class);
 
-			try{
+			try {
 				$refl = \Nette\Reflection\ClassType::from($class);
 
 				foreach (array_keys($classes) as $item) {
@@ -57,7 +58,7 @@ class CompilerExtension extends Venne\Config\CompilerExtension {
 					$anot = $refl->getAnnotation("Entity");
 					$classes[self::REPOSITORY][$class] = substr($anot["repositoryClass"], 0, 1) == "\\" ? substr($anot["repositoryClass"], 1) : $anot["repositoryClass"];
 				}
-			}catch(\ReflectionException $ex){
+			} catch (\ReflectionException $ex) {
 
 			}
 		}

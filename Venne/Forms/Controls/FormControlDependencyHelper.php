@@ -14,7 +14,8 @@ use Nette\Object;
 use \InvalidArgumentException;
 use Nette\InvalidStateException;
 
-class FormControlDependencyHelper extends Object {
+class FormControlDependencyHelper extends Object
+{
 
 // <editor-fold defaultstate="collapsed" desc="variables">
 

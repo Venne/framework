@@ -14,7 +14,8 @@ namespace Venne\Localization;
  * Translator panel
  *
  * @author	Patrik Votoček
- */ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPanel {
+ */ class Panel extends \Nette\FreezableObject implements \Nette\Diagnostics\IBarPanel
+{
 
 
 	const VERSION = "2.0", XHR_HEADER = "X-Translation-Client";

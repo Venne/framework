@@ -16,7 +16,8 @@ use Nette;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class EventArgs extends \Doctrine\Common\EventArgs {
+class EventArgs extends \Doctrine\Common\EventArgs
+{
 
 
 	public $presenter;

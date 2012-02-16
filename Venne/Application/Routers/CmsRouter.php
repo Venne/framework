@@ -17,7 +17,8 @@ use Nette;
 /**
  * @author	   Josef Kříž
  */
-class CmsRouter extends \Nette\Application\Routers\RouteList {
+class CmsRouter extends \Nette\Application\Routers\RouteList
+{
 
 
 	function __construct(\SystemContainer $container)
@@ -62,7 +63,7 @@ class CmsRouter extends \Nette\Application\Routers\RouteList {
 			/* Installation	 */
 			$this[] = new Route('<action>[/<id>]', array("presenter" => "Core:Installation:Default", "action" => "default",));
 
-		}else{
+		} else {
 
 			/* Upgrade */
 			if ($container->core->moduleManager->checkModuleUpgrades()) {

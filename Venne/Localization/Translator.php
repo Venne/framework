@@ -16,7 +16,8 @@ namespace Venne\Localization;
  *
  * @property string $lang
  * @property-read array $dictionaries
- */ class Translator extends \Nette\FreezableObject implements ITranslator {
+ */ class Translator extends \Nette\FreezableObject implements ITranslator
+{
 
 	/** @var array */
 	protected $dictionaries = array();

@@ -19,7 +19,8 @@ use Nette\OutOfRangeException;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \IteratorAggregate {
+class ConfigBuilder extends Object implements \ArrayAccess, \Countable, \IteratorAggregate
+{
 
 
 	/** @var array */

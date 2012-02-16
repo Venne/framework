@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IQueryable {
+interface IQueryable
+{
 
 	/**
 	 * Create a new QueryBuilder instance that is prepopulated for this entity name

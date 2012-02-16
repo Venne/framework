@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class BooleanType extends Nette\Object implements Mapping\IFieldType {
+class BooleanType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param bool $value

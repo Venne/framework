@@ -19,7 +19,8 @@ use Nette\Caching\Cache;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class ResourcesManager extends Object {
+class ResourcesManager extends Object
+{
 
 
 	const CACHE = "Venne.Resources";

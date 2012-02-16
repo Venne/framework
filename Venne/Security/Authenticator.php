@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class Authenticator extends \Nette\Object implements \Nette\Security\IAuthenticator {
+class Authenticator extends \Nette\Object implements \Nette\Security\IAuthenticator
+{
 
 
 	/** @var \SystemContainer */

@@ -22,7 +22,8 @@ use Nette;
  *
  * @copyright Maxipes Fík
  */
-final class Stopwatch implements \Nette\Diagnostics\IBarPanel {
+final class Stopwatch implements \Nette\Diagnostics\IBarPanel
+{
 
 
 	private static $timers = array();

@@ -14,7 +14,8 @@ namespace Venne;
  * Freezable object
  *
  * @author	Patrik Votoček
- */ abstract class FreezableObject extends \Nette\FreezableObject {
+ */ abstract class FreezableObject extends \Nette\FreezableObject
+{
 
 	/** @var array */
 	public $onFreeze = array();

@@ -27,7 +27,8 @@ use Nette\Utils\Paginator;
  * @copyright  Copyright (c) 2009 David Grudl
  * @package	Nette Extras
  */
-class VisualPaginator extends Control {
+class VisualPaginator extends Control
+{
 
 	/** @var Paginator */
 	private $paginator;

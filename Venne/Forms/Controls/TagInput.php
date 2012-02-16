@@ -16,7 +16,8 @@ use Nette\Utils\Strings;
 use Nette\Application\Responses\JsonResponse;
 
 
-class TagInput extends \Nette\Forms\Controls\TextInput {
+class TagInput extends \Nette\Forms\Controls\TextInput
+{
 
 	/** @var string rule */
 	const UNIQUE = ':unique';
@@ -35,6 +36,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput {
 
 	/** @var callback returning array */
 	protected $suggestCallback;
+
 
 
 	/**
@@ -231,6 +233,7 @@ class TagInput extends \Nette\Forms\Controls\TextInput {
 
 		$presenter->sendResponse(new JsonResponse($data));
 	}
+
 
 
 	/********************* validation *********************/

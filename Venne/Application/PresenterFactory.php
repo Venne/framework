@@ -17,7 +17,8 @@ use Nette\Utils\Strings;
  * @author Josef Kříž <pepakriz@gmail.com>
  * @author Patrik Votoček
  */
-class PresenterFactory implements \Nette\Application\IPresenterFactory {
+class PresenterFactory implements \Nette\Application\IPresenterFactory
+{
 
 	const DEFAULT_NAMESPACE = 'App';
 

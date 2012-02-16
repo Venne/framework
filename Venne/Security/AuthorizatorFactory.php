@@ -116,7 +116,7 @@ class AuthorizatorFactory extends Object
 	protected function setPermissionsByRole(Permission $permission, $role)
 	{
 		$roleEntity = $this->context->core->roleRepository->findOneByName($role);
-		if($roleEntity->parent){
+		if ($roleEntity->parent) {
 			$this->setPermissionsByRole($permission, $roleEntity->parent->name);
 		}
 

@@ -20,7 +20,8 @@ use Nette\Object;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-abstract class BaseModule extends Object implements IModule {
+abstract class BaseModule extends Object implements IModule
+{
 
 
 	/** @var string */

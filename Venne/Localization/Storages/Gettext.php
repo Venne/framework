@@ -19,7 +19,8 @@ use Nette\Utils\Strings, Venne\Localization\Dictionary;
  * @copyright  Copyright (c) 2005, 2009 Zend Technologies USA Inc.
  * @author	Patrik Votoček
  */
-class Gettext extends \Nette\Object implements \Venne\Localization\IStorage {
+class Gettext extends \Nette\Object implements \Venne\Localization\IStorage
+{
 
 	/** @var string */
 	private $fileMask;

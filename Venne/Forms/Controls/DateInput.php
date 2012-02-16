@@ -35,7 +35,8 @@ use Nette\Forms\IControl, Nette\Forms\Controls\BaseControl;
  * @copyright 2011, Ondřej Vodáček
  * @license New BSD License
  */
-class DateInput extends BaseControl {
+class DateInput extends BaseControl
+{
 
 	const TYPE_DATETIME = 'datetime', TYPE_DATETIME_LOCAL = 'datetime-local', TYPE_DATE = 'date', TYPE_MONTH = 'month', TYPE_TIME = 'time', TYPE_WEEK = 'week';
 

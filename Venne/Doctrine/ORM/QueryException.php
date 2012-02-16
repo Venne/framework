@@ -18,7 +18,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class QueryException extends \Exception {
+class QueryException extends \Exception
+{
 
 
 	/** @var Doctrine\ORM\Query */

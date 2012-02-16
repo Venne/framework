@@ -17,7 +17,8 @@ use Nette\Application\UI\Presenter;
 /**
  * @author	 Josef Kříž
  */
-class ConfigForm extends \Venne\Application\UI\Form {
+class ConfigForm extends \Venne\Application\UI\Form
+{
 
 
 	/** @var array of function(Form $form, $entity); Occurs when the form is submitted, valid and entity is saved */

@@ -21,7 +21,8 @@ namespace Venne\Forms\Controls;
 
 use Nette\Utils\Html, Nette\Forms\Form, Nette\Forms\Controls\BaseControl;
 
-class CheckboxList extends BaseControl {
+class CheckboxList extends BaseControl
+{
 
 	/** @var Nette\Utils\Html  separator element template */
 	protected $separator;

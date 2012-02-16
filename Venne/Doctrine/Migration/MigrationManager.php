@@ -17,7 +17,8 @@ use Nette\Object;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class MigrationManager extends Object {
+class MigrationManager extends Object
+{
 
 
 	/** @var array */

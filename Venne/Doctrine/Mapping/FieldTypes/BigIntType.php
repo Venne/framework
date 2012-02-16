@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class BigIntType extends Nette\Object implements Mapping\IFieldType {
+class BigIntType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param int $value

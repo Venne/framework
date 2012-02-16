@@ -13,7 +13,8 @@ namespace Venne\Localization;
  * Extractor filter interface
  *
  * @author	Patrik Votoček
- */ interface IFilter {
+ */ interface IFilter
+{
 
 	/**
 	 * @param Dictionary

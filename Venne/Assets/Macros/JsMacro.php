@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class JsMacro extends \Nette\Latte\Macros\MacroSet {
+class JsMacro extends \Nette\Latte\Macros\MacroSet
+{
 
 
 	public static function filter(\Nette\Latte\MacroNode $node, $writer)

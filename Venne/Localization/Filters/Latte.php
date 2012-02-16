@@ -16,7 +16,8 @@ use Venne\Localization\Dictionary;
  *
  * @author	Patrik Votoček
  */
-class Latte extends \Nette\Object implements \Venne\Localization\IFilter {
+class Latte extends \Nette\Object implements \Venne\Localization\IFilter
+{
 
 	/** @var array */
 	public $exts = array("*.latte");

@@ -18,7 +18,8 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-abstract class BaseMigration extends AbstractMigration {
+abstract class BaseMigration extends AbstractMigration
+{
 
 
 	abstract public function getModuleName();

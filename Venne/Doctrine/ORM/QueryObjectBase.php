@@ -22,7 +22,8 @@ use Nette\Utils\Paginator;
 /**
  * @author Filip Procházka
  */
-abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject {
+abstract class QueryObjectBase implements Venne\Doctrine\IQueryObject
+{
 
 	/** @var Paginator */
 	private $paginator;

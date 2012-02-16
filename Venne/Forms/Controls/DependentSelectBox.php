@@ -15,7 +15,8 @@ use Nette\Forms\Container as FormContainer;
 
 // \Nette\Forms\FormContainer::extensionMethod("addDependentSelectBox", "DependentSelectBox\DependentSelectBox::formAddDependentSelectBox");
 
-class DependentSelectBox extends SelectBox {
+class DependentSelectBox extends SelectBox
+{
 
 // <editor-fold defaultstate="collapsed" desc="variables">
 

@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class NeonAdapter extends \Nette\Config\Adapters\NeonAdapter {
+class NeonAdapter extends \Nette\Config\Adapters\NeonAdapter
+{
 
 
 	/**

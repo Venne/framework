@@ -13,7 +13,8 @@ namespace Venne\Localization;
  * Translator adapter
  *
  * @author	Patrik Votocek
- */ interface ITranslator extends \Nette\Localization\ITranslator {
+ */ interface ITranslator extends \Nette\Localization\ITranslator
+{
 
 	/**
 	 * @return array

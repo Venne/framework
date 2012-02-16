@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class SmallIntType extends Nette\Object implements Mapping\IFieldType {
+class SmallIntType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param int $value

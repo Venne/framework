@@ -20,7 +20,8 @@ use Venne\Application\Routers\PageRoute;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class NetteExtension extends \Nette\Config\Extensions\NetteExtension {
+class NetteExtension extends \Nette\Config\Extensions\NetteExtension
+{
 
 
 	public function loadConfiguration()

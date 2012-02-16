@@ -16,7 +16,8 @@ use Nette\Utils\Html;
 /**
  * @author	 Josef Kříž
  */
-class TextWithSelect extends \Nette\Forms\Controls\TextInput {
+class TextWithSelect extends \Nette\Forms\Controls\TextInput
+{
 
 
 	/** @var \Nette\Utils\Html  container element template */

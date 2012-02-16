@@ -18,7 +18,8 @@ use Doctrine\ORM\EntityManager;
 /**
  * @author	 Josef Kříž
  */
-class EntityForm extends \Venne\Application\UI\Form {
+class EntityForm extends \Venne\Application\UI\Form
+{
 
 
 	/** @var array of function(Form $form, $entity); Occurs when the form is submitted, valid and entity is saved */

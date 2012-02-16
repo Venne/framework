@@ -19,7 +19,8 @@ use Nette\Forms\Container;
  * @author Filip Procházka
  * @author Jan Tvrdík
  */
-class Replicator extends Container {
+class Replicator extends Container
+{
 
 	/** @var callback */
 	private $factoryCallback;

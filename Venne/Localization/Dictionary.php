@@ -18,7 +18,8 @@ namespace Venne\Localization;
  * @property string $pluralForm
  * @property array $metadata
  * @property-read \ArrayIterator $iterator
- */ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \Serializable {
+ */ class Dictionary extends \Venne\FreezableObject implements \IteratorAggregate, \Serializable
+{
 
 	const STATUS_SAVED = TRUE, STATUS_TRANSLATED = FALSE, STATUS_UNTRANSLATED = NULL;
 

@@ -19,7 +19,8 @@ use Nette\Utils\Strings;
  *
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class Control extends \Nette\Application\UI\Control {
+class Control extends \Nette\Application\UI\Control
+{
 
 
 	/** @var string */

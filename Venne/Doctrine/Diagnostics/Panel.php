@@ -28,7 +28,8 @@ use Nette\Utils\Strings;
  * @author Patrik Votoček
  * @author Filip Procházka <filip.prochazka@kdyby.org>
  */
-class Panel extends Nette\Object implements Nette\Diagnostics\IBarPanel, Doctrine\DBAL\Logging\SQLLogger {
+class Panel extends Nette\Object implements Nette\Diagnostics\IBarPanel, Doctrine\DBAL\Logging\SQLLogger
+{
 
 
 	/** @var int logged time */

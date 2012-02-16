@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class PasswordType extends Nette\Object implements Mapping\IFieldType {
+class PasswordType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param string $value

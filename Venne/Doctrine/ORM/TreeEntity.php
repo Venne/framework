@@ -13,7 +13,8 @@ namespace Venne\Doctrine\ORM;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class TreeEntity extends BaseEntity {
+ */ class TreeEntity extends BaseEntity
+{
 
 
 	/**

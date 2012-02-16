@@ -13,7 +13,8 @@ namespace Venne\Application\UI;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class Events {
+ */ class Events
+{
 
 
 	const beforeStartup = 'beforeStartup';

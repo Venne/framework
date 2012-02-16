@@ -18,7 +18,8 @@ use Nette\Forms\ISubmitterControl;
  * @author Josef Kříž <pepakriz@gmail.com>
  * @author Filip Procházka
  */
-class Form extends \Nette\Application\UI\Form {
+class Form extends \Nette\Application\UI\Form
+{
 
 
 	public function __construct()
@@ -84,9 +85,9 @@ class Form extends \Nette\Application\UI\Form {
 
 		foreach ($this->getComponents(TRUE, 'Nette\Forms\ISubmitterControl') as $submitControl) {
 			$name = ucfirst((Nette\Utils\Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m)
-				{
-					return strtoupper($m[1]);
-				})));
+			{
+				return strtoupper($m[1]);
+			})));
 
 			if (method_exists($this, 'handle' . $name . 'Click')) {
 				$submitControl->onClick[] = callback($this, 'handle' . $name . 'Click');

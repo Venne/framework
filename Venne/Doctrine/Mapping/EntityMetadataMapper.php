@@ -23,7 +23,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-abstract class EntityMetadataMapper extends Nette\Object {
+abstract class EntityMetadataMapper extends Nette\Object
+{
 
 	/** @var ObjectManager */
 	private $workspace;

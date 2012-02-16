@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class FrontPresenter extends \Venne\Application\UI\Presenter {
+class FrontPresenter extends \Venne\Application\UI\Presenter
+{
 
 
 	const MODE_NORMAL = 0;

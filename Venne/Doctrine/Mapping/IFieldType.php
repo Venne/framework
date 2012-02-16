@@ -18,7 +18,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IFieldType {
+interface IFieldType
+{
 
 	/**
 	 * @param mixed $value

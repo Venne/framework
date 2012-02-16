@@ -13,7 +13,8 @@ namespace Venne\Forms;
 
 /**
  * @author	 Josef Kříž
- */ class Container extends \Nette\Forms\Container {
+ */ class Container extends \Nette\Forms\Container
+{
 
 
 	/** @var \Nette\DI\Container */

@@ -22,7 +22,8 @@ use Nette\ComponentModel\IContainer;
  *
  * @method Venne\Forms\EntityForm getForm() getForm()
  */
-class EntityContainer extends Nette\Forms\Container {
+class EntityContainer extends Nette\Forms\Container
+{
 
 	/** @var object */
 	private $entity;

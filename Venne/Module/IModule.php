@@ -20,7 +20,8 @@ use Nette\Config\Configurator;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-interface IModule {
+interface IModule
+{
 
 
 	public function getName();

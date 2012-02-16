@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class DecimalType extends Nette\Object implements Mapping\IFieldType {
+class DecimalType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param decimal $value

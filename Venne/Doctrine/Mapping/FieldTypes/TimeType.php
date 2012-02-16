@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class TimeType extends Nette\Object implements Mapping\IFieldType {
+class TimeType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param string $value

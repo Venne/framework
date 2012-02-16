@@ -55,9 +55,9 @@ class Configurator extends \Nette\Config\Configurator
 		$ret = array();
 
 		$adapter = new NeonAdapter();
-		if(file_exists($this->parameters["configDir"] . "/modules.neon")){
+		if (file_exists($this->parameters["configDir"] . "/modules.neon")) {
 			$ret = $adapter->load($this->parameters["configDir"] . "/modules.neon");
-		}else{
+		} else {
 			$ret = $adapter->load($this->parameters["configDir"] . "/modules.orig.neon");
 		}
 
@@ -335,7 +335,7 @@ class Configurator extends \Nette\Config\Configurator
 			Debugger::$strictMode = true;
 			Debugger::enable($debugger['developerIp'] && $this->isProductionMode() ? (array)$debugger['developerIp'] : $this->isProductionMode(), $debugger['logDir'], $debugger['logEmail']);
 			Debugger::$logger->mailer = array("\\Venne\\Diagnostics\\Logger", "venneMailer");
-			\Nette\Diagnostics\Logger::$emailSnooze = $this->parameters["debugger"]["emailSnooze"] ?: $container->parameters["debugger"]["emailSnooze"];
+			\Nette\Diagnostics\Logger::$emailSnooze = $this->parameters["debugger"]["emailSnooze"] ? : $container->parameters["debugger"]["emailSnooze"];
 			Debugger::$logDirectory = $container->parameters["logDir"];
 			\Venne\Diagnostics\Logger::$linkPrefix = "http://" . $container->httpRequest->url->host . $container->httpRequest->url->basePath . "admin/system/log/show?name=";
 		}

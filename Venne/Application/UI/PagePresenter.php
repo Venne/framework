@@ -148,6 +148,7 @@ class PagePresenter extends FrontPresenter
 	}
 
 
+
 	/**
 	 * Component factory. Delegates the creation of components to a createComponent<Name> method.
 	 *
@@ -156,12 +157,13 @@ class PagePresenter extends FrontPresenter
 	 */
 	public function createComponent($name)
 	{
-		if(substr($name, 0, 17) == "contentExtension_"){
+		if (substr($name, 0, 17) == "contentExtension_") {
 			$this->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onRender);
-		}else{
+		} else {
 			return parent::createComponent($name);
 		}
 	}
+
 
 
 	/**

@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class TextType extends Nette\Object implements Mapping\IFieldType {
+class TextType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param string $value

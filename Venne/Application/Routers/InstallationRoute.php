@@ -13,7 +13,8 @@ namespace Venne\Application\Routers;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class InstallationRoute extends \Nette\Application\Routers\Route {
+ */ class InstallationRoute extends \Nette\Application\Routers\Route
+{
 
 	/**
 	 * Maps HTTP request to a Request object.

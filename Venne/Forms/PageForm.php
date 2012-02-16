@@ -16,7 +16,8 @@ use Nette\Application\UI\Presenter;
 /**
  * @author	 Josef Kříž
  */
-class PageForm extends EntityForm {
+class PageForm extends EntityForm
+{
 
 
 	/**

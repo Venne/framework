@@ -16,7 +16,8 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AdminPresenter extends \Venne\Application\UI\Presenter {
+class AdminPresenter extends \Venne\Application\UI\Presenter
+{
 
 
 	/** @persistent */

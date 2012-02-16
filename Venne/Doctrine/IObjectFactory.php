@@ -18,7 +18,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IObjectFactory {
+interface IObjectFactory
+{
 
 	/**
 	 * @return object

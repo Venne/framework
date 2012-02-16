@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class TypeMapper extends Nette\Object {
+class TypeMapper extends Nette\Object
+{
 
 	/** @var array */
 	private static $typesMap = array(Type::TARRAY => 'Kdyby\Doctrine\Mapping\FieldTypes\ArrayType', Type::OBJECT => 'Kdyby\Doctrine\Mapping\FieldTypes\ObjectType', Type::BOOLEAN => 'Kdyby\Doctrine\Mapping\FieldTypes\BooleanType', Type::INTEGER => 'Kdyby\Doctrine\Mapping\FieldTypes\IntegerType', Type::SMALLINT => 'Kdyby\Doctrine\Mapping\FieldTypes\SmallIntType', Type::BIGINT => 'Kdyby\Doctrine\Mapping\FieldTypes\BigIntType', Type::STRING => 'Kdyby\Doctrine\Mapping\FieldTypes\StringType', Type::TEXT => 'Kdyby\Doctrine\Mapping\FieldTypes\TextType', Type::DATETIME => 'Kdyby\Doctrine\Mapping\FieldTypes\DateTimeType', Type::DATETIMETZ => 'Kdyby\Doctrine\Mapping\FieldTypes\DateTimeTzType', Type::DATE => 'Kdyby\Doctrine\Mapping\FieldTypes\DateType', Type::TIME => 'Kdyby\Doctrine\Mapping\FieldTypes\TimeType', Type::DECIMAL => 'Kdyby\Doctrine\Mapping\FieldTypes\DecimalType', Type::FLOAT => 'Kdyby\Doctrine\Mapping\FieldTypes\FloatType', Type::CALLBACK => 'Kdyby\Doctrine\Mapping\FieldTypes\CallbackType', Type::PASSWORD => 'Kdyby\Doctrine\Mapping\FieldTypes\PasswordType');

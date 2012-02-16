@@ -13,7 +13,8 @@ namespace Venne\Application\Routers;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
- */ class RouterEvents {
+ */ class RouterEvents
+{
 
 
 	const onStartOfRouters = 'onStartOfRouters';

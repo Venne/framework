@@ -17,7 +17,8 @@ use Nette\DI\ContainerBuilder;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class ModuleExtension extends CompilerExtension {
+class ModuleExtension extends CompilerExtension
+{
 
 
 	public function loadConfiguration()

@@ -19,7 +19,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-class CallbackType extends Nette\Object implements Mapping\IFieldType {
+class CallbackType extends Nette\Object implements Mapping\IFieldType
+{
 
 	/**
 	 * @param array $value

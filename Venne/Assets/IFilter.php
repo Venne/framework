@@ -19,7 +19,8 @@ use Nette\Caching\Cache;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-interface IFilter {
+interface IFilter
+{
 
 
 	/**

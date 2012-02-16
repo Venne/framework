@@ -17,7 +17,8 @@ use Nette\DI\ContainerBuilder;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class VenneExtension extends CompilerExtension {
+class VenneExtension extends CompilerExtension
+{
 
 
 	public $defaults = array('stopwatch' => array('debugger' => TRUE,),);
@@ -30,32 +31,47 @@ class VenneExtension extends CompilerExtension {
 		$config = $this->getConfig();
 
 
-		$container->addDefinition("translator")->setClass("Venne\Localization\Translator")->addSetup("setLang", "cs");
+		$container->addDefinition("translator")
+			->setClass("Venne\Localization\Translator")
+			->addSetup("setLang", "cs");
 		//->addSetup("addDictionary", array('Venne'));
 
-		$container->addDefinition("translatorPanel")->setClass("Venne\Localization\Panel");
+		$container->addDefinition("translatorPanel")
+			->setClass("Venne\Localization\Panel");
 
-		$container->addDefinition("authorizatorFactory")->setFactory("App\CoreModule\AuthorizatorFactory")->setAutowired(false);
+		$container->addDefinition("authorizatorFactory")
+			->setFactory("App\CoreModule\AuthorizatorFactory")
+			->setAutowired(false);
 
-		$container->addDefinition("authorizator")->setClass("Nette\Security\Permission")->setFactory("@authorizatorFactory::getCurrentPermissions");
+		$container->addDefinition("authorizator")
+			->setClass("Nette\Security\Permission")
+			->setFactory("@authorizatorFactory::getCurrentPermissions");
 
-		$container->addDefinition("authenticator")->setClass("App\CoreModule\Authenticator", array("@container"));
+		$container->addDefinition("authenticator")
+			->setClass("App\CoreModule\Authenticator", array("@container"));
 
 		foreach ($container->parameters["modules"] as $module => $item) {
-			$container->addDefinition($module . "Module")->addTag("module")->setClass("App\\" . ucfirst($module) . "Module\\Module");
+			$container->addDefinition($module . "Module")
+				->addTag("module")
+				->setClass("App\\" . ucfirst($module) . "Module\\Module");
 		}
 
 		if ($config["stopwatch"]["debugger"]) {
-			$container->getDefinition("user")->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
+			$container->getDefinition("user")
+				->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
 		}
 
-		$container->addDefinition("configManager")->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))->addTag("manager");
+		$container->addDefinition("configManager")
+			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))
+			->addTag("manager");
 
 
 		/** ------------------- mappers --------------------- */
-		$container->addDefinition("configFormMapper")->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
+		$container->addDefinition("configFormMapper")
+			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
 
-		$container->addDefinition("entityFormMapper")->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
+		$container->addDefinition("entityFormMapper")
+			->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
 
 
 		/* -------------------- macros ------------------------ */

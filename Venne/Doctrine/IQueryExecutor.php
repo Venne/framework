@@ -18,7 +18,8 @@ use Nette;
 /**
  * @author Filip Procházka
  */
-interface IQueryExecutor {
+interface IQueryExecutor
+{
 
 	/**
 	 * @param IQueryObject $queryObject

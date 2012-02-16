@@ -61,11 +61,11 @@ class UserStorage extends \Nette\Http\UserStorage
 		/* delete old login */
 		$time = $this->sessionHandler->getOptions();
 		$time = $time['cookie_lifetime'];
-		$date = Nette\DateTime::from(time()-$time)->format('Y-m-d H:i:s');
+		$date = Nette\DateTime::from(time() - $time)->format('Y-m-d H:i:s');
 
 		$qb = $this->repository->createQueryBuilder("a");
 		$result = $qb->where("a.created < :date")->setParameter("date", $date)->getQuery()->getResult();
-		foreach($result as $item){
+		foreach ($result as $item) {
 			$this->repository->delete($result);
 		}
 

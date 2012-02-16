@@ -23,7 +23,8 @@ use Nette\Config\Adapters\NeonAdapter;
 /**
  * @author Filip Procházka
  */
-class ConfigFormMapper extends \Nette\Object {
+class ConfigFormMapper extends \Nette\Object
+{
 
 
 	/** @var string */

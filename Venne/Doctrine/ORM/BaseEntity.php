@@ -16,7 +16,8 @@ use Nette\Object;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class BaseEntity extends Object implements IEntity {
+class BaseEntity extends Object implements IEntity
+{
 
 
 	/**
