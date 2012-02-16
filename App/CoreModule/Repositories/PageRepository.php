@@ -18,7 +18,8 @@ use App\CoreModule\Entities\UserEntity;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class PageRepository extends BaseRepository {
+class PageRepository extends BaseRepository
+{
 
 
 	/**
@@ -36,6 +37,36 @@ class PageRepository extends BaseRepository {
 		}
 
 		$this->flush($withoutFlush);
+	}
+
+
+
+	/**
+	 * Check if page URL is unique.
+	 *
+	 * @param \App\CoreModule\Entities\PageEntity $page
+	 * @return bool
+	 */
+	public function isUnique(\App\CoreModule\Entities\PageEntity $page)
+	{
+		$pages = $this->findBy(array("url" => $page->url));
+
+		if (!$pages || (count($pages) == 1 && $pages[0] === $page )) {
+			return true;
+		}
+
+		foreach ($pages as $item) {
+			if($item === $page){
+				continue;
+			}
+
+			foreach ($item->languages as $lang) {
+				if ($page->isInLanguageAlias($lang->alias)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 }

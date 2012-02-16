@@ -68,29 +68,23 @@ class DefaultPresenter extends BasePresenter
 
 	public function createComponentForm($name)
 	{
-		$entity = $this->context->core->cmsManager->getContentEntity($this->getParam("type"));
+		$repository = $this->context->core->pageRepository;
+		$entity = $this->context->core->cmsManager->getContentEntity($this->getParameter("type"));
 		$entity->languages->add($this->context->core->languageRepository->find(1));
 		$em = $this->context->entityManager;
 
-		$form = $this->context->core->cmsManager->getContentForm($this->getParam("type"), $entity);
+		$form = $this->context->core->cmsManager->getContentForm($this->getParameter("type"), $entity);
 		$form->addSubmit("_submit", "Save");
-		$form->onSuccess[] = function($form) use ($em)
+		$form->onSuccess[] = function($form) use ($em, $repository)
 		{
-			$em->persist($form->entity);
-			$ok = false;
-			try {
+			if($repository->isUnique($form->entity->page)){
+				$em->persist($form->entity);
 				$em->flush();
-				$ok = true;
-			} catch (\PDOException $ex) {
-				if ($ex->getCode() == "23000") {
-					$form->presenter->flashMessage("URL is not unique", "warning");
-				} else {
-					throw $ex;
-				}
-			}
-			if ($ok) {
+
 				$form->getPresenter()->flashMessage("Page has been created");
 				$form->getPresenter()->redirect("default", array("type" => null));
+			}else{
+				$form->presenter->flashMessage("URL is not unique", "warning");
 			}
 		};
 		return $form;
@@ -100,9 +94,10 @@ class DefaultPresenter extends BasePresenter
 
 	public function createComponentFormTranslate($name)
 	{
+		$repository = $this->context->core->pageRepository;
 		$em = $this->context->entityManager;
 
-		$pageEntity = $this->context->core->pageRepository->find($this->getParam("id"));
+		$pageEntity = $this->context->core->pageRepository->find($this->getParameter("id"));
 		$contentEntity = $this->context->core->cmsManager->getContentEntity($pageEntity->type);
 		$contentEntity = $em->getRepository(get_class($contentEntity))->findOneBy(array("page" => $pageEntity->id));
 
@@ -114,26 +109,17 @@ class DefaultPresenter extends BasePresenter
 
 		$form = $this->context->core->cmsManager->getContentForm($pageEntity->type, $entity);
 		$form->addSubmit("_submit", "Save");
-		$form->onSuccess[] = function($form) use ($em)
+		$form->onSuccess[] = function($form) use ($em, $repository)
 		{
-			$em->persist($form->entity);
-			try {
+			if($repository->isUnique($form->entity->page)){
+				$em->persist($form->entity);
 				$em->flush();
-			} catch (\PDOException $ex) {
-				if ($ex->getCode() == "23000") {
-					$form->presenter->flashMessage("URL is not unique", "warning");
-				} else {
-					throw $ex;
-				}
+
+				$form->getPresenter()->flashMessage("Page has been created");
+				$form->getPresenter()->redirect("default", array("type" => null));
+			}else{
+				$form->presenter->flashMessage("URL is not unique", "warning");
 			}
-		};
-		$form->onSuccess[] = function($form)
-		{
-			$form->getPresenter()->flashMessage("Page has been created");
-		};
-		$form->onSuccess[] = function($form)
-		{
-			$form->getPresenter()->redirect("default", array("type" => null));
 		};
 		return $form;
 	}
@@ -142,33 +128,25 @@ class DefaultPresenter extends BasePresenter
 
 	public function createComponentFormEdit($name)
 	{
+		$repository = $this->context->core->pageRepository;
 		$em = $this->context->entityManager;
-		$pageEntity = $this->context->core->pageRepository->find($this->getParam("id"));
+		$pageEntity = $this->context->core->pageRepository->find($this->getParameter("id"));
 		$entity = $this->context->core->cmsManager->getContentEntity($pageEntity->type);
 		$entity = $em->getRepository(get_class($entity))->findOneBy(array("page" => $pageEntity->id));
 
 		$form = $this->context->core->cmsManager->getContentForm($pageEntity->type, $entity);
 		$form->addSubmit("_submit", "Save");
-		$form->onSuccess[] = function($form) use ($em)
+		$form->onSuccess[] = function($form) use ($em, $repository)
 		{
-			$em->persist($form->entity);
-			try {
+			if($repository->isUnique($form->entity->page)){
+				$em->persist($form->entity);
 				$em->flush();
-			} catch (\PDOException $ex) {
-				if ($ex->getCode() == "23000") {
-					$form->presenter->flashMessage("URL is not unique", "warning");
-				} else {
-					throw $ex;
-				}
+
+				$form->getPresenter()->flashMessage("Page has been updated");
+				$form->getPresenter()->redirect("default", array("type" => null));
+			}else{
+				$form->presenter->flashMessage("URL is not unique", "warning");
 			}
-		};
-		$form->onSuccess[] = function($form)
-		{
-			$form->getPresenter()->flashMessage("Page has been updated");
-		};
-		$form->onSuccess[] = function($form)
-		{
-			$form->getPresenter()->redirect("this");
 		};
 		return $form;
 	}
