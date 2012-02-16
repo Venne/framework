@@ -18,13 +18,40 @@ use Venne;
  *
  * @secured
  */
-class DefaultPresenter extends BasePresenter {
+class DefaultPresenter extends BasePresenter
+{
 
 
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("General", $this->link(":Core:Admin:Security:Default:"));
+
+		$this->template->items = $this->context->core->loginRepository->findAll();
+	}
+
+
+
+	public function handleDelete($id)
+	{
+		$repository = $this->context->core->loginRepository;
+
+		$repository->delete($repository->find($id));
+		$this->flashMessage("User has been logged out");
+		$this->redirect("this");
+	}
+
+
+
+	public function handleReload($id)
+	{
+		$repository = $this->context->core->loginRepository;
+		$entity = $repository->find($id);
+		$entity->reload = true;
+
+		$repository->save($entity);
+		$this->flashMessage("User has been updated");
+		$this->redirect("this");
 	}
 
 }
