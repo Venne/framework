@@ -12,6 +12,7 @@
 namespace Venne\Security;
 
 use Venne;
+use Nette;
 use Nette\Http\Session;
 use App\CoreModule\Entities\LoginEntity;
 use App\CoreModule\Entities\UserEntity;
@@ -24,7 +25,6 @@ use Venne\Doctrine\ORM\BaseRepository;
  */
 class UserStorage extends \Nette\Http\UserStorage
 {
-
 
 	/** @var BaseRepository */
 	protected $repository;
@@ -56,6 +56,17 @@ class UserStorage extends \Nette\Http\UserStorage
 
 			$login = $this->repository->createNew(array($identity->id != -1 ? $identity : NULL, $this->sessionHandler->getId()));
 			$this->repository->save($login);
+		}
+
+		/* delete old login */
+		$time = $this->sessionHandler->getOptions();
+		$time = $time['cookie_lifetime'];
+		$date = Nette\DateTime::from(time()-$time)->format('Y-m-d H:i:s');
+
+		$qb = $this->repository->createQueryBuilder("a");
+		$result = $qb->where("a.created < :date")->setParameter("date", $date)->getQuery()->getResult();
+		foreach($result as $item){
+			$this->repository->delete($result);
 		}
 
 		return $this;
