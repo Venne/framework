@@ -115,8 +115,13 @@ class AuthorizatorFactory extends Object
 	 */
 	protected function setPermissionsByRole(Permission $permission, $role)
 	{
+		$roleEntity = $this->context->core->roleRepository->findOneByName($role);
+		if($roleEntity->parent){
+			$this->setPermissionsByRole($permission, $roleEntity->parent->name);
+		}
+
 		if (!$permission->hasRole($role)) {
-			$permission->addRole($role);
+			$permission->addRole($role, $roleEntity->parent ? $roleEntity->parent->name : NULL);
 		}
 
 		if ($role == "admin") {
@@ -125,7 +130,6 @@ class AuthorizatorFactory extends Object
 		}
 
 		/* allow/deny */
-		$roleEntity = $this->context->core->roleRepository->findOneByName($role);
 		foreach ($roleEntity->permissions as $perm) {
 			if ($permission->hasResource($perm->resource)) {
 				if ($perm->allow) {

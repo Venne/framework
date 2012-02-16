@@ -2,8 +2,6 @@
 
 {include "../head.latte"}
 
-{*control menu*}
-
 {control formRole}
 
 {var $form=>$presenter["form"]}
@@ -12,6 +10,7 @@
 {form form class=>venne-form}
 
 {var $items = $permissions["root"]}
+{dump $permissions["root"]}
 
 {block #items}
 <ul{if $dep == ""} class="sortable"{/if}>

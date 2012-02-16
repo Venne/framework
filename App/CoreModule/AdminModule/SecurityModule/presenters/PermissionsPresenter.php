@@ -55,9 +55,6 @@ class PermissionsPresenter extends BasePresenter {
 		}
 
 		$this->template->roles = $this->context->core->roleRepository->findAll();
-		$role = $this->roleRepository->findOneByName($this->role);
-
-
 		$this->template->authorizator = $this->context->authorizatorFactory->getPermissionsByRoles(array($this->role));
 		$this->template->permissions = $this->getPermissions($this->template->authorizator);
 	}
@@ -137,7 +134,7 @@ class PermissionsPresenter extends BasePresenter {
 	public function formSaveRecursion($form, $menu)
 	{
 		$repository = $this->permissionRepository;
-		$session = $this->context->session->getSection("Venne.Security.Authorizator");
+		$session = $this->context->session->getSection(\App\CoreModule\AuthorizatorFactory::SESSION_SECTION);
 
 		foreach ($menu as $key => $item) {
 			if ($form["allow_" . str_replace("\\", "_", $item)]->isSubmittedBy()) {
@@ -182,9 +179,9 @@ class PermissionsPresenter extends BasePresenter {
 		$repository = $this->context->core->loginRepository;
 
 		foreach ($repository->findBy(array("user"=>NULL)) as $entity){
-		$entity->valid = false;
-		$repository->save($entity);
-	}
+			$entity->reload = true;
+			$repository->save($entity);
+		}
 	}
 
 
