@@ -49,11 +49,6 @@ class VenneExtension extends CompilerExtension {
 			$container->getDefinition("user")->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
 		}
 
-		if ($config["requestsPanel"]["debugger"]) {
-			$container->getDefinition("user")->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\RequestsPanel')));
-		}
-
-
 		$container->addDefinition("configManager")->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))->addTag("manager");
 
 
