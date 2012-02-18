@@ -56,9 +56,6 @@ class SystemApplicationForm extends \Venne\Forms\ConfigForm {
 		$group = $this->addGroup("Application");
 		$container->setCurrentGroup($group);
 		$container->addCheckbox("debugger", "Debugger panel in bluescreen")->setDefaultValue(true);
-		$panel = $venne->addContainer("requestsPanel");
-		$panel->setCurrentGroup($group);
-		$panel->addCheckbox("debugger", "Requests panel")->setDefaultValue(true);
 
 
 		/* routing */
