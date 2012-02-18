@@ -27,6 +27,7 @@ Installation
 	# git clone git://github.com/Venne/sandbox.git myProject
 	# cd myProject
 	# sh ./bin/clone_vendors.sh
+	# sh ./bin/prepare_sandbox.sh
 	
 
 
