@@ -31,9 +31,13 @@ class DoctrineExtension extends CompilerExtension
 		$config = $this->getConfig();
 
 
-		$container->addDefinition("doctrineCache")
-			->setClass("Doctrine\Common\Cache\ArrayCache")
+		$cache = $container->addDefinition("doctrineCache")
 			->setInternal(true);
+		if(function_exists("apc_fetch")){
+			$cache->setClass("Doctrine\Common\Cache\ApcCache");
+		}else{
+			$cache->setClass("Doctrine\Common\Cache\ArrayCache");
+		}
 
 		$container->addDefinition("doctrineAnnotationRegistry")
 			->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/Doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))
