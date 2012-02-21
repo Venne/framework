@@ -50,7 +50,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	protected $password;
 
 	/**
-	 * @Column(type="string", name="`key`", nullable=true)
+	 * @Column(type="string", name="`key`")
 	 */
 	protected $key;
 
@@ -91,6 +91,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 		$this->login = "";
 		$this->password = "";
 		$this->email = "";
+		$this->key = "";
 		$this->generateNewSalt();
 	}
 
@@ -102,7 +103,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 	public function invalidateLogins()
 	{
 		foreach ($this->logins as $login) {
-			$user->valid = false;
+			$login->reload = true;
 		}
 	}
 
