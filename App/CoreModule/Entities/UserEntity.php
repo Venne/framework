@@ -16,7 +16,7 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  * @Entity(repositoryClass="\App\CoreModule\Repositories\UserRepository")
- * @Table(name="`user`")
+ * @Table(name="user")
  *
  * @property-read integer $id
  * @property string $email
@@ -77,7 +77,7 @@ class UserEntity extends \Nette\Security\Identity implements \Venne\Doctrine\ORM
 
 
 	/**
-	 * @Form(type="manyToMany", targetEntity="\App\CoreModule\Entities\RoleEntity")
+	 * @Form(type="manyToMany", targetEntity="RoleEntity")
 	 */
 	protected $roleEntities;
 

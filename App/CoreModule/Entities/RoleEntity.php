@@ -31,24 +31,24 @@ class RoleEntity extends \Venne\Doctrine\ORM\BaseEntity {
 	protected $name;
 
 	/**
-	 * @OneToMany(targetEntity="roleEntity", mappedBy="parent", cascade={"persist", "remove", "detach"})
+	 * @OneToMany(targetEntity="RoleEntity", mappedBy="parent", cascade={"persist", "remove", "detach"})
 	 */
 	protected $childrens;
 
 	/**
-	 * @ManyToOne(targetEntity="roleEntity", inversedBy="id", cascade={"persist", "remove", "detach"})
+	 * @ManyToOne(targetEntity="RoleEntity", inversedBy="id", cascade={"persist", "remove", "detach"})
 	 * @JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
 	 * @OrderBy({"order" = "ASC"})
 	 */
 	protected $parent;
 
 	/**
-	 * @OneToMany(targetEntity="permissionEntity", mappedBy="role")
+	 * @OneToMany(targetEntity="PermissionEntity", mappedBy="role")
 	 */
 	protected $permissions;
 
 	/**
-	 * @ManyToMany(targetEntity="userEntity", mappedBy="roles")
+	 * @ManyToMany(targetEntity="UserEntity", mappedBy="roles")
 	 */
 	protected $users;
 
