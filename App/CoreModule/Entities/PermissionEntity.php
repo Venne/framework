@@ -41,7 +41,7 @@ use Venne;
 	protected $allow;
 
 	/**
-	 * @ManyToOne(targetEntity="roleEntity", inversedBy="id")
+	 * @ManyToOne(targetEntity="RoleEntity", inversedBy="id")
 	 * @JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")
 	 */
 	protected $role;

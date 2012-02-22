@@ -31,7 +31,8 @@ class DoctrineExtension extends CompilerExtension
 		$config = $this->getConfig();
 
 
-		$cache = $container->addDefinition("doctrineCache")
+		// Cache
+		$cache = $container->addDefinition($this->prefix("cache"))
 			->setInternal(true);
 		if(function_exists("apc_fetch")){
 			$cache->setClass("Doctrine\Common\Cache\ApcCache");
@@ -39,28 +40,27 @@ class DoctrineExtension extends CompilerExtension
 			$cache->setClass("Doctrine\Common\Cache\ArrayCache");
 		}
 
+
+		// Annotations
 		$container->addDefinition("doctrineAnnotationRegistry")
 			->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/Doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))
 			->setShared(false)
 			->setInternal(true);
-
 		$container->addDefinition("doctrineAnnotationReader")
 			->setClass('Doctrine\Common\Annotations\SimpleAnnotationReader', array("@doctrineAnnotationRegistry"))
 			->addSetup("addNamespace", 'Doctrine\\ORM\\Mapping')
 			->setInternal(true);
-
 		$container->addDefinition("doctrineCachedAnnotationReader")
-			->setClass("Doctrine\Common\Annotations\CachedReader", array("@doctrineAnnotationReader", "@doctrineCache"))
+			->setClass("Doctrine\Common\Annotations\CachedReader", array("@doctrineAnnotationReader", "@doctrine.cache"))
 			->setInternal(true);
-
 		$container->addDefinition("doctrineAnnotationDriver")
 			->setClass("Doctrine\ORM\Mapping\Driver\AnnotationDriver", array("@doctrineCachedAnnotationReader", array($container->parameters["appDir"], $container->parameters["venneDir"])))
 			->setInternal(true);
 
 		$container->addDefinition("entityManagerConfig")
 			->setClass("Doctrine\ORM\Configuration")
-			->addSetup('setMetadataCacheImpl', "@doctrineCache")
-			->addSetup("setQueryCacheImpl", "@doctrineCache")
+			->addSetup('setMetadataCacheImpl', "@doctrine.cache")
+			->addSetup("setQueryCacheImpl", "@doctrine.cache")
 			->addSetup("setMetadataDriverImpl", "@doctrineAnnotationDriver")
 			->addSetup("setProxyDir", $container->parameters["appDir"] . '/proxies')
 			->addSetup("setProxyNamespace", 'App\Proxies')
@@ -88,6 +88,15 @@ class DoctrineExtension extends CompilerExtension
 		$container->addDefinition('entityManager')
 			->setClass("Doctrine\ORM\EntityManager")
 			->setFactory("\Doctrine\ORM\EntityManager::create", array("%database%", "@entityManagerConfig", "@eventManager"));
+
+		if($container->parameters["database"]["driver"] == "pdo_mysql" && $container->parameters["database"]["charset"]){
+			$container->addDefinition($this->prefix("mysqlListener"))
+				->setClass("Doctrine\DBAL\Event\Listeners\MysqlSessionInit", array($container->parameters["database"]["charset"], $container->parameters["database"]["collation"]))
+				->setInternal(true);
+
+			$container->getDefinition("eventManager")
+				->addSetup("addEventSubscriber", "@doctrine.mysqlListener");
+		}
 
 
 		$container->addDefinition("doctrineConnection")

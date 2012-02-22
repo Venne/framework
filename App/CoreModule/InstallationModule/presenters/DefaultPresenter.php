@@ -66,11 +66,19 @@ class DefaultPresenter extends Presenter {
 			$this->setView("default");
 			if ($this->context->parameters["administration"]["login"]["password"]) {
 				$this->setView("database");
-				if ($this->context->parameters["database"]["dbname"]) {
+				if ($this->context->parameters["database"]["driver"]) {
 					$this->setView("website");
 
-					if (count($this->context->schemaManager->listTables()) == 0) {
-						$this->context->core->moduleManager->installModule("core");
+					try{
+						if (count($this->context->schemaManager->listTables()) == 0) {
+							$this->context->core->moduleManager->installModule("core");
+						}
+					}catch(\PDOException $e){
+						if($e->getCode() == "HY000"){
+							$this->context->core->moduleManager->installModule("core");
+						}else{
+							throw $e;
+						}
 					}
 
 					if ($this->context->parameters["website"]["title"]) {

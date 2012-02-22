@@ -19,7 +19,8 @@ use Venne\Forms\Mapping\ConfigFormMapper;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class SystemDatabaseForm extends \Venne\Forms\ConfigForm {
+class SystemDatabaseForm extends \Venne\Forms\ConfigForm
+{
 
 
 	/** @var bool */
@@ -27,6 +28,16 @@ class SystemDatabaseForm extends \Venne\Forms\ConfigForm {
 
 	/** @var bool */
 	protected $showTestConnection = true;
+
+
+	protected $drivers = array(
+		'pdo_mysql',
+		'pdo_sqlite',
+		'pdo_pgsql',
+		'pdo_oci',
+		'oci8',
+		'pdo_sqlsrv',
+	);
 
 
 
@@ -62,23 +73,30 @@ class SystemDatabaseForm extends \Venne\Forms\ConfigForm {
 	{
 		parent::startup();
 
-		$this->addGroup();
+		$this->addGroup("Base settings");
 		if ($this->showTestConnection) $this->addCheckbox("test", "Test connection");
 		if ($this->testConnection && $this->showTestConnection) $this["test"]->setDefaultValue(true);
-		$this->addSelect("driver", "Driver", array("pdo_mysql" => "pdo_mysql", "pdo_pgsql" => "pdo_pgsql"));
+		$this->addSelect("driver", "Driver")
+			->setItems($this->drivers, false)
+			->setDefaultValue("pdo_mysql");
+
+		$this->addGroup("Connection settings");
 		$this->addText("host", "Host");
+		$this->addText("port", "Port");
 		$this->addText("user", "User name");
 		$this->addPassword("password", "Password");
 		$this->addText("dbname", "Database");
+		$this->addTextWithSelect("path", "Path")->setItems(array("%tempDir%/database.db"), false);
+		$this->addCheckbox("memory", "Db in memory");
+		$this->addTextWithSelect("charset", "Charset")->setItems(array("utf8"), false);
+		$this->addTextWithSelect("collation", "Collation")->setItems(array("utf8_general_ci", "utf8_czech_ci"), false);
 
-		$this["host"]->addRule(self::FILLED, 'Enter host');
-		$this["user"]->addRule(self::FILLED, 'Enter user name');
-		$this["dbname"]->addRule(self::FILLED, 'Enter database name');
+		$this->presenter->context->assets->assetManager->addJavascript("@CoreModule/admin/js/systemDatabaseForm.js");
 	}
 
 
 
-	protected function handleError()
+	public function handleError()
 	{
 
 	}
@@ -92,14 +110,19 @@ class SystemDatabaseForm extends \Venne\Forms\ConfigForm {
 		}
 
 		$values = $this->getValues();
+		$host = $values["host"];
 
-		/*
-		 * Test
-		 */
+		if ($values["driver"] == "pdo_sqlite") {
+			$host = $this->presenter->context->expand($host);
+		} else {
+			$host = "host={$host};dbname={$values["dbname"]}";
+		}
+
+		/* Test */
 		if ((!$this->showTestConnection && $this->testConnection) || ($this->showTestConnection && $values["test"])) {
 			set_error_handler(array($this, 'handleError'));
 			try {
-				$db = new \Nette\Database\Connection(substr($values["driver"], 4) . ':host=' . $values["host"] . ';dbname=' . $values["dbname"], $values["user"], $values["password"]);
+				$db = new \Nette\Database\Connection(substr($values["driver"], 4) . ':' . $host, $values["user"], $values["password"]);
 			} catch (\PDOException $e) {
 				$this->getPresenter()->flashMessage("Cannot connect to database " . $e->getMessage(), "warning");
 				return false;
