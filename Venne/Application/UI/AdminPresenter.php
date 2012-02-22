@@ -32,8 +32,8 @@ class AdminPresenter extends \Venne\Application\UI\Presenter
 	{
 		/* Check database */
 		if (!$this->context->createCheckConnection()) {
-			if (substr($this->getName(), 0, 13) != "System:Admin:" && $this->getName() != "Core:Admin:Login") {
-				$this->redirect(":System:Admin:Database:");
+			if ($this->getName() != "Core:Admin:System:Database" && $this->getName() != "Core:Admin:Login") {
+				$this->redirect(":Core:Admin:System:Database:");
 			}
 			$this->flashMessage("Database connection not found. Please fix it.", "warning");
 		}
