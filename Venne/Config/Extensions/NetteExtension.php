@@ -40,9 +40,12 @@ class NetteExtension extends \Nette\Config\Extensions\NetteExtension
 		$container->getDefinition('session')
 			->addSetup("setSavePath", '%tempDir%/sessions');
 
-		$container->getDefinition($this->prefix('userStorage'))
-			->setClass('Venne\Security\UserStorage')
-			->setArguments(array("@session", "@core.loginRepository"));
+		// User storage
+		if(file_exists($container->parameters["flagsDir"] . "/installed")){
+			$container->getDefinition($this->prefix('userStorage'))
+				->setClass('Venne\Security\UserStorage')
+				->setArguments(array("@session", "@core.loginRepository"));
+		}
 	}
 
 

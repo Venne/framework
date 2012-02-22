@@ -123,7 +123,7 @@ class DoctrineExtension extends CompilerExtension
 
 	public static function checkConnection(\Nette\DI\Container $context, \Doctrine\ORM\EntityManager $entityManager)
 	{
-		if (!$context->parameters["database"]["dbname"]) {
+		if (!$context->parameters["database"]["driver"]) {
 			return false;
 		}
 
