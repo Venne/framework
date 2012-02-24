@@ -80,7 +80,7 @@ class Configurator extends \Nette\Config\Configurator
 				'parent' => 'Nette\DI\Container',
 			)
 		);
-		//$ret = $parameters + $ret;
+		$ret = $parameters + $ret;
 		$ret["venneModeInstallation"] = false;
 		$ret["venneModeAdmin"] = false;
 		$ret["venneModeFront"] = false;

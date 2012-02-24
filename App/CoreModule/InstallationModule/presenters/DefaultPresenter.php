@@ -183,8 +183,8 @@ class DefaultPresenter extends Presenter {
 		$this->template->websiteUrl = $this->getHttpRequest()->getUrl()->getBaseUrl();
 		$this["vennePanel"]->setVisibility(false);
 
-		$this->setTitle("Venne:CMS");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
+		$this["head"]->setTitle("Venne:CMS");
+		$this["head"]->setRobots($this["head"]::ROBOTS_NOINDEX | $this["head"]::ROBOTS_NOFOLLOW);
 	}
 
 }
