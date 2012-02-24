@@ -66,7 +66,7 @@ class VenneExtension extends CompilerExtension
 			->addTag("manager");
 
 
-		/** ------------------- mappers --------------------- */
+		// Mappers
 		$container->addDefinition("configFormMapper")
 			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
 
@@ -74,9 +74,54 @@ class VenneExtension extends CompilerExtension
 			->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
 
 
-		/* -------------------- macros ------------------------ */
+		// Template
+		$container->addDefinition($this->prefix("templateConfigurator"))
+			->setClass("Venne\Templating\TemplateConfigurator");
+
+
+		// Macros
 		$this->compileMacro("Venne\Assets\Macros\CssMacro", $this->prefix("cssMacro"));
 		$this->compileMacro("Venne\Assets\Macros\JsMacro", $this->prefix("jsMacro"));
+
+
+		// Helpers
+		$container->addDefinition($this->prefix("helpers"))
+			->setClass("Venne\Templating\Helpers");
+	}
+
+
+	public function beforeCompile()
+	{
+		$container = $this->getContainerBuilder();
+
+		$this->registerMacroFactories($container);
+		$this->registerHelperFactories($container);
+	}
+
+
+	/**
+	 * @param \Nette\DI\ContainerBuilder $container
+	 */
+	protected function registerMacroFactories(ContainerBuilder $container)
+	{
+		$config = $container->getDefinition($this->prefix('templateConfigurator'));
+
+		foreach ($container->findByTag('macro') as $factory => $meta) {
+			$config->addSetup('addFactory', array($factory));
+		}
+	}
+
+
+	/**
+	 * @param \Nette\DI\ContainerBuilder $container
+	 */
+	protected function registerHelperFactories(ContainerBuilder $container)
+	{
+		$config = $container->getDefinition($this->prefix('helpers'));
+
+		foreach ($container->findByTag('helper') as $factory => $meta) {
+			$config->addSetup('addHelper', array(substr($factory, strrpos($factory, ".") + 1, -6), $factory));
+		}
 	}
 
 }

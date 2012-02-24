@@ -175,8 +175,8 @@ class PagePresenter extends FrontPresenter
 	{
 		parent::beforeRender();
 		$this->template->entity = $this->page;
-		$this->setTitle($this->page->title);
-		$this->setRobots($this->page->robots);
+		$this["head"]->setTitle($this->page->title);
+		$this["head"]->setRobots($this->page->robots);
 	}
 
 }

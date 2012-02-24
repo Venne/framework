@@ -80,11 +80,11 @@ class Configurator extends \Nette\Config\Configurator
 				'parent' => 'Nette\DI\Container',
 			)
 		);
-		$ret = $parameters + $ret;
+		//$ret = $parameters + $ret;
 		$ret["venneModeInstallation"] = false;
 		$ret["venneModeAdmin"] = false;
 		$ret["venneModeFront"] = false;
-		$ret['rootDir'] = dirname($ret['wwwDir']);
+		$ret['rootDir'] = isset($parameters['rootDir']) ? $parameters['rootDir'] : dirname($ret['wwwDir']);
 		$ret['tempDir'] = $ret['rootDir'] . '/temp';
 		$ret['tempDir'] = $ret['rootDir'] . '/temp';
 		$ret['libsDir'] = $ret['rootDir'] . '/libs';

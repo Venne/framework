@@ -13,25 +13,20 @@ namespace Venne\Application\UI;
 
 use Venne;
 use Nette\Application\UI\InvalidLinkException;
+use Venne\Templating\ITemplateConfigurator;
 
 /**
  * Description of Presenter
  *
  * @author Josef Kříž <pepakriz@gmail.com>
  *
- * @property-read \SystemContainer $context
+ * @property-read \SystemContainer|\Nette\DI\Container $context
  */
 class Presenter extends \Nette\Application\UI\Presenter
 {
 
-
-	const ROBOTS_INDEX = 1;
-
-	const ROBOTS_NOINDEX = 2;
-
-	const ROBOTS_FOLLOW = 4;
-
-	const ROBOTS_NOFOLLOW = 8;
+	/** @var ITemplateConfigurator */
+	protected $templateConfigurator;
 
 	/** @persistent */
 	public $lang;
@@ -39,33 +34,25 @@ class Presenter extends \Nette\Application\UI\Presenter
 	/** @var array of array */
 	protected $paths = array();
 
-	/** @var string */
-	public $keywords;
 
-	/** @var string */
-	public $description;
-
-	/** @var string */
-	public $robots;
-
-	/** @var string */
-	public $author;
-
-	/** @var string */
-	public $title;
-
-	/** @var string */
-	public $titleTemplate;
-
-	/** @var string */
-	public $titleSeparator;
-
-
-
-	public function __construct(\Nette\DI\IContainer $context)
+	public function __construct(\Nette\DI\Container $container)
 	{
 		\Venne\Panels\Stopwatch::start();
-		parent::__construct($context);
+		parent::__construct($container);
+
+		if ($container->hasService('venne_templateConfigurator')) {
+			$this->setTemplateConfigurator($container->venne->templateConfigurator);
+		}
+	}
+
+
+
+	/**
+	 * @param \Venne\Templating\ITemplateConfigurator $configurator
+	 */
+	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
+	{
+		$this->templateConfigurator = $configurator;
 	}
 
 
@@ -90,11 +77,11 @@ class Presenter extends \Nette\Application\UI\Presenter
 		parent::startup();
 
 
-		/* Startup event */
+		// Startup event
 		$this->context->eventManager->dispatchEvent(\Venne\Application\UI\Events\Events::onStartup, $this->getEventArgs());
 
 
-		/* Language */
+		// Language
 		if (count($this->context->parameters["website"]["languages"]) > 1) {
 			if (!$this->lang && !$this->getParameter("lang")) {
 				$this->lang = $this->getDefaultLanguageAlias();
@@ -104,15 +91,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 		}
 
 
-		/* Meta */
-		$this->titleTemplate = $this->context->parameters["website"]["title"];
-		$this->titleSeparator = $this->context->parameters["website"]["titleSeparator"];
-		$this->author = $this->context->parameters["website"]["author"];
-		$this->keywords = $this->context->parameters["website"]["keywords"];
-		$this->description = $this->context->parameters["website"]["description"];
-
-
-		/* stopwatch */
+		// Stopwatch
 		\Venne\Panels\Stopwatch::stop("base startup");
 		\Venne\Panels\Stopwatch::start();
 	}
@@ -253,7 +232,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function beforeRender()
 	{
-		/* stopwatch */
+		// Stopwatch
 		\Venne\Panels\Stopwatch::stop("module startup and action");
 		\Venne\Panels\Stopwatch::start();
 
@@ -281,22 +260,31 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 *
 	 * @return \Nette\Templating\Template
 	 */
-	protected function createTemplate($class = NULL)
+	public function createTemplate($class = NULL)
 	{
 		$template = parent::createTemplate($class);
-		$latte = new \Nette\Latte\Engine();
 
-		foreach ($this->context->findByTag("macro") as $macro => $item) {
-			$this->context->{"create" . str_replace(".", "_", substr(ucfirst($macro), 0, -7))}($latte->getCompiler());
+		if ($this->templateConfigurator !== NULL) {
+			$this->templateConfigurator->configure($template);
 		}
 
-
-		/* translator */
-		$template->setTranslator($this->context->translator);
-
-
-		$template->registerFilter($latte);
 		return $template;
+	}
+
+
+	/**
+	 * @param \Nette\Templating\Template $template
+	 *
+	 * @return void
+	 */
+	public function templatePrepareFilters($template)
+	{
+		if ($this->templateConfigurator !== NULL) {
+			$this->templateConfigurator->prepareFilters($template);
+
+		} else {
+			$template->registerFilter(new \Nette\Latte\Engine);
+		}
 	}
 
 
@@ -438,7 +426,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isAllowed($destination)
 	{
-		if ($this->context->params['venneModeInstallation']) return true;
+		if ($this->context->parameters['venneModeInstallation']) return true;
 		if ($destination == "this") {
 			$action = "action" . ucfirst($this->action);
 			$class = $this->name;
@@ -491,64 +479,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 
-	/**
-	 * @param string $text
-	 */
-	public function setKeywords($text)
-	{
-		$this->keywords = $text;
-	}
-
-
-
-	/**
-	 * @param string $text
-	 */
-	public function setDescription($text)
-	{
-		$this->description = $text;
-	}
-
-
-
-	/**
-	 * @param string $text
-	 */
-	public function setTitle($text)
-	{
-		$this->title = $text;
-	}
-
-
-
-	/**
-	 * @param string $text
-	 */
-	public function setAuthor($text)
-	{
-		$this->author = $text;
-	}
-
-
-
-	/**
-	 * @param int|string $robots
-	 */
-	public function setRobots($robots)
-	{
-		if (is_numeric($robots)) {
-			$arr = array();
-			if ($robots & self::ROBOTS_INDEX) $arr[] = "index";
-			if ($robots & self::ROBOTS_NOINDEX) $arr[] = "noindex";
-			if ($robots & self::ROBOTS_FOLLOW) $arr[] = "follow";
-			if ($robots & self::ROBOTS_NOFOLLOW) $arr[] = "nofollow";
-			$this->robots = implode(", ", $arr);
-		} else {
-			$this->robots = $robots;
-		}
-	}
-
-
 
 	/**
 	 * @param string $name
@@ -589,42 +519,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 	{
 		$head = $this->context->core->createPanelControl();
 		return $head;
-	}
-
-
-
-	/**
-	 * Is this presenter part of administration
-	 *
-	 * @return bool
-	 */
-	public function isAdminPresenter()
-	{
-		return (bool)($this instanceof AdminPresenter);
-	}
-
-
-
-	/**
-	 * Is this presenter part of installation
-	 *
-	 * @return bool
-	 */
-	public function isInstallationPresenter()
-	{
-		return (bool)($this instanceof InstallationPresenter);
-	}
-
-
-
-	/**
-	 * Is this presenter part of frontend
-	 *
-	 * @return bool
-	 */
-	public function isFrontPresenter()
-	{
-		return (bool)($this instanceof FrontPresenter);
 	}
 
 }

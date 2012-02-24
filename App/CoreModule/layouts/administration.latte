@@ -25,9 +25,9 @@
 	{body}
 	<div id="page">
 		<div id="top">
-			{if !$presenter->isInstallationPresenter()}<a href="{link :Core:Admin:Default:}">{/if}
+			{if !$presenter instanceof \Venne\Application\UI\InstallationPresenter}<a href="{link :Core:Admin:Default:}">{/if}
 				<div id="logo"></div>
-			{if !$presenter->isInstallationPresenter()}</a>{/if}
+			{if !$presenter instanceof \Venne\Application\UI\InstallationPresenter}</a>{/if}
 			<div id="menu">
 				{if !isset($hideMenuItems) && $presenter->context->createCheckConnection() && !$presenter->context->core_moduleManager->checkModuleUpgrades()}
 				<ul>
@@ -73,7 +73,7 @@
 			</div>
 		</div>
 		<div id="bottom">
-			<span>Copyright © 2011 - 2012 Josef Kříž</span> | <span>version {=VENNE_VERSION_ID} {=VENNE_VERSION_STATE}</span>{if !$presenter->isInstallationPresenter()} | <span><a href="{link :Core:Admin:About:}">about Venne:CMS</a></span>{/if}
+			<span>Copyright © 2011 - 2012 Josef Kříž</span> | <span>version {=VENNE_VERSION_ID} {=VENNE_VERSION_STATE}</span>{if !$presenter instanceof \Venne\Application\UI\InstallationPresenter} | <span><a href="{link :Core:Admin:About:}">about Venne:CMS</a></span>{/if}
 		</div>
 	</div>
 	{/body}

@@ -29,6 +29,8 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 
 	const MACRO = "macro";
 
+	const HELPER = "helper";
+
 	const FORM = "form";
 
 	const MANAGER = "manager";
@@ -47,7 +49,29 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileMacro($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setParameters(array("compiler"))->setFactory($class . "::install", array("%compiler%"))->setShared(false)->setAutowired(false)->addTag(self::MACRO);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setParameters(array("compiler"))
+				->setFactory($class . "::install", array("%compiler%"))
+				->setShared(false)
+				->setAutowired(false)
+				->addTag(self::MACRO);
+	}
+
+
+	/**
+	 * Compile helper.
+	 *
+	 * @param string $class
+	 * @param string $name
+	 */
+	protected function compileHelper($class, $name)
+	{
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->setAutowired(false)
+				->addTag(self::HELPER);
 	}
 
 
@@ -60,7 +84,10 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileManager($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->addTag(self::MANAGER);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->addTag(self::MANAGER);
 	}
 
 
@@ -73,7 +100,10 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileService($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->addTag(self::SERVICE);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->addTag(self::SERVICE);
 	}
 
 
@@ -86,7 +116,11 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileSubscriber($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->setAutowired(false)->addTag(self::SUBSCRIBER);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->setAutowired(false)
+				->addTag(self::SUBSCRIBER);
 	}
 
 
@@ -99,7 +133,12 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileControl($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->setShared(false)->setAutowired(false)->addTag(self::CONTROL);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->setShared(false)
+				->setAutowired(false)
+				->addTag(self::CONTROL);
 	}
 
 
@@ -112,7 +151,12 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileWidget($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->setShared(false)->setAutowired(false)->addTag(self::WIDGET);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->setShared(false)
+				->setAutowired(false)
+				->addTag(self::WIDGET);
 	}
 
 
@@ -125,7 +169,12 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	 */
 	protected function compileForm($class, $name)
 	{
-		$this->getContainerBuilder()->addDefinition($name)->setClass($class)->setAutowired(false)->setShared(false)->addTag(self::FORM);
+		$this->getContainerBuilder()
+			->addDefinition($name)
+				->setClass($class)
+				->setAutowired(false)
+				->setShared(false)
+				->addTag(self::FORM);
 	}
 
 
@@ -145,7 +194,12 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 			$name = substr($name, strlen($this->prefix("")));
 		}
 
-		$this->getContainerBuilder()->addDefinition($repositoryName)->setClass($class)->setFactory("@entityManager::getRepository", array("\\" . $name))->addTag("repository")->setAutowired(false);
+		$this->getContainerBuilder()
+			->addDefinition($repositoryName)
+				->setClass($class)
+				->setFactory("@entityManager::getRepository", array("\\" . $name))
+				->addTag("repository")
+				->setAutowired(false);
 	}
 
 }

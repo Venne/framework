@@ -92,8 +92,8 @@ class AdminPresenter extends \Venne\Application\UI\Presenter
 	{
 		parent::beforeRender();
 
-		$this->setTitle("Venne:CMS");
-		$this->setRobots(self::ROBOTS_NOINDEX | self::ROBOTS_NOFOLLOW);
+		$this["head"]->setTitle("Venne:CMS");
+		$this["head"]->setRobots($this["head"]::ROBOTS_NOINDEX | $this["head"]::ROBOTS_NOFOLLOW);
 
 		$this->template->adminMenu = new \App\CoreModule\Events\AdminEventArgs;
 		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events\AdminEvents::onAdminMenu, $this->template->adminMenu);

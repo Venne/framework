@@ -13,6 +13,7 @@ namespace Venne\Application\UI;
 
 use Venne;
 use Nette\Utils\Strings;
+use Venne\Templating\ITemplateConfigurator;
 
 /**
  * Description of Control
@@ -22,6 +23,8 @@ use Nette\Utils\Strings;
 class Control extends \Nette\Application\UI\Control
 {
 
+	/** @var ITemplateConfigurator */
+	protected $templateConfigurator;
 
 	/** @var string */
 	protected $view;
@@ -34,18 +37,19 @@ class Control extends \Nette\Application\UI\Control
 
 
 
-	public function __construct()
-	{
-		parent::__construct();
-	}
-
-
-
 	protected function startup()
 	{
 		$this->startupCheck = TRUE;
 	}
 
+
+	/**
+	 * @param \Venne\Templating\ITemplateConfigurator $configurator
+	 */
+	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
+	{
+		$this->templateConfigurator = $configurator;
+	}
 
 
 	/**
@@ -53,8 +57,12 @@ class Control extends \Nette\Application\UI\Control
 	 */
 	protected function createTemplate($class = NULL)
 	{
-		$template = $this->presenter->createTemplate($class);
-		$template->control = $template->_control = $this;
+		$template = parent::createTemplate($class);
+
+		if ($this->templateConfigurator !== NULL) {
+			$this->templateConfigurator->configure($template);
+		}
+
 		return $template;
 	}
 
@@ -68,9 +76,12 @@ class Control extends \Nette\Application\UI\Control
 	 */
 	public function templatePrepareFilters($template)
 	{
-		// default filters
-		$template->registerHelper("thumb", '\Venne\Templating\ThumbHelper::thumb');
-		$template->registerFilter(new Venne\Latte\Engine($this->getPresenter()->getContext()));
+		if ($this->templateConfigurator !== NULL) {
+			$this->templateConfigurator->prepareFilters($template);
+
+		} else {
+			$template->registerFilter(new \Nette\Latte\Engine);
+		}
 	}
 
 
@@ -82,6 +93,10 @@ class Control extends \Nette\Application\UI\Control
 	protected function attached($presenter)
 	{
 		parent::attached($presenter);
+
+		if ($this->presenter->context->hasService('venne_templateConfigurator')) {
+			$this->setTemplateConfigurator($this->presenter->context->venne->templateConfigurator);
+		}
 
 		$this->startup();
 		if (!$this->startupCheck) {

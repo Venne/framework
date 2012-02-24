@@ -32,7 +32,17 @@ class CompilerExtension extends Venne\Config\CompilerExtension
 
 	function __construct($modulePath, $moduleNamespace)
 	{
-		$classes = array(self::CONTROL => array(), self::SUBSCRIBER => array(), self::SERVICE => array(), self::MACRO => array(), self::FORM => array(), self::MANAGER => array(), self::REPOSITORY => array(), self::WIDGET => array());
+		$classes = array(
+			self::CONTROL => array(),
+			self::SUBSCRIBER => array(),
+			self::SERVICE => array(),
+			self::MACRO => array(),
+			self::HELPER => array(),
+			self::FORM => array(),
+			self::MANAGER => array(),
+			self::REPOSITORY => array(),
+			self::WIDGET => array()
+		);
 
 		foreach (Finder::findFiles("*.php")->from($modulePath)->exclude(".git", "Resources") as $file) {
 			$relative = $file->getRealpath();
@@ -105,6 +115,12 @@ class CompilerExtension extends Venne\Config\CompilerExtension
 		/* macros */
 		foreach ($this->classes[self::MACRO] as $class => $name) {
 			$this->compileMacro($class, $this->prefix($name));
+		}
+
+
+		/* helpers */
+		foreach ($this->classes[self::HELPER] as $class => $name) {
+			$this->compileHelper($class, $this->prefix($name));
 		}
 
 
