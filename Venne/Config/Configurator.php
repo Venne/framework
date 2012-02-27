@@ -220,14 +220,10 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	protected function createCompiler()
 	{
-		$compiler = new Compiler;
+		$compiler = parent::createCompiler();
 		$compiler
-			->addExtension('php', new \Nette\Config\Extensions\PhpExtension())
-			->addExtension('constants', new Nette\Config\Extensions\ConstantsExtension())
-			->addExtension('nette', new Venne\Config\NetteExtension())
 			->addExtension('venne', new Venne\Config\VenneExtension())
 			->addExtension('doctrine', new Venne\Config\DoctrineExtension())
-			->addExtension('module', new Venne\Config\ModuleExtension())
 			->addExtension('assets', new Venne\Config\AssetExtension());
 
 		foreach ($this->modules as $module) {

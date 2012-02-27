@@ -17,7 +17,7 @@ use Nette\Application\UI, Nette\Security;
  * @author	 John Doe
  * @package	MyApplication
  */
-class LoginPresenter extends \Venne\Application\UI\AdminPresenter {
+class LoginPresenter extends \App\CoreModule\Presenters\AdminPresenter {
 
 
 	/** @persistent */

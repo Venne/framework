@@ -18,6 +18,6 @@ use Venne;
  *
  * @secured
  */
-class AboutPresenter extends \Venne\Application\UI\AdminPresenter {
+class AboutPresenter extends \App\CoreModule\Presenters\AdminPresenter {
 
 }

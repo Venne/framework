@@ -16,7 +16,7 @@ use Venne;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-abstract class BasePresenter extends \Venne\Application\UI\AdminPresenter {
+abstract class BasePresenter extends \App\CoreModule\Presenters\AdminPresenter {
 
 
 	public function startup()

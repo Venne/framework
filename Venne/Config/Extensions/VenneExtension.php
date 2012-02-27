@@ -21,7 +21,11 @@ class VenneExtension extends CompilerExtension
 {
 
 
-	public $defaults = array('stopwatch' => array('debugger' => TRUE,),);
+	public $defaults = array(
+		'stopwatch' => array(
+			'debugger' => TRUE,
+		),
+	);
 
 
 
@@ -31,13 +35,39 @@ class VenneExtension extends CompilerExtension
 		$config = $this->getConfig();
 
 
+		// application
+		$container->getDefinition('nette.presenterFactory')
+			->setClass('Venne\Application\PresenterFactory', array("@container"));
+
+		$container->addDefinition($this->prefix("componentVerifier"))
+			->setClass("Venne\Security\ComponentVerifiers\ComponentVerifier");
+
+
+		// routing
+		$container->getDefinition('router')
+			->setFactory("Venne\Application\Routers\CmsRouter", array("@container"));
+
+
+		// session
+		$container->getDefinition('session')
+			->addSetup("setSavePath", '%tempDir%/sessions');
+
+
+		// translator
 		$container->addDefinition("translator")
 			->setClass("Venne\Localization\Translator")
 			->addSetup("setLang", "cs");
-		//->addSetup("addDictionary", array('Venne'));
 
 		$container->addDefinition("translatorPanel")
 			->setClass("Venne\Localization\Panel");
+
+
+		// security
+		if (file_exists($container->parameters["flagsDir"] . "/installed")) {
+			$container->getDefinition($this->prefix('userStorage'))
+				->setClass('Venne\Security\UserStorage')
+				->setArguments(array("@session", "@core.loginRepository"));
+		}
 
 		$container->addDefinition("authorizatorFactory")
 			->setFactory("App\CoreModule\AuthorizatorFactory")
@@ -50,23 +80,8 @@ class VenneExtension extends CompilerExtension
 		$container->addDefinition("authenticator")
 			->setClass("App\CoreModule\Authenticator", array("@container"));
 
-		foreach ($container->parameters["modules"] as $module => $item) {
-			$container->addDefinition($module . "Module")
-				->addTag("module")
-				->setClass("App\\" . ucfirst($module) . "Module\\Module");
-		}
 
-		if ($config["stopwatch"]["debugger"]) {
-			$container->getDefinition("user")
-				->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
-		}
-
-		$container->addDefinition("configManager")
-			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))
-			->addTag("manager");
-
-
-		// Mappers
+		// mappers
 		$container->addDefinition("configFormMapper")
 			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
 
@@ -74,20 +89,44 @@ class VenneExtension extends CompilerExtension
 			->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
 
 
-		// Template
+		// template
 		$container->addDefinition($this->prefix("templateConfigurator"))
 			->setClass("Venne\Templating\TemplateConfigurator");
 
 
-		// Macros
+		// macros
 		$this->compileMacro("Venne\Assets\Macros\CssMacro", $this->prefix("cssMacro"));
 		$this->compileMacro("Venne\Assets\Macros\JsMacro", $this->prefix("jsMacro"));
 
 
-		// Helpers
+		// helpers
 		$container->addDefinition($this->prefix("helpers"))
 			->setClass("Venne\Templating\Helpers");
+
+		// managers
+		$this->compileManager("Venne\Module\ResourcesManager", $this->prefix("resourcesManager"));
+
+		$container->addDefinition("configManager")
+			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))
+			->addTag("manager");
+
+
+		// modules
+		foreach ($container->parameters["modules"] as $module => $item) {
+			$container->addDefinition($module . "Module")
+				->addTag("module")
+				->setClass("App\\" . ucfirst($module) . "Module\\Module");
+		}
+
+
+		// debugger
+		if ($config["stopwatch"]["debugger"]) {
+			$container->getDefinition("user")
+				->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
+		}
+
 	}
+
 
 
 	public function beforeCompile()
@@ -97,6 +136,7 @@ class VenneExtension extends CompilerExtension
 		$this->registerMacroFactories($container);
 		$this->registerHelperFactories($container);
 	}
+
 
 
 	/**
@@ -110,6 +150,7 @@ class VenneExtension extends CompilerExtension
 			$config->addSetup('addFactory', array($factory));
 		}
 	}
+
 
 
 	/**

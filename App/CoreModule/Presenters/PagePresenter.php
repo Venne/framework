@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Application\UI;
+namespace App\CoreModule\Presenters;
 
 use Venne;
 use Venne\Application\Routers\PageRoute;

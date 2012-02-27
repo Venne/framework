@@ -9,22 +9,18 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Config;
+namespace Venne\Security;
 
 use Venne;
-use Nette\DI\ContainerBuilder;
+use Nette\Security\User;
+
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class ModuleExtension extends CompilerExtension
+interface IComponentVerifier
 {
 
-
-	public function loadConfiguration()
-	{
-		$this->compileManager("Venne\Module\ResourcesManager", $this->prefix("resourcesManager"));
-	}
+	public function isAllowed(\Reflector $element);
 
 }
-

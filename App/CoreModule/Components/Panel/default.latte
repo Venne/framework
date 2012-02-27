@@ -5,7 +5,7 @@
 <script type="text/javascript">
 	var adminpanel = true;
 	$(function() {
-		{if $presenter instanceof \Venne\Application\UI\FrontPresenter}
+		{if $presenter instanceof \App\CoreModule\Presenters\FrontPresenter}
 		$("#venne-panel-roller a").click(function(){
 			if(adminpanel){
 				$.get("./?do={!$control->name}-closePanel");
@@ -64,13 +64,13 @@
 	});
 </script>
 
-{if $presenter instanceof \Venne\Application\UI\FrontPresenter}
+{if $presenter instanceof \App\CoreModule\Presenters\FrontPresenter}
 <div id="venne-panel-roller" class="{if $showAdminPanel}closed{/if}">
 	<a href="javaScript:;">close</a>
 </div>
 {/if}
 
-<div id="venne-panel" class="{if $presenter instanceof \Venne\Application\UI\FrontPresenter}{if $showAdminPanel}closed{/if}{/if}">
+<div id="venne-panel" class="{if $presenter instanceof \App\CoreModule\Presenters\FrontPresenter}{if $showAdminPanel}closed{/if}{/if}">
 	{if $presenter->user->isLoggedIn()}
 	<div class="panel-left">
 		<div class="first box">
@@ -101,7 +101,7 @@
 		<div class="box">{_"Hello"} {$presenter->user->identity->name}</div>
 
 
-		{if $presenter instanceof \Venne\Application\UI\AdminPresenter}
+		{if $presenter instanceof \App\CoreModule\Presenters\AdminPresenter}
 		<div class="box"><a href="{$basePath}/">{_"View the Site"}</a></div>
 		
 		<div class="box">
@@ -122,7 +122,7 @@
 			{/if}
 		{/if}
 
-		{if $presenter instanceof \Venne\Application\UI\FrontPresenter}
+		{if $presenter instanceof \App\CoreModule\Presenters\FrontPresenter}
 		<div class="box">
 			<div class="popup">Mode
 				{if $presenter->isModeModule()}<a href="javaScript:;">{_"Edit module"}</a>

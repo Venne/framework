@@ -9,14 +9,14 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Application\UI;
+namespace App\CoreModule\Presenters;
 
 use Venne;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AdminPresenter extends \Venne\Application\UI\Presenter
+class AdminPresenter extends BasePresenter
 {
 
 

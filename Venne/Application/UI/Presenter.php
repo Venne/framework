@@ -13,7 +13,10 @@ namespace Venne\Application\UI;
 
 use Venne;
 use Nette\Application\UI\InvalidLinkException;
+use Nette\Application\UI\PresenterComponentReflection;
+use Nette\Application\ForbiddenRequestException;
 use Venne\Templating\ITemplateConfigurator;
+use Venne\Security\IComponentVerifier;
 
 /**
  * Description of Presenter
@@ -21,6 +24,8 @@ use Venne\Templating\ITemplateConfigurator;
  * @author Josef Kříž <pepakriz@gmail.com>
  *
  * @property-read \SystemContainer|\Nette\DI\Container $context
+ *
+ * @method \SystemContainer|\Nette\DI\Container getContext() getContext()
  */
 class Presenter extends \Nette\Application\UI\Presenter
 {
@@ -28,27 +33,30 @@ class Presenter extends \Nette\Application\UI\Presenter
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
 
-	/** @persistent */
-	public $lang;
+	/** @var IComponentVerifier */
+	protected $componentVerifer;
 
-	/** @var array of array */
-	protected $paths = array();
 
 
 	public function __construct(\Nette\DI\Container $container)
 	{
-		\Venne\Panels\Stopwatch::start();
 		parent::__construct($container);
 
+		// template configurator
 		if ($container->hasService('venne_templateConfigurator')) {
 			$this->setTemplateConfigurator($container->venne->templateConfigurator);
+		}
+
+		// component verifer
+		if ($container->hasService('venne_componentVerifier')) {
+			$this->setComponentVerifer($container->venne->componentVerifier);
 		}
 	}
 
 
 
 	/**
-	 * @param \Venne\Templating\ITemplateConfigurator $configurator
+	 * @param ITemplateConfigurator $configurator
 	 */
 	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
@@ -58,97 +66,11 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 	/**
-	 * @return Events\EventArgs
+	 * @param \Venne\Security\IComponentVerifier $componentVerifer
 	 */
-	protected function getEventArgs()
+	public function setComponentVerifer($componentVerifer)
 	{
-		$args = new \Venne\Application\UI\Events\EventArgs();
-		$args->setPresenter($this);
-		return $args;
-	}
-
-
-
-	/**
-	 * @return void
-	 */
-	public function startup()
-	{
-		parent::startup();
-
-
-		// Startup event
-		$this->context->eventManager->dispatchEvent(\Venne\Application\UI\Events\Events::onStartup, $this->getEventArgs());
-
-
-		// Language
-		if (count($this->context->parameters["website"]["languages"]) > 1) {
-			if (!$this->lang && !$this->getParameter("lang")) {
-				$this->lang = $this->getDefaultLanguageAlias();
-			}
-		} else {
-			$this->lang = $this->context->parameters["website"]["defaultLanguage"];
-		}
-
-
-		// Stopwatch
-		\Venne\Panels\Stopwatch::stop("base startup");
-		\Venne\Panels\Stopwatch::start();
-	}
-
-
-
-	/**
-	 * @return string
-	 */
-	protected function getDefaultLanguageAlias()
-	{
-		$httpRequest = $this->context->httpRequest;
-
-		$lang = $httpRequest->getCookie('lang');
-		if (!$lang) {
-			$lang = $httpRequest->detectLanguage($this->context->parameters["website"]["languages"]);
-			if (!$lang) {
-				$lang = $this->context->parameters["website"]["defaultLanguage"];
-			}
-		}
-		return $lang;
-	}
-
-
-
-	/**
-	 * Redirect to other language.
-	 *
-	 * @param string $alias
-	 */
-	public function handleChangeLanguage($alias)
-	{
-		$this->redirect("this", array("lang" => $alias));
-	}
-
-
-
-	/**
-	 * Get module
-	 *
-	 * @return \Venne\Module\IModule
-	 */
-	public function getModule()
-	{
-		return $this->context->{$this->getModuleName() . "Theme"};
-	}
-
-
-
-	/**
-	 * Get module name
-	 *
-	 * @return string
-	 */
-	public function getModuleName()
-	{
-		return lcfirst(substr($this->name, 0, strpos($this->name, ":")));
+		$this->componentVerifer = $componentVerifer;
 	}
 
 
@@ -160,97 +82,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function checkRequirements($element)
 	{
-		parent::checkRequirements($element);
-
-		$methods = array();
-		$methods[] = "startup";
-		$methods[] = $this->formatActionMethod(ucfirst($this->getAction()));
-		$signal = $this->getSignal();
-		if ($signal) {
-			$methods[] = $this->formatSignalMethod(ucfirst($signal[1]));
+		if ($this->componentVerifer && !$this->componentVerifer->isAllowed($element)) {
+			throw new ForbiddenRequestException;
 		}
-
-		if (!$this->isMethodAllowed($methods)) {
-			throw new \Nette\Application\ForbiddenRequestException;
-		}
-	}
-
-
-
-	/**
-	 * Checks authorization on methods.
-	 *
-	 * @param array $methods
-	 * @return bool
-	 */
-	protected function isMethodAllowed($methods)
-	{
-		$methods = (array)$methods;
-		$ref = $this->getReflection();
-
-		if ($ref->hasAnnotation("secured")) {
-			$secured = $ref->getAnnotation("secured");
-
-			if (isset($secured["resource"])) {
-				$resource = $secured["resource"];
-			} else {
-				$resource = $ref->getName();
-			}
-			$resource = substr($resource, 0, 4) == "App\\" ? substr($resource, 4) : $resource;
-
-			if (!$this->user->isAllowed($resource)) {
-				return false;
-			}
-
-			foreach ($methods as $method) {
-				if ($ref->hasMethod($method)) {
-					$mRef = $ref->getMethod($method);
-					if ($mRef->hasAnnotation("resource")) {
-						$methodResource = $mRef->getAnnotation("resource");
-					} else {
-						$methodResource = $resource;
-					}
-					$methodResource = substr($methodResource, 0, 4) == "App\\" ? substr($methodResource, 4) : $methodResource;
-
-					$methodResource .= $mRef->hasAnnotation("privilege") ? "\\" . $mRef->getAnnotation("privilege") : "";
-
-					if ($methodResource != $resource && !$this->user->isAllowed($methodResource)) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
-
-
-
-	/**
-	 * Common render method.
-	 *
-	 * @return void
-	 */
-	public function beforeRender()
-	{
-		// Stopwatch
-		\Venne\Panels\Stopwatch::stop("module startup and action");
-		\Venne\Panels\Stopwatch::start();
-
-
-		parent::beforeRender();
-	}
-
-
-
-	/**
-	 * @param  Nette\Application\IResponse  optional catched exception
-	 * @return void
-	 */
-	public function shutdown($response)
-	{
-		parent::shutdown($response);
-		\Venne\Panels\Stopwatch::stop("template render");
-		\Venne\Panels\Stopwatch::start();
 	}
 
 
@@ -270,6 +104,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 		return $template;
 	}
+
 
 
 	/**
@@ -298,11 +133,17 @@ class Presenter extends \Nette\Application\UI\Presenter
 	public function createComponent($name)
 	{
 		$control = parent::createComponent($name);
-
 		if ($control) {
+			$method = 'createComponent' . ucfirst($name);
+			if (method_exists($this, $method)) {
+				$this->checkRequirements($this->getReflection()->getMethod($method));
+			}
+
 			return $control;
 		}
 
+
+		// widget from DIC
 		$method = "create" . ucfirst($name) . "Widget";
 		if (method_exists($this->context, $method)) {
 			$context = $this->context;
@@ -311,44 +152,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 				return $context->$method();
 			});
 		}
-	}
-
-
-
-	/**
-	 * Formats view template file names.
-	 *
-	 * @return array
-	 */
-	public function formatTemplateFiles()
-	{
-		$theme = $this->context->parameters["venneModeFront"] ? $this->context->parameters["website"]["theme"] : "admin";
-		$name = $this->getName();
-		$presenter = substr($name, strrpos(':' . $name, ':'));
-		$dir = dirname(dirname($this->getReflection()->getFileName()));
-
-		$path = str_replace(":", "Module/", substr($name, 0, strrpos($name, ":"))) . "Module";
-		$subPath = substr($name, strrpos($name, ":") !== FALSE ? strrpos($name, ":") + 1 : 0);
-		if ($path) {
-			$path .= "/";
-		}
-
-		return array(
-			"$dir/templates/$presenter/$this->view.latte",
-			"$dir/templates/$presenter.$this->view.latte",
-		);
-	}
-
-
-
-	/**
-	 * Get AssetManager
-	 *
-	 * @return Venne\Assets\AssetManager
-	 */
-	public function getAssetManager()
-	{
-		return $this->getContext()->assets->assetManager;
 	}
 
 
@@ -372,11 +175,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 				return parent::isLinkCurrent($destination, $args);
 			} else {
 				if (substr($destination, 0, 1) !== ":") {
-					if (strpos($destination, ":") === false) {
-						$destination = ":" . $this->name . ":" . $destination;
-					} else {
-						$destination = ":" . substr($this->name, 0, strrpos($this->name, ":")) . ":" . $destination;
-					}
+					$destination = strpos($destination, ":") === false
+						? ":" . $this->name . ":" . $destination
+						: ":" . substr($this->name, 0, strrpos($this->name, ":")) . ":" . $destination;
 				}
 
 				$reg = "/^" . str_replace("*", ".*", str_replace("#", "\/", $destination)) . "$/";
@@ -396,27 +197,14 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isUrlCurrent($url)
 	{
-		$url2 = $this->getContext()->httpRequest->getUrl()->getPath();
-		$link = explode("?", $url);
+		$path = $this->getContext()->httpRequest->getUrl()->getPath();
 		$basePath = $this->getContext()->httpRequest->getUrl()->getBasePath();
+		$link = reset(explode("?", $url));
 
-		if ($url2 == $basePath && $link[0] == $basePath) {
+		if ($path == $basePath && $link == $basePath || (!$link && !$url) || ($link && $path == $link)) {
 			return true;
 		}
-
-		if (!$link[0] && !$url) {
-			return true;
-		}
-
-		if (!$link[0]) {
-			return false;
-		}
-
-		if ($url2 == $link[0]) {
-			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 
 
@@ -426,7 +214,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isAllowed($destination)
 	{
-		if ($this->context->parameters['venneModeInstallation']) return true;
+		if ($this->context->parameters['venneModeInstallation']) {
+			return true;
+		}
 		if ($destination == "this") {
 			$action = "action" . ucfirst($this->action);
 			$class = $this->name;
@@ -479,47 +269,19 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 
-
-	/**
-	 * @param string $name
-	 * @param string $url
-	 */
-	public function addPath($name, $url)
-	{
-		$this->paths[] = array("name" => $name, "url" => $url);
-	}
-
+	/**************************** services *********************************/
 
 
 	/**
-	 * @return array
+	 * Get AssetManager
+	 *
+	 * @return Venne\Assets\AssetManager
 	 */
-	public function getPaths()
+	public function getAssetManager()
 	{
-		return $this->paths;
+		return $this->getContext()->assets->assetManager;
 	}
 
-
-
-	/**
-	 * @return \App\CoreModule\Components\Head\HeadControl
-	 */
-	public function createComponentHead()
-	{
-		$head = $this->context->core->createHeadControl();
-		return $head;
-	}
-
-
-
-	/**
-	 * @return \App\CoreModule\Components\Panel\PanelControl
-	 */
-	public function createComponentVennePanel()
-	{
-		$head = $this->context->core->createPanelControl();
-		return $head;
-	}
 
 }
 

@@ -43,6 +43,7 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
+
 	/**
 	 * @param \Venne\Templating\ITemplateConfigurator $configurator
 	 */
@@ -50,6 +51,7 @@ class Control extends \Nette\Application\UI\Control
 	{
 		$this->templateConfigurator = $configurator;
 	}
+
 
 
 	/**
@@ -64,6 +66,23 @@ class Control extends \Nette\Application\UI\Control
 		}
 
 		return $template;
+	}
+
+
+
+	/**
+	 * @param string $name
+	 *
+	 * @return \Nette\ComponentModel\IComponent
+	 */
+	protected function createComponent($name)
+	{
+		$method = 'createComponent' . ucfirst($name);
+		if (method_exists($this, $method)) {
+			$this->checkRequirements($this->getReflection()->getMethod($method));
+		}
+
+		return parent::createComponent($name);
 	}
 
 
