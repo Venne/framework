@@ -19,7 +19,6 @@ use Venne;
 class FrontPresenter extends BasePresenter
 {
 
-
 	const MODE_NORMAL = 0;
 
 	const MODE_MODULE = 1;
@@ -28,34 +27,8 @@ class FrontPresenter extends BasePresenter
 
 	const MODE_ELEMENTS = 3;
 
-	public $contentExtensionsKey;
-
 	/** @persistent */
 	public $mode = 0;
-
-	protected $_args;
-
-
-
-	/**
-	 * @return \Venne\Application\UI\EventArgs
-	 */
-	protected function createArgs()
-	{
-		if (!$this->_args) {
-			$this->_args = new \Venne\Application\UI\EventArgs;
-			$this->_args->presenter = $this;
-		}
-		return $this->_args;
-	}
-
-
-
-	public function startup()
-	{
-		$this->context->eventManager->dispatchEvent(Venne\Application\UI\Events::beforeStartup, $this->createArgs());
-		parent::startup();
-	}
 
 
 

@@ -20,13 +20,13 @@ class Events
 {
 
 
-	const onCreate = 'onCreate';
+	const onContentExtensionCreate = 'onContentExtensionCreate';
 
-	const onSave = 'onSave';
+	const onContentExtensionSave = 'onContentExtensionSave';
 
-	const onLoad = 'onLoad';
+	const onContentExtensionLoad = 'onContentExtensionLoad';
 
-	const onRender = 'onRender';
+	const onContentExtensionRender = 'onContentExtensionRender';
 
-	const onRemove = 'onRemove';
+	const onContentExtensionRemove = 'onContentExtensionRemove';
 }

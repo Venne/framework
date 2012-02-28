@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Application\UI\Events;
+namespace App\CoreModule\Events;
 
 use Venne;
 

@@ -38,7 +38,7 @@ class BasePresenter extends \Venne\Application\UI\Presenter
 	 */
 	protected function getEventArgs()
 	{
-		$args = new \Venne\Application\UI\Events\EventArgs();
+		$args = new \App\CoreModule\Events\EventArgs();
 		$args->setPresenter($this);
 		return $args;
 	}
@@ -53,7 +53,7 @@ class BasePresenter extends \Venne\Application\UI\Presenter
 
 
 		// Startup event
-		$this->context->eventManager->dispatchEvent(\Venne\Application\UI\Events\Events::onStartup, $this->getEventArgs());
+		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events\Events::onPresenterStartup, $this->getEventArgs());
 
 
 		// Language
@@ -142,6 +142,15 @@ class BasePresenter extends \Venne\Application\UI\Presenter
 	}
 
 
+	public function afterRender()
+	{
+		parent::afterRender();
+
+		// onRender event
+		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events\Events::onPresenterRender, $this->getEventArgs());
+	}
+
+
 
 	/**
 	 * @param  Nette\Application\IResponse  optional catched exception
@@ -150,6 +159,10 @@ class BasePresenter extends \Venne\Application\UI\Presenter
 	public function shutdown($response)
 	{
 		parent::shutdown($response);
+
+		// onShutdown event
+		$this->context->eventManager->dispatchEvent(\App\CoreModule\Events\Events::onPresenterShutdown, $this->getEventArgs());
+
 		\Venne\Panels\Stopwatch::stop("template render");
 		\Venne\Panels\Stopwatch::start();
 	}

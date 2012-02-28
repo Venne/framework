@@ -77,7 +77,7 @@ class HeadMacro extends \Nette\Latte\Macros\MacroSet
 
 	public function extensionsBegin(\Nette\Latte\MacroNode $node, $writer)
 	{
-		return $writer->write('$presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onRender);');
+		return $writer->write('$presenter->context->eventManager->dispatchEvent(\Venne\ContentExtension\Events::onContentExtensionRender);');
 	}
 
 }
