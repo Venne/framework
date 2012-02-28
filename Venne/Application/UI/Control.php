@@ -14,6 +14,7 @@ namespace Venne\Application\UI;
 use Venne;
 use Nette\Utils\Strings;
 use Venne\Templating\ITemplateConfigurator;
+use Venne\Security\IComponentVerifier;
 
 /**
  * Description of Control
@@ -26,11 +27,8 @@ class Control extends \Nette\Application\UI\Control
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
 
-	/** @var string */
-	protected $view;
-
-	/** @var array */
-	protected $params;
+	/** @var IComponentVerifier */
+	protected $componentVerifer;
 
 	/** @var bool */
 	private $startupCheck;
@@ -50,6 +48,16 @@ class Control extends \Nette\Application\UI\Control
 	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
 		$this->templateConfigurator = $configurator;
+	}
+
+
+
+	/**
+	 * @param \Venne\Security\IComponentVerifier $componentVerifer
+	 */
+	public function setComponentVerifer($componentVerifer)
+	{
+		$this->componentVerifer = $componentVerifer;
 	}
 
 
@@ -97,7 +105,6 @@ class Control extends \Nette\Application\UI\Control
 	{
 		if ($this->templateConfigurator !== NULL) {
 			$this->templateConfigurator->prepareFilters($template);
-
 		} else {
 			$template->registerFilter(new \Nette\Latte\Engine);
 		}
@@ -106,17 +113,23 @@ class Control extends \Nette\Application\UI\Control
 
 
 	/**
-	 *
 	 * @param \Nette\Application\IPresenter $presenter
 	 */
 	protected function attached($presenter)
 	{
 		parent::attached($presenter);
 
+		// template configurator
 		if ($this->presenter->context->hasService('venne_templateConfigurator')) {
 			$this->setTemplateConfigurator($this->presenter->context->venne->templateConfigurator);
 		}
 
+		// component verifer
+		if ($this->presenter->context->hasService('venne_componentVerifier')) {
+			$this->setComponentVerifer($this->presenter->context->venne->componentVerifier);
+		}
+
+		// startup check
 		$this->startup();
 		if (!$this->startupCheck) {
 			$class = $this->getReflection()->getMethod('startup')->getDeclaringClass()->getName();
@@ -132,11 +145,12 @@ class Control extends \Nette\Application\UI\Control
 	 * @param string
 	 * @return array
 	 */
-	protected function formatTemplateFiles($view)
+	protected function formatTemplateFiles()
 	{
-		$theme = $this->presenter->context->parameters["venneModeFront"] ? $this->presenter->context->parameters["website"]["theme"] : "admin";
-		$dir = dirname($this->getReflection()->getFileName());
-		$list = array($this->presenter->context->parameters["wwwDir"] . "/themes/" . $theme . "/controls/" . ucfirst($this->name) . "/template.latte", $dir . "/$view.latte");
+		$refl = $this->getReflection();
+		$list = array(
+			dirname($refl->getFileName()) . '/' . $refl->getShortName() . '.latte',
+		);
 		return $list;
 	}
 
@@ -149,68 +163,46 @@ class Control extends \Nette\Application\UI\Control
 	 * @return string
 	 * @throws \Nette\InvalidStateException
 	 */
-	protected function formatTemplateFile($view)
+	protected function formatTemplateFile()
 	{
-		$files = $this->formatTemplateFiles($view);
+		$files = $this->formatTemplateFiles();
 		foreach ($files as $file) {
 			if (file_exists($file)) {
 				return $file;
 			}
 		}
 
-		throw new \Nette\InvalidStateException("No template files found for view '$view'");
+		throw new \Nette\InvalidStateException("No template files found");
 	}
 
 
 
-	public function render($param = NULL, $type = NULL)
+	/**
+	 * Checks authorization.
+	 *
+	 * @return void
+	 */
+	public function checkRequirements($element)
 	{
-		$this->view = $this->view ? : "default";
-		$viewMethod = "view" . ucfirst($this->view);
-		$this->params = $this->params ? : func_get_args();
+		if ($this->componentVerifer && !$this->componentVerifer->isAllowed($element)) {
+			throw new ForbiddenRequestException;
+		}
+	}
 
-		call_user_func_array(array($this, 'beforeRender'), $this->params);
 
-		ob_start();
-		if (method_exists($this, $viewMethod)) {
-			call_user_func_array(array($this, $viewMethod), $this->params);
+
+	/**
+	 * Render control.
+	 */
+	public function render()
+	{
+		if (!$this->template->getFile()) {
+			$this->template->setFile($this->formatTemplateFile());
 		}
 
-		$this->template->setFile($this->formatTemplateFile(lcfirst($this->view)));
-
-		$output = ob_get_clean();
-		$output = (string)$this->template;
-		echo $output;
-
-		call_user_func_array(array($this, 'afterRender'), $this->params);
+		$this->template->render();
 	}
 
-
-
-	protected function beforeRender()
-	{
-
-	}
-
-
-
-	protected function afterRender()
-	{
-
-	}
-
-
-
-	public function __call($name, $args)
-	{
-		if (Strings::startsWith($name, "render")) {
-			$this->view = substr($name, 6);
-			$this->params = $args;
-
-			return call_user_func(array($this, 'render'));
-		}
-		return parent::__call($name, $args);
-	}
 
 }
 
