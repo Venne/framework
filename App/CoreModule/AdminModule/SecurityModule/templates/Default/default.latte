@@ -15,7 +15,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		{foreach $items as $item}
+		{foreach $loginRepository->findBy(array(), array("created"=>"DESC"), 20, $presenter["vp"]->getPaginator()->getPage()*20-20) as $item}
 		<tr class="screens {if $iterator->getCounter()%2 == 0} even{/if}{if $iterator->isLast()} footer{/if}">
 			<td>
 				{$item->id}
@@ -32,5 +32,12 @@
 		</tr>
 		{/foreach}
 	</tbody>
+	<tfoot>
+    	<tr>
+    		<td colspan="3">
+    			{control vp}
+    		</td>
+    	</tr>
+    </tfoot>
 </table>
 

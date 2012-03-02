@@ -22,12 +22,20 @@ class DefaultPresenter extends BasePresenter
 {
 
 
+	/** @persistent */
+	public $page;
+
+	/** @var \Venne\Doctrine\ORM\BaseRepository */
+	protected $loginRepository;
+
+
+
 	public function startup()
 	{
 		parent::startup();
 		$this->addPath("General", $this->link(":Core:Admin:Security:Default:"));
 
-		$this->template->items = $this->context->core->loginRepository->findAll();
+		$this->loginRepository = $this->context->core->loginRepository;
 	}
 
 
@@ -52,6 +60,24 @@ class DefaultPresenter extends BasePresenter
 		$repository->save($entity);
 		$this->flashMessage("User has been updated");
 		$this->redirect("this");
+	}
+
+
+
+	public function createComponentVp()
+	{
+		$vp = new \Venne\Utils\VisualPaginator;
+		$pg = $vp->getPaginator();
+		$pg->setItemsPerPage(20);
+		$pg->setItemCount($this->loginRepository->createQueryBuilder("a")->select("COUNT(a.id)")->getQuery()->getSingleScalarResult());
+		return $vp;
+	}
+
+
+
+	public function renderDefault()
+	{
+		$this->template->loginRepository = $this->loginRepository;
 	}
 
 }
