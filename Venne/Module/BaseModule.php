@@ -86,7 +86,7 @@ abstract class BaseModule extends Object implements IModule
 
 
 
-	public function compile(Configurator $configurator, Compiler $compiler)
+	public function compile(Compiler $compiler)
 	{
 		$compiler->addExtension($this->getName(), new CompilerExtension($this->getPath(), $this->getNamespace()));
 	}

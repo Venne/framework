@@ -9,10 +9,11 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Config;
+namespace Venne\Config\Extensions;
 
 use Venne;
 use Nette\DI\ContainerBuilder;
+use Venne\Config\CompilerExtension;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -108,7 +109,7 @@ class DoctrineExtension extends CompilerExtension
 			->setFactory("@doctrineConnection::getSchemaManager");
 
 		$container->addDefinition('checkConnection')
-			->setFactory("Venne\Config\DoctrineExtension::checkConnection")
+			->setFactory("Venne\Config\Extensions\DoctrineExtension::checkConnection")
 			->setShared(false);
 	}
 
@@ -132,7 +133,7 @@ class DoctrineExtension extends CompilerExtension
 			return true;
 		}
 
-		$old = set_error_handler("Venne\Config\DoctrineExtension::checkConnectionErrorHandler");
+		$old = set_error_handler("Venne\Config\Extensions\DoctrineExtension::checkConnectionErrorHandler");
 		try {
 			$connection->connect();
 			if ($connection->isConnected()) {

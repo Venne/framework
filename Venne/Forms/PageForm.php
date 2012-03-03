@@ -117,13 +117,13 @@ class PageForm extends EntityForm
 		parent::attached($obj);
 		$evm = $this->presenter->context->eventManager;
 
-		$evm->dispatchEvent(\Venne\ContentExtension\Events::onCreate, $this->createArgs());
+		$evm->dispatchEvent(\Venne\ContentExtension\Events::onContentExtensionCreate, $this->createArgs());
 
 		if ($obj instanceof Presenter) {
 			if (!$this->isSubmitted()) {
-				$evm->dispatchEvent(\Venne\ContentExtension\Events::onLoad, $this->createArgs());
+				$evm->dispatchEvent(\Venne\ContentExtension\Events::onContentExtensionLoad, $this->createArgs());
 			} else {
-				$evm->dispatchEvent(\Venne\ContentExtension\Events::onSave, $this->createArgs());
+				$evm->dispatchEvent(\Venne\ContentExtension\Events::onContentExtensionSave, $this->createArgs());
 			}
 		}
 	}

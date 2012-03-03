@@ -15,7 +15,6 @@ use Nette\DI\Container;
 use Nette\Security\Permission;
 use Nette\Application\Routers\RouteList;
 use Nette\Config\Compiler;
-use Nette\Config\Configurator;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -48,7 +47,7 @@ interface IModule
 
 
 
-	public function compile(Configurator $configurator, Compiler $compiler);
+	public function compile(Compiler $compiler);
 
 
 

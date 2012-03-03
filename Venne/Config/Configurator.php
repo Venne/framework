@@ -37,6 +37,9 @@ class Configurator extends \Nette\Config\Configurator
 	/** @var \Nette\Loaders\RobotLoader */
 	protected $robotLoader;
 
+	/** @var Compiler */
+	protected $compiler;
+
 
 
 	public function __construct($parameters = NULL, $modules = NULL, $productionMode = NULL)
@@ -44,7 +47,6 @@ class Configurator extends \Nette\Config\Configurator
 		$this->parameters = $this->getDefaultParameters($parameters);
 		$this->modules = $this->getDefaultModules($modules);
 		$this->setProductionMode($productionMode);
-
 		$this->setTempDirectory($this->parameters["tempDir"]);
 	}
 
@@ -135,41 +137,35 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	public function createContainer()
 	{
-		/* add config files */
+		// add config files
 		foreach ($this->getConfigFiles() as $file) {
 			$this->addConfig($file, self::NONE);
 		}
 
 
-		/* create container */
+		// create container
 		\Venne\Panels\Stopwatch::start();
 		$container = parent::createContainer();
 		\Venne\Panels\Stopwatch::stop("generate container");
 		\Venne\Panels\Stopwatch::start();
 
 
-		/* start debugger*/
+		// start debugger
 		$this->runDebugger($container);
 
 
-		/* register robotLoader */
+		// register robotLoader and configurator
 		$container->addService("robotLoader", $this->robotLoader);
+		$container->addService("configurator", $this);
 
 
-		/* Register subscribers */
-		$eventManager = $container->eventManager;
-		foreach ($container->findByTag("subscriber") as $module => $par) {
-			$eventManager->addEventSubscriber($container->{$module});
-		}
-
-
-		/* parameters */
+		// parameters
 		$baseUrl = rtrim($container->httpRequest->getUrl()->getBaseUrl(), '/');
 		$container->parameters['baseUrl'] = $baseUrl;
 		$container->parameters['basePath'] = preg_replace('#https?://[^/]+#A', '', $baseUrl);
 
 
-		/* Setup Application */
+		// setup Application
 		$application = $container->application;
 		$application->catchExceptions = (bool)$this->isProductionMode();
 		$application->errorPresenter = $container->parameters['website']['errorPresenter'];
@@ -179,13 +175,13 @@ class Configurator extends \Nette\Config\Configurator
 		};
 
 
-		/* Initialize modules */
+		// initialize modules
 		foreach ($container->findByTag("module") as $module => $par) {
 			$container->{$module}->configure($container);
 		}
 
 
-		/* Detect updated flag */
+		// detect updated flag
 		if (file_exists($this->parameters['flagsDir'] . "/updated")) {
 			$dirContent = \Nette\Utils\Finder::find('*')->from($this->parameters['tempDir'] . "/cache")->childFirst();
 			foreach ($dirContent as $file) {
@@ -198,7 +194,7 @@ class Configurator extends \Nette\Config\Configurator
 		}
 
 
-		/* Set timer to router */
+		// set timer to router
 		$container->application->onStartup[] = function()
 		{
 			\Venne\Panels\Stopwatch::start();
@@ -220,19 +216,19 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	protected function createCompiler()
 	{
-		$compiler = parent::createCompiler();
-		$compiler
-			->addExtension('venne', new Venne\Config\VenneExtension())
-			->addExtension('doctrine', new Venne\Config\DoctrineExtension())
-			->addExtension('assets', new Venne\Config\AssetExtension());
+		$this->compiler = parent::createCompiler();
+		$this->compiler
+			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
+			->addExtension('doctrine', new Venne\Config\Extensions\DoctrineExtension())
+			->addExtension('assets', new Venne\Config\Extensions\AssetExtension());
 
 		foreach ($this->modules as $module) {
 			$class = "\\App\\" . ucfirst($module) . "Module\\Module";
 			$instance = new $class;
-			$instance->compile($this, $compiler);
+			$instance->compile($this->compiler);
 		}
 
-		return $compiler;
+		return $this->compiler;
 	}
 
 
@@ -249,7 +245,7 @@ class Configurator extends \Nette\Config\Configurator
 			"config" => array(
 				"orig" => $this->parameters['configDir'] . "/global.orig.neon",
 				"config" => $this->parameters['configDir'] . "/global.neon"
-			)
+			),
 		);
 
 		foreach ($configList as $name => $item) {
@@ -312,6 +308,13 @@ class Configurator extends \Nette\Config\Configurator
 
 
 
+	public function buildContainer(& $dependencies = NULL)
+	{
+		return parent::buildContainer($dependencies);
+	}
+
+
+
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
 		$this->parameters["logDir"] = $logDirectory;
@@ -336,5 +339,16 @@ class Configurator extends \Nette\Config\Configurator
 			\Venne\Diagnostics\Logger::$linkPrefix = "http://" . $container->httpRequest->url->host . $container->httpRequest->url->basePath . "admin/system/log/show?name=";
 		}
 	}
+
+
+
+	/**
+	 * @return \Nette\Config\Compiler
+	 */
+	public function getCompiler()
+	{
+		return $this->compiler;
+	}
+
 
 }

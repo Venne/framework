@@ -66,7 +66,11 @@ class ConfigFormMapper extends \Nette\Object
 
 	public function setRoot($root)
 	{
+		$root = str_replace('\.', '\\', $root);
 		$this->root = $this->root = $root ? explode(".", $root) : array();
+		foreach($this->root as $key=>$item){
+			$this->root[$key] = str_replace('\\', '.', $item);
+		}
 	}
 
 
@@ -91,7 +95,7 @@ class ConfigFormMapper extends \Nette\Object
 		$data = $this->data;
 
 		foreach ($this->root as $item) {
-			$data = $data[$item];
+			$data = isset($data[$item]) ? $data[$item] : array();
 		}
 
 		return $data;
@@ -108,6 +112,7 @@ class ConfigFormMapper extends \Nette\Object
 			$data = & $data[$item];
 		}
 
+		$data = $data ?: array();
 		$data = ($values + $data);
 
 		file_put_contents($this->fileName, $this->adapter->dump($this->data));
@@ -125,6 +130,9 @@ class ConfigFormMapper extends \Nette\Object
 		if (!$rec) {
 			$values = $this->loadConfig();
 		} else {
+			if(!isset($values[$rec])){
+				$values[$rec] = array();
+			}
 			$values = $values[$rec];
 		}
 
@@ -161,7 +169,7 @@ class ConfigFormMapper extends \Nette\Object
 		foreach ($container->getComponents() as $key => $control) {
 			if (!Nette\Utils\Strings::startsWith($key, "_")) {
 				if ($control instanceof \Nette\Forms\Container) {
-					$this->load($control, true, $values[$key]);
+					$this->load($control, true, isset($values[$key]) ? $values[$key] : "");
 				} else if ($control instanceof \Nette\Forms\IControl) {
 					$control->value = isset($values[$key]) ? $values[$key] : "";
 				}

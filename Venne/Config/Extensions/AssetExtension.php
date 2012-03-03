@@ -9,9 +9,10 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Config;
+namespace Venne\Config\Extensions;
 
 use Venne;
+use Venne\Config\CompilerExtension;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>

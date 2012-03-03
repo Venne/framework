@@ -151,7 +151,7 @@ class ResourcesManager extends Object
 	 */
 	protected function syncModule($name)
 	{
-		$path = $this->container->{$name}->getPath() . "/Resources";
+		$path = $this->container->{$name}->getPath() . "/Resources/public";
 		$dest = $this->container->parameters["resourcesDir"] . "/" . $name;
 
 		$this->rmdir($dest);

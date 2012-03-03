@@ -9,10 +9,11 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Config;
+namespace Venne\Config\Extensions;
 
 use Venne;
 use Nette\DI\ContainerBuilder;
+use Venne\Config\CompilerExtension;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -41,11 +42,6 @@ class VenneExtension extends CompilerExtension
 
 		$container->addDefinition($this->prefix("componentVerifier"))
 			->setClass("Venne\Security\ComponentVerifiers\ComponentVerifier");
-
-
-		// routing
-		$container->getDefinition('router')
-			->setFactory("Venne\Application\Routers\CmsRouter", array("@container"));
 
 
 		// session
@@ -103,6 +99,7 @@ class VenneExtension extends CompilerExtension
 		$container->addDefinition($this->prefix("helpers"))
 			->setClass("Venne\Templating\Helpers");
 
+
 		// managers
 		$this->compileManager("Venne\Module\ResourcesManager", $this->prefix("resourcesManager"));
 
@@ -135,6 +132,48 @@ class VenneExtension extends CompilerExtension
 
 		$this->registerMacroFactories($container);
 		$this->registerHelperFactories($container);
+		$this->registerRoutes($container);
+	}
+
+
+
+	public function afterCompile(\Nette\Utils\PhpGenerator\ClassType $class)
+	{
+		parent::afterCompile($class);
+
+		$initialize = $class->methods['initialize'];
+
+		foreach ($this->getSortedServices($this->getContainerBuilder(), "subscriber") as $item) {
+			$initialize->addBody('$this->getService("eventManager")->addEventSubscriber($this->getService(?));', array($item));
+		}
+	}
+
+
+
+	/**
+	 * @param ContainerBuilder $container
+	 */
+	protected function registerRoutes(ContainerBuilder $container)
+	{
+		$router = $container->getDefinition('router');
+
+		foreach ($this->getSortedServices($container, "route") as $route) {
+			$router->addSetup('$service[] = $this->getService(?)', array($route));
+		}
+	}
+
+
+
+	/**
+	 * @param ContainerBuilder $container
+	 */
+	protected function registerSubscribers(ContainerBuilder $container)
+	{
+		$eventManager = $container->getDefinition('eventManager');
+
+		foreach ($this->getSortedServices($container, "subscriber") as $item) {
+			$eventManager->addSetup("addEventSubscriber", "@{$item}");
+		}
 	}
 
 
@@ -163,6 +202,32 @@ class VenneExtension extends CompilerExtension
 		foreach ($container->findByTag('helper') as $factory => $meta) {
 			$config->addSetup('addHelper', array(substr($factory, strrpos($factory, ".") + 1, -6), $factory));
 		}
+	}
+
+
+
+	/**
+	 * @param \Nette\DI\ContainerBuilder $container
+	 * @param $tag
+	 * @return array
+	 */
+	protected function getSortedServices(ContainerBuilder $container, $tag)
+	{
+		$items = array();
+		$ret = array();
+		foreach ($container->findByTag($tag) as $route => $meta) {
+			$priority = isset($meta['priority']) ? $meta['priority'] : (int)$meta;
+			$items[$priority][] = $route;
+		}
+
+		krsort($items);
+
+		foreach ($items as $items2) {
+			foreach ($items2 as $item) {
+				$ret[] = $item;
+			}
+		}
+		return $ret;
 	}
 
 }

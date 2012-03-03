@@ -39,6 +39,21 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 
 	const WIDGET = "widget";
 
+	const ROUTE = "route";
+
+	public static $types = array(
+		self::CONTROL => "Control",
+		self::SUBSCRIBER => "Subscriber",
+		self::SERVICE => "Service",
+		self::MACRO => "Macro",
+		self::HELPER => "Helper",
+		self::FORM => "Form",
+		self::MANAGER => "Manager",
+		self::REPOSITORY => "Repository",
+		self::WIDGET => "Widget",
+		self::ROUTE => "Route",
+	);
+
 
 
 	/**
@@ -51,12 +66,13 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setParameters(array("compiler"))
-				->setFactory($class . "::install", array("%compiler%"))
-				->setShared(false)
-				->setAutowired(false)
-				->addTag(self::MACRO);
+			->setParameters(array("compiler"))
+			->setFactory($class . "::install", array("%compiler%"))
+			->setShared(false)
+			->setAutowired(false)
+			->addTag(self::MACRO);
 	}
+
 
 
 	/**
@@ -69,9 +85,9 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->setAutowired(false)
-				->addTag(self::HELPER);
+			->setClass($class)
+			->setAutowired(false)
+			->addTag(self::HELPER);
 	}
 
 
@@ -86,8 +102,8 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->addTag(self::MANAGER);
+			->setClass($class)
+			->addTag(self::MANAGER);
 	}
 
 
@@ -102,8 +118,8 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->addTag(self::SERVICE);
+			->setClass($class)
+			->addTag(self::SERVICE);
 	}
 
 
@@ -118,9 +134,9 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->setAutowired(false)
-				->addTag(self::SUBSCRIBER);
+			->setClass($class)
+			->setAutowired(false)
+			->addTag(self::SUBSCRIBER);
 	}
 
 
@@ -135,10 +151,10 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->setShared(false)
-				->setAutowired(false)
-				->addTag(self::CONTROL);
+			->setClass($class)
+			->setShared(false)
+			->setAutowired(false)
+			->addTag(self::CONTROL);
 	}
 
 
@@ -153,10 +169,10 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->setShared(false)
-				->setAutowired(false)
-				->addTag(self::WIDGET);
+			->setClass($class)
+			->setShared(false)
+			->setAutowired(false)
+			->addTag(self::WIDGET);
 	}
 
 
@@ -171,10 +187,10 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 	{
 		$this->getContainerBuilder()
 			->addDefinition($name)
-				->setClass($class)
-				->setAutowired(false)
-				->setShared(false)
-				->addTag(self::FORM);
+			->setClass($class)
+			->setAutowired(false)
+			->setShared(false)
+			->addTag(self::FORM);
 	}
 
 
@@ -196,10 +212,32 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 
 		$this->getContainerBuilder()
 			->addDefinition($repositoryName)
-				->setClass($class)
-				->setFactory("@entityManager::getRepository", array("\\" . $name))
-				->addTag("repository")
-				->setAutowired(false);
+			->setClass($class)
+			->setFactory("@entityManager::getRepository", array("\\" . $name))
+			->addTag("repository")
+			->setAutowired(false)
+			->addTag(self::REPOSITORY);
+	}
+
+
+
+	/**
+	 * Compile route.
+	 *
+	 * @param string $class
+	 * @param string $name
+	 */
+	protected function compileRoute($class, $name, $priority = NULL)
+	{
+		$route = $this->getContainerBuilder()
+			->addDefinition($name)
+			->setClass($class)
+			->setAutowired(FALSE)
+			->addTag(self::ROUTE);
+
+		if ($priority) {
+			$route->addTag(array("priority" => $priority));
+		}
 	}
 
 }

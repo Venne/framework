@@ -41,7 +41,8 @@ class CompilerExtension extends Venne\Config\CompilerExtension
 			self::FORM => array(),
 			self::MANAGER => array(),
 			self::REPOSITORY => array(),
-			self::WIDGET => array()
+			self::WIDGET => array(),
+			self::ROUTE => array()
 		);
 
 		foreach (Finder::findFiles("*.php")->from($modulePath)->exclude(".git", "Resources") as $file) {
@@ -86,12 +87,6 @@ class CompilerExtension extends Venne\Config\CompilerExtension
 	{
 		$container = $this->getContainerBuilder();
 		$config = $this->getConfig();
-
-
-		/* configs */
-		foreach ($this->configs as $config) {
-			\Nette\Config\Compiler::parseServices($container, $this->loadFromFile($config));
-		}
 
 
 		/* services */
@@ -145,6 +140,18 @@ class CompilerExtension extends Venne\Config\CompilerExtension
 		/* forms */
 		foreach ($this->classes[self::FORM] as $class => $name) {
 			$this->compileForm($class, $this->prefix($name));
+		}
+
+
+		/* routes */
+		foreach ($this->classes[self::ROUTE] as $class => $name) {
+			$this->compileRoute($class, $this->prefix($name));
+		}
+
+
+		/* configs */
+		foreach ($this->configs as $config) {
+			\Nette\Config\Compiler::parseServices($container, $this->loadFromFile($config));
 		}
 	}
 
