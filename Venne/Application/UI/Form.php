@@ -208,6 +208,13 @@ class Form extends \Nette\Application\UI\Form
 	return $container[$name];
 });
 
+\Nette\Forms\Container::extensionMethod("addContentEditor", function(Nette\Forms\Container $container, $name, $label = NULL, $cols = 40, $rows = 80)
+{
+	$container[$name] = new \Venne\Forms\Controls\ContentEditor($label, $cols, $rows);
+	$container[$name]->getControlPrototype()->data('venne-form-editor', true);
+	return $container[$name];
+});
+
 \Nette\Forms\Container::extensionMethod("addCheckboxList", function(Nette\Forms\Container $container, $name, $label, array $items = NULL)
 {
 	return $container[$name] = new \Venne\Forms\Controls\CheckboxList($label, $items);

@@ -19,6 +19,6 @@ use Venne;
 interface IHelper
 {
 
-	public static function filter($text);
+	public static function filter();
 
 }

@@ -87,20 +87,16 @@ class Configurator extends \Nette\Config\Configurator
 		$ret["venneModeAdmin"] = false;
 		$ret["venneModeFront"] = false;
 		$ret['rootDir'] = isset($parameters['rootDir']) ? $parameters['rootDir'] : dirname($ret['wwwDir']);
-		$ret['tempDir'] = $ret['rootDir'] . '/temp';
-		$ret['tempDir'] = $ret['rootDir'] . '/temp';
-		$ret['libsDir'] = $ret['rootDir'] . '/libs';
-		$ret['logDir'] = $ret['rootDir'] . '/log';
-		$ret['netteDir'] = $ret['libsDir'] . '/Nette';
-		$ret['venneDir'] = $ret['libsDir'] . '/Venne';
-		$ret['appDir'] = $ret['rootDir'] . '/app';
-		$ret['configDir'] = $ret['appDir'] . '/config';
-		$ret['wwwCacheDir'] = $ret['wwwDir'] . '/cache';
-		$ret['resourcesDir'] = $ret['wwwDir'] . '/resources';
-		$ret['flagsDir'] = $ret['rootDir'] . '/flags';
-		if ($parameters) {
-			$ret += $parameters;
-		}
+		$ret['tempDir'] = isset($parameters['tempDir']) ? $parameters['tempDir'] : $ret['rootDir'] . '/temp';
+		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : $ret['rootDir'] . '/libs';
+		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['rootDir'] . '/log';
+		$ret['netteDir'] = isset($parameters['netteDir']) ? $parameters['netteDir'] : $ret['libsDir'] . '/Nette';
+		$ret['venneDir'] = isset($parameters['venneDir']) ? $parameters['venneDir'] : $ret['libsDir'] . '/Venne';
+		$ret['appDir'] = isset($parameters['appDir']) ? $parameters['appDir'] : $ret['rootDir'] . '/app';
+		$ret['configDir'] = isset($parameters['configDir']) ? $parameters['configDir'] : $ret['appDir'] . '/config';
+		$ret['wwwCacheDir'] = isset($parameters['wwwCacheDir']) ? $parameters['wwwCacheDir'] : $ret['wwwDir'] . '/cache';
+		$ret['resourcesDir'] = isset($parameters['resourcesDir']) ? $parameters['resourcesDir'] : $ret['wwwDir'] . '/resources';
+		$ret['flagsDir'] = isset($parameters['flagsDir']) ? $parameters['flagsDir'] : $ret['rootDir'] . '/flags';
 		return $ret;
 	}
 
@@ -317,7 +313,7 @@ class Configurator extends \Nette\Config\Configurator
 
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
-		$this->parameters["logDir"] = $logDirectory;
+		$this->parameters["logDir"] = $logDirectory ?: $this->parameters["logDir"];
 		$this->parameters["debugger"] = array();
 		$this->parameters["debugger"]["emailSnooze"] = $email;
 	}
