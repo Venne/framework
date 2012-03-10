@@ -34,7 +34,8 @@ class SqlException extends \Exception
 	 */
 	public function __construct(PDOException $previous, $code = NULL, Query $query = NULL, $message = "")
 	{
-		parent::__construct($message ? : $previous->getMessage(), $code, $previous);
+		parent::__construct($previous->getMessage(), NULL, $previous);
+		$this->code = $previous->getCode();
 		$this->query = $query;
 	}
 
