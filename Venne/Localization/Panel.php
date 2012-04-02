@@ -35,7 +35,7 @@ namespace Venne\Localization;
 	 * @param \Nette\DI\IContainer
 	 * @param ITranslator
 	 */
-	public function __construct(\Nette\DI\IContainer $container, ITranslator $translator = NULL)
+	public function __construct(\Nette\DI\Container $container, ITranslator $translator = NULL)
 	{
 		if (!$translator) {
 			$translator = $container->translator;
@@ -103,9 +103,9 @@ namespace Venne\Localization;
 
 
 	/**
-	 * @param \Nette\DI\IContainer
+	 * @param \Nette\DI\Container
 	 */
-	protected function processRequests(\Nette\DI\IContainer $container)
+	protected function processRequests(\Nette\DI\Container $container)
 	{
 		$this->updating();
 

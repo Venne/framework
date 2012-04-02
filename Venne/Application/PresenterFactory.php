@@ -22,7 +22,7 @@ class PresenterFactory implements \Nette\Application\IPresenterFactory
 
 	const DEFAULT_NAMESPACE = 'App';
 
-	/** @var Nette\DI\IContainer */
+	/** @var Nette\DI\Container */
 	private $container;
 
 	protected $caseSensitive = false;
@@ -30,9 +30,9 @@ class PresenterFactory implements \Nette\Application\IPresenterFactory
 
 
 	/**
-	 * @param Nette\DI\IContainer
+	 * @param Nette\DI\Container
 	 */
-	public function __construct(\Nette\DI\IContainer $container)
+	public function __construct(\Nette\DI\Container $container)
 	{
 		$this->container = $container;
 	}
