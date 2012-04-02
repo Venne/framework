@@ -19,3 +19,4 @@ define('VENNE_VERSION_ID', '2.0000');
 define('VENNE_VERSION_STATE', 'alpha');
 
 require_once __DIR__ . '/Config/Configurator.php';
+require_once __DIR__ . '/Tests/Configurator.php';
