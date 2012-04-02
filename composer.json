@@ -1,0 +1,26 @@
+{
+	"name": "venne/cms",
+	"description": "Simple and easy for use system for managing your websites.",
+	"keywords": ["cms", "nette", "doctrine"],
+	"homepage": "https://github.com/Venne/Venne-CMS",
+	"authors": [
+		{
+			"name": "Josef Kříž",
+			"homepage": "http://josef-kriz.cz"
+		}
+	],
+	"require": {
+		"php" : ">=5.3.2",
+		"nette/nette" : "dev-release-2.0.x",
+		"doctrine/orm" : "2.2.1"
+	},
+	"repositories": [
+        {
+            "type": "vcs",
+            "url": "git://github.com/Nette/nette.git"
+        }
+    ],
+	"autoload": {
+        "psr-0": {"Venne": "libs/"}
+    }
+}
