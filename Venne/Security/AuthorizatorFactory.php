@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace App\CoreModule;
+namespace CoreModule;
 
 use Venne;
 use Nette\Object;
@@ -237,7 +237,7 @@ class AuthorizatorFactory extends Object
 
 		/* class */
 		if ($refl->hasAnnotation("secured")) {
-			$ret[substr($class, 4)] = true;
+			$ret[$class] = true;
 		}
 
 		return $ret;

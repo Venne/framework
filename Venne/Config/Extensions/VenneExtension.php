@@ -37,9 +37,6 @@ class VenneExtension extends CompilerExtension
 
 
 		// application
-		$container->getDefinition('nette.presenterFactory')
-			->setClass('Venne\Application\PresenterFactory', array("@container"));
-
 		$container->addDefinition($this->prefix("componentVerifier"))
 			->setClass("Venne\Security\ComponentVerifiers\ComponentVerifier");
 
@@ -66,7 +63,7 @@ class VenneExtension extends CompilerExtension
 		}
 
 		$container->addDefinition("authorizatorFactory")
-			->setFactory("App\CoreModule\AuthorizatorFactory")
+			->setFactory("CoreModule\AuthorizatorFactory")
 			->setAutowired(false);
 
 		$container->addDefinition("authorizator")
@@ -74,7 +71,7 @@ class VenneExtension extends CompilerExtension
 			->setFactory("@authorizatorFactory::getCurrentPermissions");
 
 		$container->addDefinition("authenticator")
-			->setClass("App\CoreModule\Authenticator", array("@container"));
+			->setClass("CoreModule\Authenticator", array("@container"));
 
 
 		// mappers
@@ -112,7 +109,7 @@ class VenneExtension extends CompilerExtension
 		foreach ($container->parameters["modules"] as $module => $item) {
 			$container->addDefinition($module . "Module")
 				->addTag("module")
-				->setClass("App\\" . ucfirst($module) . "Module\\Module");
+				->setClass(ucfirst($module) . "Module\\Module");
 		}
 
 

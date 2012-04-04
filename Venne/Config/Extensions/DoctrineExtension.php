@@ -64,7 +64,7 @@ class DoctrineExtension extends CompilerExtension
 			->addSetup("setQueryCacheImpl", "@doctrine.cache")
 			->addSetup("setMetadataDriverImpl", "@doctrineAnnotationDriver")
 			->addSetup("setProxyDir", $container->parameters["appDir"] . '/proxies')
-			->addSetup("setProxyNamespace", 'App\Proxies')
+			->addSetup("setProxyNamespace", 'Proxies')
 			->setInternal(true);
 
 		if ($container->parameters["debugger"]["mode"] == "development") {

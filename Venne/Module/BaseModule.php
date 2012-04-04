@@ -95,7 +95,7 @@ abstract class BaseModule extends Object implements IModule
 
 	public function getForm(Container $container)
 	{
-		return new \App\CoreModule\Forms\ModuleForm($container->configFormMapper, $this->getName());
+		return new \CoreModule\Forms\ModuleForm($container->configFormMapper, $this->getName());
 	}
 
 
@@ -115,7 +115,7 @@ abstract class BaseModule extends Object implements IModule
 
 		/* Create db schema  */
 		$classes = array();
-		$entities = $container->core->scannerService->searchClassesBySubclass("\Nette\Object", "App\\" . ucfirst($this->getName()) . "Module\\");
+		$entities = $container->core->scannerService->searchClassesBySubclass("\Nette\Object", ucfirst($this->getName()) . "Module\\");
 		foreach ($entities as $entity) {
 			$ref = \Nette\Reflection\ClassType::from($entity);
 			if ($ref->hasAnnotation("Entity")) {
@@ -130,18 +130,50 @@ abstract class BaseModule extends Object implements IModule
 	public function uninstall(Container $container)
 	{
 		$em = $container->entityManager;
+		$connection = $em->getConnection();
+		$dbPlatform = $connection->getDatabasePlatform();
 		$tool = new \Doctrine\ORM\Tools\SchemaTool($em);
 
 
-		/* Drop db schema */
+		// load
 		$classes = array();
-		$entities = $container->core->scannerService->searchClassesBySubclass("\Venne\Doctrine\ORM\BaseEntity", "App\\" . ucfirst($this->getName()) . "Module\\");
+		$entities = $container->core->scannerService->searchClassesBySubclass("\Venne\Doctrine\ORM\BaseEntity", ucfirst($this->getName()) . "Module\\");
 		foreach ($entities as $entity) {
 			$ref = \Nette\Reflection\ClassType::from($entity);
 			if ($ref->hasAnnotation("Entity")) {
 				$classes[] = $em->getClassMetadata($entity);
 			}
 		}
+		
+		// delete entities
+		$connection->beginTransaction();
+		try {
+			foreach($classes as $class){
+				$repository = $em->getRepository($class->getName());
+				foreach($repository->findAll() as $entity){
+					$em->remove($entity);
+				}
+			}
+			$connection->commit();
+		} catch (\Exception $e) {
+			$connection->rollback();
+		}
+		
+		/*
+		$connection->beginTransaction();
+		try {
+			$connection->query('SET FOREIGN_KEY_CHECKS=0');
+			foreach($classes as $class){
+				$q = $dbPlatform->getTruncateTableSql($class->getTableName());
+				$connection->executeUpdate($q);
+			}
+			$connection->query('SET FOREIGN_KEY_CHECKS=1');
+			$connection->commit();
+		} catch (\Exception $e) {
+			$connection->rollback();
+		}*/
+				
+		// drop schema
 		$tool->dropSchema($classes);
 	}
 

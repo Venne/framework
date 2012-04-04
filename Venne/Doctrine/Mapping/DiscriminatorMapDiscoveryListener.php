@@ -95,7 +95,7 @@ class DiscriminatorMapDiscoveryListener extends Nette\Object implements Doctrine
 
 			$classes[] = $className;
 		}
-		$classes = array("App\PagesModule\BaseEntity");
+		$classes = array("PagesModule\BaseEntity");
 		return $classes;
 	}
 

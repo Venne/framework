@@ -13,7 +13,7 @@ namespace Venne\ContentExtension;
 
 use Nette;
 use Venne\Forms\PageForm;
-use App\CoreModule\PageEntity;
+use CoreModule\PageEntity;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>

@@ -34,7 +34,7 @@ class PageForm extends EntityForm
 
 	public function setEntity($entity)
 	{
-		if (!$entity instanceof \App\CoreModule\Entities\BasePageEntity) {
+		if (!$entity instanceof \CoreModule\Entities\BasePageEntity) {
 			throw new \Nette\InvalidArgumentException;
 		}
 

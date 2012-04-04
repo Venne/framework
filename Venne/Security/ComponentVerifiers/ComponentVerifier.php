@@ -73,7 +73,6 @@ class ComponentVerifier extends \Nette\Object implements IComponentVerifier
 		// startup
 		$secured = $element->getAnnotation("secured");
 		$resource = isset($secured["resource"]) ? $secured["resource"] : $element->getName();
-		$resource = substr($resource, 0, 4) == "App\\" ? substr($resource, 4) : $resource;
 		if (!$this->user->isAllowed($resource)) {
 			return false;
 		}

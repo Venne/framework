@@ -14,8 +14,8 @@ namespace Venne\Security;
 use Venne;
 use Nette;
 use Nette\Http\Session;
-use App\CoreModule\Entities\LoginEntity;
-use App\CoreModule\Entities\UserEntity;
+use CoreModule\Entities\LoginEntity;
+use CoreModule\Entities\UserEntity;
 use Nette\Security\IIdentity;
 use Venne\Doctrine\ORM\BaseRepository;
 
@@ -88,7 +88,7 @@ class UserStorage extends \Nette\Http\UserStorage
 
 
 	/**
-	 * @return \App\CoreModule\Entities\LoginEntity|bool
+	 * @return \CoreModule\Entities\LoginEntity|bool
 	 */
 	protected function getLogin()
 	{
@@ -118,7 +118,7 @@ class UserStorage extends \Nette\Http\UserStorage
 	 */
 	protected function invalidatePermissions()
 	{
-		$session = $this->sessionHandler->getSection(\App\CoreModule\AuthorizatorFactory::SESSION_SECTION);
+		$session = $this->sessionHandler->getSection(\CoreModule\AuthorizatorFactory::SESSION_SECTION);
 		$session->remove();
 		$this->login->reload = 0;
 		$this->repository->save($this->login);

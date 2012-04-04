@@ -219,7 +219,7 @@ class Configurator extends \Nette\Config\Configurator
 			->addExtension('assets', new Venne\Config\Extensions\AssetExtension());
 
 		foreach ($this->modules as $module) {
-			$class = "\\App\\" . ucfirst($module) . "Module\\Module";
+			$class = "\\" . ucfirst($module) . "Module\\Module";
 			$instance = new $class;
 			$instance->compile($this->compiler);
 		}

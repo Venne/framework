@@ -23,9 +23,9 @@ class ContentEditor extends \Nette\Forms\Controls\TextArea
 
 	public function getValue()
 	{
-		$args = new \App\CoreModule\Events\ContentHelperArgs;
+		$args = new \CoreModule\Events\ContentHelperArgs;
 		$args->setText(parent::getValue());
-		$this->getForm()->getPresenter()->getContext()->eventManager->dispatchEvent(\App\CoreModule\Events\ContentHelperEvents::onContentSave, $args);
+		$this->getForm()->getPresenter()->getContext()->eventManager->dispatchEvent(\CoreModule\Events\ContentHelperEvents::onContentSave, $args);
 		return $args->getText();
 	}
 
@@ -33,9 +33,9 @@ class ContentEditor extends \Nette\Forms\Controls\TextArea
 
 	public function setValue($text)
 	{
-		$args = new \App\CoreModule\Events\ContentHelperArgs;
+		$args = new \CoreModule\Events\ContentHelperArgs;
 		$args->setText($text);
-		$this->getForm()->getPresenter()->getContext()->eventManager->dispatchEvent(\App\CoreModule\Events\ContentHelperEvents::onContentLoad, $args);
+		$this->getForm()->getPresenter()->getContext()->eventManager->dispatchEvent(\CoreModule\Events\ContentHelperEvents::onContentLoad, $args);
 		parent::setValue($args->getText());
 	}
 
