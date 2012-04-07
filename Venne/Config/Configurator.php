@@ -88,7 +88,7 @@ class Configurator extends \Nette\Config\Configurator
 		$ret["venneModeFront"] = false;
 		$ret['rootDir'] = isset($parameters['rootDir']) ? $parameters['rootDir'] : dirname($ret['wwwDir']);
 		$ret['tempDir'] = isset($parameters['tempDir']) ? $parameters['tempDir'] : $ret['rootDir'] . '/temp';
-		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : $ret['rootDir'] . '/libs';
+		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : $ret['rootDir'] . '/vendor';
 		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['rootDir'] . '/log';
 		$ret['netteDir'] = isset($parameters['netteDir']) ? $parameters['netteDir'] : $ret['libsDir'] . '/Nette';
 		$ret['venneDir'] = isset($parameters['venneDir']) ? $parameters['venneDir'] : $ret['libsDir'] . '/Venne';

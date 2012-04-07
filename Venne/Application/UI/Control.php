@@ -120,12 +120,12 @@ class Control extends \Nette\Application\UI\Control
 		parent::attached($presenter);
 
 		// template configurator
-		if ($this->presenter->context->hasService('venne_templateConfigurator')) {
+		if ($this->presenter->context->hasService('venne.templateConfigurator')) {
 			$this->setTemplateConfigurator($this->presenter->context->venne->templateConfigurator);
 		}
 
 		// component verifer
-		if ($this->presenter->context->hasService('venne_componentVerifier')) {
+		if ($this->presenter->context->hasService('venne.componentVerifier')) {
 			$this->setComponentVerifer($this->presenter->context->venne->componentVerifier);
 		}
 

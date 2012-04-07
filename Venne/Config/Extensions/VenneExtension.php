@@ -87,11 +87,6 @@ class VenneExtension extends CompilerExtension
 			->setClass("Venne\Templating\TemplateConfigurator");
 
 
-		// macros
-		$this->compileMacro("Venne\Assets\Macros\CssMacro", $this->prefix("cssMacro"));
-		$this->compileMacro("Venne\Assets\Macros\JsMacro", $this->prefix("jsMacro"));
-
-
 		// helpers
 		$container->addDefinition($this->prefix("helpers"))
 			->setClass("Venne\Templating\Helpers");

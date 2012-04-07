@@ -26,14 +26,13 @@ Installation
 	
 	# git clone git://github.com/Venne/sandbox.git myProject
 	# cd myProject
-	# sh ./bin/clone_vendors.sh
-	# sh ./bin/prepare_sandbox.sh
+	# php prepare
 	
 
 
 - Download sandbox from: https://github.com/Venne/sandbox/
 - Unpack to the document root directory within your web server.
-- Run /bin/clone_vendors.sh for cloning vendors to the project.
+- Run `php prepare` for cloning vendors to the project.
 - Run from browser and make installation process.
 - Have a lot of fun!
 

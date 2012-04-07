@@ -43,12 +43,12 @@ class Presenter extends \Nette\Application\UI\Presenter
 		parent::__construct($container);
 
 		// template configurator
-		if ($container->hasService('venne_templateConfigurator')) {
+		if ($container->hasService('venne.templateConfigurator')) {
 			$this->setTemplateConfigurator($container->venne->templateConfigurator);
 		}
 
 		// component verifer
-		if ($container->hasService('venne_componentVerifier')) {
+		if ($container->hasService('venne.componentVerifier')) {
 			$this->setComponentVerifer($container->venne->componentVerifier);
 		}
 	}

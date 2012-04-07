@@ -44,7 +44,7 @@ class DoctrineExtension extends CompilerExtension
 
 		// Annotations
 		$container->addDefinition("doctrineAnnotationRegistry")
-			->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/Doctrine/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))
+			->setFactory("Doctrine\Common\Annotations\AnnotationRegistry::registerFile", array($container->parameters["libsDir"] . '/doctrine/orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php'))
 			->setShared(false)
 			->setInternal(true);
 		$container->addDefinition("doctrineAnnotationReader")
