@@ -44,9 +44,7 @@ abstract class BaseModule extends Object implements IModule
 			return $this->name;
 		}
 
-		$path = $this->getPath();
-		$pos = strrpos($path, "/");
-		return lcfirst(substr($path, $pos + 1, -6));
+		return lcfirst(substr($this->getReflection()->getNamespaceName(), 0, -6));
 	}
 
 
