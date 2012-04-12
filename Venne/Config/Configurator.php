@@ -28,8 +28,13 @@ class Configurator extends \Nette\Config\Configurator
 {
 
 
+	const CACHE_NAMESPACE = 'Nette.Configurator';
+
 	/** @var array */
 	protected $modules = array();
+
+	/** @var Venne\Module\IModule[] */
+	protected $moduleInstances = array();
 
 	/** @var \Nette\DI\Container */
 	protected $container;
@@ -42,12 +47,24 @@ class Configurator extends \Nette\Config\Configurator
 
 
 
-	public function __construct($parameters = NULL, $modules = NULL, $productionMode = NULL)
+	public function __construct($parameters = NULL, $modules = NULL)
 	{
 		$this->parameters = $this->getDefaultParameters($parameters);
 		$this->modules = $this->getDefaultModules($modules);
-		$this->setProductionMode($productionMode);
 		$this->setTempDirectory($this->parameters["tempDir"]);
+		$this->checkFlags();
+	}
+
+
+
+	protected function checkFlags()
+	{
+		// detect updated flag
+		if (file_exists($this->parameters['flagsDir'] . "/updated")) {
+			$cache = new Cache(new \Nette\Caching\Storages\PhpFileStorage($cacheDir), self::CACHE_NAMESPACE);
+			$cache->clean();
+			@unlink($this->parameters['flagsDir'] . "/updated");
+		}
 	}
 
 
@@ -57,25 +74,36 @@ class Configurator extends \Nette\Config\Configurator
 		$ret = array();
 
 		$adapter = new NeonAdapter();
-		if (file_exists($this->parameters["configDir"] . "/modules.neon")) {
-			$ret = $adapter->load($this->parameters["configDir"] . "/modules.neon");
-		} else {
-			$ret = $adapter->load($this->parameters["configDir"] . "/modules.orig.neon");
-		}
+		$ret = $adapter->load($this->parameters["configDir"] . "/modules.neon");
 
 		return is_array($modules) ? array_merge($ret, $modules) : $ret;
 	}
 
 
 
+	protected function getModuleInstances()
+	{
+		if (!$this->moduleInstances) {
+			foreach ($this->modules as $module) {
+				$class = "\\" . ucfirst($module) . "Module\\Module";
+				$this->moduleInstances[] = new $class;
+			}
+		}
+		return $this->moduleInstances;
+	}
+
+
+
 	protected function getDefaultParameters($parameters = NULL)
 	{
-		$parameters = (array)$parameters;
-
+		$parameters = (array) $parameters;
+		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
 			'wwwDir' => isset($_SERVER['SCRIPT_FILENAME']) ? dirname($_SERVER['SCRIPT_FILENAME']) : NULL,
-			'productionMode' => static::detectProductionMode(),
-			'environment' => static::detectProductionMode() ? self::PRODUCTION : self::DEVELOPMENT,
+			'debugMode' => $debugMode,
+			'productionMode' => !$debugMode,
+			'environment' => isset($parameters["environment"]) ? $parameters["environment"] :
+					($debugMode ? self::DEVELOPMENT : self::PRODUCTION),
 			'consoleMode' => PHP_SAPI === 'cli',
 			'container' => array(
 				'class' => 'SystemContainer',
@@ -83,20 +111,16 @@ class Configurator extends \Nette\Config\Configurator
 			)
 		);
 		$ret = $parameters + $ret;
-		$ret["venneModeInstallation"] = false;
-		$ret["venneModeAdmin"] = false;
-		$ret["venneModeFront"] = false;
-		$ret['rootDir'] = isset($parameters['rootDir']) ? $parameters['rootDir'] : dirname($ret['wwwDir']);
-		$ret['tempDir'] = isset($parameters['tempDir']) ? $parameters['tempDir'] : $ret['rootDir'] . '/temp';
-		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : $ret['rootDir'] . '/vendor';
-		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['rootDir'] . '/log';
-		$ret['netteDir'] = isset($parameters['netteDir']) ? $parameters['netteDir'] : $ret['libsDir'] . '/Nette';
-		$ret['venneDir'] = isset($parameters['venneDir']) ? $parameters['venneDir'] : $ret['libsDir'] . '/Venne';
-		$ret['appDir'] = isset($parameters['appDir']) ? $parameters['appDir'] : $ret['rootDir'] . '/app';
+		$ret['appDir'] = isset($parameters['appDir']) ? $parameters['appDir'] : dirname($ret['wwwDir']) . '/app';
+		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : dirname($ret['wwwDir']) . '/vendor';
+		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['appDir'] . '/log';
+		$ret['dataDir'] = isset($parameters['dataDir']) ? $parameters['dataDir'] : $ret['appDir'] . '/data';
+		$ret['tempDir'] = isset($parameters['tempDir']) ? $parameters['tempDir'] : $ret['appDir'] . '/temp';
+		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['appDir'] . '/log';
 		$ret['configDir'] = isset($parameters['configDir']) ? $parameters['configDir'] : $ret['appDir'] . '/config';
 		$ret['wwwCacheDir'] = isset($parameters['wwwCacheDir']) ? $parameters['wwwCacheDir'] : $ret['wwwDir'] . '/cache';
 		$ret['resourcesDir'] = isset($parameters['resourcesDir']) ? $parameters['resourcesDir'] : $ret['wwwDir'] . '/resources';
-		$ret['flagsDir'] = isset($parameters['flagsDir']) ? $parameters['flagsDir'] : $ret['rootDir'] . '/flags';
+		$ret['flagsDir'] = isset($parameters['flagsDir']) ? $parameters['flagsDir'] : $ret['appDir'] . '/flags';
 		return $ret;
 	}
 
@@ -146,10 +170,6 @@ class Configurator extends \Nette\Config\Configurator
 		\Venne\Panels\Stopwatch::start();
 
 
-		// start debugger
-		$this->runDebugger($container);
-
-
 		// register robotLoader and configurator
 		$container->addService("robotLoader", $this->robotLoader);
 		$container->addService("configurator", $this);
@@ -163,12 +183,11 @@ class Configurator extends \Nette\Config\Configurator
 
 		// setup Application
 		$application = $container->application;
-		$application->catchExceptions = (bool)$this->isProductionMode();
+		$application->catchExceptions = (bool) !$this->isDebugMode();
 		$application->errorPresenter = $container->parameters['website']['errorPresenter'];
-		$application->onShutdown[] = function()
-		{
-			\Venne\Panels\Stopwatch::stop("shutdown");
-		};
+		$application->onShutdown[] = function() {
+					\Venne\Panels\Stopwatch::stop("shutdown");
+				};
 
 
 		// initialize modules
@@ -177,28 +196,13 @@ class Configurator extends \Nette\Config\Configurator
 		}
 
 
-		// detect updated flag
-		if (file_exists($this->parameters['flagsDir'] . "/updated")) {
-			$dirContent = \Nette\Utils\Finder::find('*')->from($this->parameters['tempDir'] . "/cache")->childFirst();
-			foreach ($dirContent as $file) {
-				if ($file->isDir()) @rmdir($file->getPathname()); else
-					@unlink($file->getPathname());
-			}
-			@unlink($directory);
-			@unlink($this->parameters['flagsDir'] . "/updated");
-			$container->eventManager->dispatchEvent(\Venne\Module\Events\Events::onUpdateFlag);
-		}
-
-
 		// set timer to router
-		$container->application->onStartup[] = function()
-		{
-			\Venne\Panels\Stopwatch::start();
-		};
-		$container->application->onRequest[] = function()
-		{
-			\Venne\Panels\Stopwatch::stop("routing");
-		};
+		$container->application->onStartup[] = function() {
+					\Venne\Panels\Stopwatch::start();
+				};
+		$container->application->onRequest[] = function() {
+					\Venne\Panels\Stopwatch::stop("routing");
+				};
 
 
 		\Venne\Panels\Stopwatch::stop("container configuration");
@@ -214,13 +218,11 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		$this->compiler = parent::createCompiler();
 		$this->compiler
-			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
-			->addExtension('doctrine', new Venne\Config\Extensions\DoctrineExtension())
-			->addExtension('assets', new Venne\Config\Extensions\AssetExtension());
+				->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
+				->addExtension('doctrine', new Venne\Config\Extensions\DoctrineExtension())
+				->addExtension('assets', new Venne\Config\Extensions\AssetExtension());
 
-		foreach ($this->modules as $module) {
-			$class = "\\" . ucfirst($module) . "Module\\Module";
-			$instance = new $class;
+		foreach ($this->getModuleInstances() as $instance) {
 			$instance->compile($this->compiler);
 		}
 
@@ -231,61 +233,19 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function getConfigFiles()
 	{
-		$configs = array();
-
-		$configList = array(
-			"modules" => array(
-				"orig" => $this->parameters['configDir'] . "/modules.orig.neon",
-				"config" => $this->parameters['configDir'] . "/modules.neon"
-			),
-			"config" => array(
-				"orig" => $this->parameters['configDir'] . "/global.orig.neon",
-				"config" => $this->parameters['configDir'] . "/global.neon"
-			),
+		$configs = array(
+			$this->parameters['configDir'] . "/config.neon",
+			$this->parameters['configDir'] . "/config_" . $this->parameters["environment"] . ".neon",
 		);
 
-		foreach ($configList as $name => $item) {
-			/* Detect and prepare configuration files */
-			if (!is_readable($item["config"]) && !is_readable($item["orig"])) {
-				die("Your config files are not readable");
-			}
-			if (!file_exists($item["config"])) {
-				if (is_writable($this->parameters["configDir"])) {
-					umask(0000);
-					copy($item["orig"], $item["config"]);
-					if ($name == "config") {
-						$configs[] = $item["config"];
-					}
-				} else {
-					if ($name == "config") {
-						$configs[] = $item["orig"];
-					}
-				}
-			} else {
-				if ($name == "config") {
-					$configs[] = $item["config"];
-				}
+		foreach ($this->getModuleInstances() as $instance) {
+			$path = $instance->getPath() . "/public/config/config.neon";
+			if (is_file($path)) {
+				$configs[] = $path;
 			}
 		}
 
 		return $configs;
-	}
-
-
-
-	/**
-	 * Sets path to temporary directory.
-	 *
-	 * @return Configurator  provides a fluent interface
-	 */
-	public function setTempDirectory($path)
-	{
-		parent::setTempDirectory($path);
-		if (!is_dir($sessionDir = $path . "/sessions")) {
-			umask(0000);
-			mkdir($sessionDir, 0777);
-		}
-		return $this;
 	}
 
 
@@ -297,9 +257,9 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		$this->robotLoader = $this->createRobotLoader();
 		$this->robotLoader
-			->addDirectory($this->parameters["libsDir"])
-			->addDirectory($this->parameters["appDir"])
-			->register();
+				->addDirectory($this->parameters["libsDir"])
+				->addDirectory($this->parameters["appDir"])
+				->register();
 	}
 
 
@@ -313,27 +273,10 @@ class Configurator extends \Nette\Config\Configurator
 
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
-		$this->parameters["logDir"] = $logDirectory ?: $this->parameters["logDir"];
-		$this->parameters["debugger"] = array();
-		$this->parameters["debugger"]["emailSnooze"] = $email;
-	}
-
-
-
-	protected function runDebugger($container)
-	{
-		if (isset($this->parameters["debugger"]) && $this->parameters["debugger"]) {
-			$debugger = $container->parameters["debugger"];
-
-			$this->setProductionMode($debugger["mode"] == "production");
-
-			Debugger::$strictMode = true;
-			Debugger::enable($debugger['developerIp'] && $this->isProductionMode() ? (array)$debugger['developerIp'] : $this->isProductionMode(), $debugger['logDir'], $debugger['logEmail']);
-			Debugger::$logger->mailer = array("\\Venne\\Diagnostics\\Logger", "venneMailer");
-			\Nette\Diagnostics\Logger::$emailSnooze = $this->parameters["debugger"]["emailSnooze"] ? : $container->parameters["debugger"]["emailSnooze"];
-			Debugger::$logDirectory = $container->parameters["logDir"];
-			\Venne\Diagnostics\Logger::$linkPrefix = "http://" . $container->httpRequest->url->host . $container->httpRequest->url->basePath . "admin/system/log/show?name=";
-		}
+		Nette\Diagnostics\Debugger::$strictMode = TRUE;
+		Nette\Diagnostics\Debugger::enable(
+				!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["debugger"]["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
+		);
 	}
 
 
@@ -345,6 +288,5 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		return $this->compiler;
 	}
-
 
 }

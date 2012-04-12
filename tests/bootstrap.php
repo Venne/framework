@@ -4,18 +4,28 @@
 // require '.maintenance.php';
 
 // load Venne:CMS
-require_once __DIR__ . '/../Venne/loader.php';
-
-$rootDir = __DIR__ . "/..";
+require_once dirname(__DIR__) . '/Venne/loader.php';
 
 $parameters = array(
-	"rootDir" => $rootDir,
-	"appDir" => $rootDir . "/tests/app",
-	"libsDir" => $rootDir,
-	"configDir" => $rootDir . "/tests/config",
-	"logDir" => $rootDir . "/tests/log",
-	"tempDir" => $rootDir . "/tests/temp",
+	"rootDir" => __DIR__,
+	"appDir" => __DIR__ . "/app",
+	"configDir" => __DIR__ . "/config",
+	"logDir" => __DIR__ . "/log",
+	"tempDir" => __DIR__ . "/temp",
+	"environment" => "testing",
+	"debugMode" => true,
 );
+
+foreach(array(dirname(__DIR__) , dirname(__DIR__) . "/../../../") as $dir){
+	if(file_exists($dir . "/vendor/nette")){
+		$parameters["libsDir"] = $dir;
+		break;
+	}
+}
+
+if(!isset($parameters["libsDir"])) {
+	die("You must load vendors first");
+}
 
 $configurator = new \Venne\Tests\Configurator($parameters);
 //$configurator->enableDebugger();

@@ -57,7 +57,7 @@ class VenneExtension extends CompilerExtension
 
 		// security
 		if (file_exists($container->parameters["flagsDir"] . "/installed")) {
-			$container->getDefinition($this->prefix('userStorage'))
+			$container->getDefinition('nette.userStorage')
 				->setClass('Venne\Security\UserStorage')
 				->setArguments(array("@session", "@core.loginRepository"));
 		}
@@ -76,7 +76,7 @@ class VenneExtension extends CompilerExtension
 
 		// mappers
 		$container->addDefinition("configFormMapper")
-			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/global.neon"));
+			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/config.neon"));
 
 		$container->addDefinition("entityFormMapper")
 			->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
@@ -96,7 +96,7 @@ class VenneExtension extends CompilerExtension
 		$this->compileManager("Venne\Module\ResourcesManager", $this->prefix("resourcesManager"));
 
 		$container->addDefinition("configManager")
-			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/global.neon"))
+			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/config.neon"))
 			->addTag("manager");
 
 

@@ -214,9 +214,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isAllowed($destination)
 	{
-		if ($this->context->parameters['venneModeInstallation']) {
-			return true;
-		}
 		if ($destination == "this") {
 			$action = "action" . ucfirst($this->action);
 			$class = $this->name;

@@ -55,7 +55,7 @@ class DoctrineExtension extends CompilerExtension
 			->setClass("Doctrine\Common\Annotations\CachedReader", array("@doctrineAnnotationReader", "@doctrine.cache"))
 			->setInternal(true);
 		$container->addDefinition("doctrineAnnotationDriver")
-			->setClass("Doctrine\ORM\Mapping\Driver\AnnotationDriver", array("@doctrineCachedAnnotationReader", array($container->parameters["appDir"], $container->parameters["venneDir"])))
+			->setClass("Doctrine\ORM\Mapping\Driver\AnnotationDriver", array("@doctrineCachedAnnotationReader", array($container->parameters["appDir"], $container->parameters["libsDir"])))
 			->setInternal(true);
 
 		$container->addDefinition("entityManagerConfig")
@@ -67,7 +67,7 @@ class DoctrineExtension extends CompilerExtension
 			->addSetup("setProxyNamespace", 'Proxies')
 			->setInternal(true);
 
-		if ($container->parameters["debugger"]["mode"] == "development") {
+		if ($container->parameters["debugMode"]) {
 			$container->getDefinition("entityManagerConfig")
 				->addSetup("setAutoGenerateProxyClasses", true);
 		}
