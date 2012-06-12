@@ -76,12 +76,6 @@ class VenneExtension extends CompilerExtension
 			->setClass('Venne\Widget\WidgetManager');
 
 
-		// console
-		$container->addDefinition($this->prefix('console'))
-			->setClass('Symfony\Component\Console\Application', array('Command Line Interface'))
-			->addSetup('setCatchExceptions', false);
-
-
 		// CLI
 		$cliRoute = $container->addDefinition($this->prefix("CliRoute"))
 			->setClass("Venne\Application\Routers\CliRouter")
@@ -101,7 +95,6 @@ class VenneExtension extends CompilerExtension
 		$this->registerMacroFactories();
 		$this->registerHelperFactories();
 		$this->registerRoutes();
-		$this->registerCommands();
 		$this->registerWidgets();
 	}
 
@@ -125,17 +118,6 @@ class VenneExtension extends CompilerExtension
 
 		foreach ($this->getSortedServices($container, "route") as $route) {
 			$router->addSetup('$service[] = $this->getService(?)', array($route));
-		}
-	}
-
-
-	protected function registerCommands()
-	{
-		$container = $this->getContainerBuilder();
-		$console = $container->getDefinition($this->prefix('console'));
-
-		foreach ($this->getSortedServices($container, "command") as $item) {
-			$console->addSetup("add", "@{$item}");
 		}
 	}
 
