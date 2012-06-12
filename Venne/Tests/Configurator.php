@@ -40,5 +40,19 @@ class Configurator extends \Venne\Config\Configurator
 	{
 		return static::$configurator->getContainer();
 	}
+	
+	
+	/**
+	 * Enable robotLoader.
+	 */
+	public function enableLoader()
+	{
+		$this->robotLoader = $this->createRobotLoader();
+		$this->robotLoader
+				->addDirectory($this->parameters["libsDir"])
+				->addDirectory($this->parameters["appDir"])
+				->addDirectory($this->parameters['venneDir'])
+				->register();
+	}
 
 }

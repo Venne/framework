@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . '/Venne/loader.php';
 
 $parameters = array(
 	"rootDir" => __DIR__,
+	"venneDir" => __DIR__ . '/../Venne',
 	"appDir" => __DIR__ . "/app",
 	"configDir" => __DIR__ . "/config",
 	"logDir" => __DIR__ . "/log",
@@ -16,8 +17,8 @@ $parameters = array(
 	"debugMode" => true,
 );
 
-foreach(array(dirname(__DIR__) , dirname(__DIR__) . "/../../../") as $dir){
-	if(file_exists($dir . "/vendor/nette")){
+foreach(array(dirname(__DIR__ . '/vendor/nette/nette/Nette') , dirname(__DIR__) . "/../../../vendor/nette/nette/Nette") as $dir){
+	if(file_exists($dir . "/loader.php")){
 		$parameters["libsDir"] = $dir;
 		break;
 	}

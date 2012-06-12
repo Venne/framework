@@ -13,7 +13,7 @@ namespace Venne\Config\Extensions;
 
 use Venne;
 use Nette\DI\ContainerBuilder;
-use Venne\Config\CompilerExtension;
+use Nette\Config\CompilerExtension;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -29,16 +29,19 @@ class VenneExtension extends CompilerExtension
 	);
 
 
-
 	public function loadConfiguration()
 	{
 		$container = $this->getContainerBuilder();
 		$config = $this->getConfig();
 
 
-		// application
-		$container->addDefinition($this->prefix("componentVerifier"))
-			->setClass("Venne\Security\ComponentVerifiers\ComponentVerifier");
+		$container->getDefinition('nette.presenterFactory')
+			->setClass('Venne\Application\PresenterFactory', array(
+			isset($container->parameters['appDir']) ? $container->parameters['appDir'] : NULL
+		));
+
+		$container->getDefinition('user')
+			->setClass('Venne\Security\User');
 
 
 		// session
@@ -46,40 +49,8 @@ class VenneExtension extends CompilerExtension
 			->addSetup("setSavePath", '%tempDir%/sessions');
 
 
-		// translator
-		$container->addDefinition("translator")
-			->setClass("Venne\Localization\Translator")
-			->addSetup("setLang", "cs");
-
-		$container->addDefinition("translatorPanel")
-			->setClass("Venne\Localization\Panel");
-
-
-		// security
-		if (file_exists($container->parameters["flagsDir"] . "/installed")) {
-			$container->getDefinition('nette.userStorage')
-				->setClass('Venne\Security\UserStorage')
-				->setArguments(array("@session", "@core.loginRepository"));
-		}
-
-		$container->addDefinition("authorizatorFactory")
-			->setFactory("CoreModule\AuthorizatorFactory")
-			->setAutowired(false);
-
-		$container->addDefinition("authorizator")
-			->setClass("Nette\Security\Permission")
-			->setFactory("@authorizatorFactory::getCurrentPermissions");
-
 		$container->addDefinition("authenticator")
-			->setClass("CoreModule\Authenticator", array("@container"));
-
-
-		// mappers
-		$container->addDefinition("configFormMapper")
-			->setClass("Venne\Forms\Mapping\ConfigFormMapper", array($container->parameters["appDir"] . "/config/config.neon"));
-
-		$container->addDefinition("entityFormMapper")
-			->setClass("Venne\Forms\Mapping\EntityFormMapper", array("@entityManager", new \Venne\Doctrine\Mapping\TypeMapper));
+			->setClass("Venne\Security\Authenticator", array("%administration.login.name%", "%administration.login.password%"));
 
 
 		// template
@@ -92,14 +63,6 @@ class VenneExtension extends CompilerExtension
 			->setClass("Venne\Templating\Helpers");
 
 
-		// managers
-		$this->compileManager("Venne\Module\ResourcesManager", $this->prefix("resourcesManager"));
-
-		$container->addDefinition("configManager")
-			->setClass("Venne\Config\ConfigBuilder", array("%configDir%/config.neon"))
-			->addTag("manager");
-
-
 		// modules
 		foreach ($container->parameters["modules"] as $module => $item) {
 			$container->addDefinition($module . "Module")
@@ -108,25 +71,39 @@ class VenneExtension extends CompilerExtension
 		}
 
 
-		// debugger
-		if ($config["stopwatch"]["debugger"]) {
-			$container->getDefinition("user")
-				->addSetup('Nette\Diagnostics\Debugger::$bar->addPanel(?)', array(new \Nette\DI\Statement('Venne\Panels\Stopwatch')));
-		}
+		// widgets
+		$container->addDefinition($this->prefix('widgetManager'))
+			->setClass('Venne\Widget\WidgetManager');
 
+
+		// console
+		$container->addDefinition($this->prefix('console'))
+			->setClass('Symfony\Component\Console\Application', array('Command Line Interface'))
+			->addSetup('setCatchExceptions', false);
+
+
+		// CLI
+		$cliRoute = $container->addDefinition($this->prefix("CliRoute"))
+			->setClass("Venne\Application\Routers\CliRouter")
+			->setAutowired(false);
+
+		$container->getDefinition('router')
+			->addSetup('offsetSet', array(NULL, $cliRoute));
 	}
-
 
 
 	public function beforeCompile()
 	{
 		$container = $this->getContainerBuilder();
 
-		$this->registerMacroFactories($container);
-		$this->registerHelperFactories($container);
-		$this->registerRoutes($container);
-	}
+		$this->prepareComponents();
 
+		$this->registerMacroFactories();
+		$this->registerHelperFactories();
+		$this->registerRoutes();
+		$this->registerCommands();
+		$this->registerWidgets();
+	}
 
 
 	public function afterCompile(\Nette\Utils\PhpGenerator\ClassType $class)
@@ -141,12 +118,9 @@ class VenneExtension extends CompilerExtension
 	}
 
 
-
-	/**
-	 * @param ContainerBuilder $container
-	 */
-	protected function registerRoutes(ContainerBuilder $container)
+	protected function registerRoutes()
 	{
+		$container = $this->getContainerBuilder();
 		$router = $container->getDefinition('router');
 
 		foreach ($this->getSortedServices($container, "route") as $route) {
@@ -155,40 +129,32 @@ class VenneExtension extends CompilerExtension
 	}
 
 
-
-	/**
-	 * @param ContainerBuilder $container
-	 */
-	protected function registerSubscribers(ContainerBuilder $container)
+	protected function registerCommands()
 	{
-		$eventManager = $container->getDefinition('eventManager');
+		$container = $this->getContainerBuilder();
+		$console = $container->getDefinition($this->prefix('console'));
 
-		foreach ($this->getSortedServices($container, "subscriber") as $item) {
-			$eventManager->addSetup("addEventSubscriber", "@{$item}");
+		foreach ($this->getSortedServices($container, "command") as $item) {
+			$console->addSetup("add", "@{$item}");
 		}
 	}
 
 
-
-	/**
-	 * @param \Nette\DI\ContainerBuilder $container
-	 */
-	protected function registerMacroFactories(ContainerBuilder $container)
+	protected function registerMacroFactories()
 	{
+		$container = $this->getContainerBuilder();
 		$config = $container->getDefinition($this->prefix('templateConfigurator'));
 
 		foreach ($container->findByTag('macro') as $factory => $meta) {
-			$config->addSetup('addFactory', array($factory));
+			$definition = $container->getDefinition($factory);
+			$config->addSetup('addFactory', array(substr($factory, 0, -7)));
 		}
 	}
 
 
-
-	/**
-	 * @param \Nette\DI\ContainerBuilder $container
-	 */
-	protected function registerHelperFactories(ContainerBuilder $container)
+	protected function registerHelperFactories()
 	{
+		$container = $this->getContainerBuilder();
 		$config = $container->getDefinition($this->prefix('helpers'));
 
 		foreach ($container->findByTag('helper') as $factory => $meta) {
@@ -196,6 +162,35 @@ class VenneExtension extends CompilerExtension
 		}
 	}
 
+
+	protected function registerWidgets()
+	{
+		$container = $this->getContainerBuilder();
+		$config = $container->getDefinition($this->prefix('widgetManager'));
+
+		foreach ($container->findByTag('widget') as $factory => $meta) {
+			$definition = $container->getDefinition($factory);
+
+			if (!is_string($meta)) {
+				throw new \Nette\InvalidArgumentException("Tag widget require name. Provide it in configuration. (tags: [widget: name])");
+			}
+
+			$config->addSetup('addWidget', array($meta, "@{$factory}"));
+		}
+	}
+
+
+	protected function prepareComponents()
+	{
+		$container = $this->getContainerBuilder();
+
+		foreach ($container->findByTag("component") as $name => $item) {
+			$definition = $container->getDefinition($name);
+			$definition
+				->setShared(false)
+				->setAutowired(false);
+		}
+	}
 
 
 	/**
@@ -221,6 +216,7 @@ class VenneExtension extends CompilerExtension
 		}
 		return $ret;
 	}
+
 
 }
 

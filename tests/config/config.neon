@@ -59,8 +59,4 @@ nette:
 venne:
 	stopwatch:
 		debugger: true
-
-	
-doctrine:
-	debugger: false
 	

@@ -164,10 +164,7 @@ class Configurator extends \Nette\Config\Configurator
 
 
 		// create container
-		\Venne\Panels\Stopwatch::start();
 		$container = parent::createContainer();
-		\Venne\Panels\Stopwatch::stop("generate container");
-		\Venne\Panels\Stopwatch::start();
 
 
 		// register robotLoader and configurator
@@ -205,7 +202,6 @@ class Configurator extends \Nette\Config\Configurator
 				};
 
 
-		\Venne\Panels\Stopwatch::stop("container configuration");
 		return $container;
 	}
 
@@ -218,9 +214,7 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		$this->compiler = parent::createCompiler();
 		$this->compiler
-				->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
-				->addExtension('doctrine', new Venne\Config\Extensions\DoctrineExtension())
-				->addExtension('assets', new Venne\Config\Extensions\AssetExtension());
+				->addExtension('venne', new Venne\Config\Extensions\VenneExtension());
 
 		foreach ($this->getModuleInstances() as $instance) {
 			$instance->compile($this->compiler);
@@ -233,18 +227,21 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function getConfigFiles()
 	{
-		$configs = array(
-			$this->parameters['configDir'] . "/config.neon",
-			$this->parameters['configDir'] . "/config_" . $this->parameters["environment"] . ".neon",
-		);
+		$configs = array();
 
 		foreach ($this->getModuleInstances() as $instance) {
-			$path = $instance->getPath() . "/public/config/config.neon";
-			if (is_file($path)) {
-				$configs[] = $path;
+			$paths = array(
+				$instance->getPath() . "/Resources/config/config.neon",
+				$this->parameters['configDir'] . "/" . $instance->getName() . "/config.neon"
+			);
+			foreach ($paths as $path) {
+				if (is_file($path)) {
+					$configs[] = $path;
+				}
 			}
 		}
-
+		$configs[] = $this->parameters['configDir'] . "/config.neon";
+		$configs[] = $this->parameters['configDir'] . "/config_" . $this->parameters["environment"] . ".neon";
 		return $configs;
 	}
 
@@ -256,6 +253,7 @@ class Configurator extends \Nette\Config\Configurator
 	public function enableLoader()
 	{
 		$this->robotLoader = $this->createRobotLoader();
+		$this->robotLoader->ignoreDirs .= ', tests, test';
 		$this->robotLoader
 				->addDirectory($this->parameters["libsDir"])
 				->addDirectory($this->parameters["appDir"])
@@ -275,7 +273,7 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		Nette\Diagnostics\Debugger::$strictMode = TRUE;
 		Nette\Diagnostics\Debugger::enable(
-				!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["debugger"]["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
+				!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
 		);
 	}
 

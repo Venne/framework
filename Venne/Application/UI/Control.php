@@ -24,11 +24,9 @@ use Venne\Security\IComponentVerifier;
 class Control extends \Nette\Application\UI\Control
 {
 
+
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
-
-	/** @var IComponentVerifier */
-	protected $componentVerifer;
 
 	/** @var bool */
 	private $startupCheck;
@@ -48,16 +46,6 @@ class Control extends \Nette\Application\UI\Control
 	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
 		$this->templateConfigurator = $configurator;
-	}
-
-
-
-	/**
-	 * @param \Venne\Security\IComponentVerifier $componentVerifer
-	 */
-	public function setComponentVerifer($componentVerifer)
-	{
-		$this->componentVerifer = $componentVerifer;
 	}
 
 
@@ -124,11 +112,6 @@ class Control extends \Nette\Application\UI\Control
 			$this->setTemplateConfigurator($this->presenter->context->venne->templateConfigurator);
 		}
 
-		// component verifer
-		if ($this->presenter->context->hasService('venne.componentVerifier')) {
-			$this->setComponentVerifer($this->presenter->context->venne->componentVerifier);
-		}
-
 		// startup check
 		$this->startup();
 		if (!$this->startupCheck) {
@@ -184,7 +167,7 @@ class Control extends \Nette\Application\UI\Control
 	 */
 	public function checkRequirements($element)
 	{
-		if ($this->componentVerifer && !$this->componentVerifer->isAllowed($element)) {
+		if (!$this->getPresenter()->getUser()->isAllowed($this)) {
 			throw new ForbiddenRequestException;
 		}
 	}
@@ -196,13 +179,14 @@ class Control extends \Nette\Application\UI\Control
 	 */
 	public function render()
 	{
+		//$this->templateConfigurator->prepareFilters($this->template);
+
 		if (!$this->template->getFile()) {
 			$this->template->setFile($this->formatTemplateFile());
 		}
 
 		$this->template->render();
 	}
-
 
 }
 

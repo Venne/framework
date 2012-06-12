@@ -22,12 +22,12 @@ use Nette\Templating\Template;
 class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurator
 {
 
+
 	/** @var \SystemContainer|Container */
 	protected $container;
 
 	/** @var array */
-	protected $macroFactories;
-
+	protected $macroFactories = array();
 
 	/** @var \Nette\Latte\Engine */
 	protected $latte;
@@ -56,8 +56,10 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 
 	public function configure(Template $template)
 	{
-		/* translator */
-		$template->setTranslator($this->container->translator);
+		// translator
+		if ($this->container->hasService("translator")) {
+			$template->setTranslator($this->container->translator);
+		}
 		$template->registerHelperLoader(array($this->container->venne->helpers, "loader"));
 	}
 
@@ -67,13 +69,8 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	{
 		$this->latte = new \Nette\Latte\Engine();
 		foreach ($this->macroFactories as $factory) {
-			if (!$this->container->hasService($factory)) {
-				continue;
-			}
-
-			$this->container->$factory->invoke($this->latte->getCompiler());
+			$this->container->{Container::getMethodName($factory, false)}($this->latte->getCompiler());
 		}
-
 		$template->registerFilter($this->latte);
 	}
 

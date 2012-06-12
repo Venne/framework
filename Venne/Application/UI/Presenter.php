@@ -17,6 +17,7 @@ use Nette\Application\UI\PresenterComponentReflection;
 use Nette\Application\ForbiddenRequestException;
 use Venne\Templating\ITemplateConfigurator;
 use Venne\Security\IComponentVerifier;
+use Venne\Widget\WidgetManager;
 
 /**
  * Description of Presenter
@@ -30,29 +31,37 @@ use Venne\Security\IComponentVerifier;
 class Presenter extends \Nette\Application\UI\Presenter
 {
 
+
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
 
-	/** @var IComponentVerifier */
-	protected $componentVerifer;
+	/** @var WidgetManager */
+	protected $widgetManager;
+
+	/** @var \Nette\DI\Container */
+	private $context;
 
 
-
-	public function __construct(\Nette\DI\Container $container)
+	public function __construct()
 	{
+		$container = new \Nette\DI\Container;
+		$container->parameters["productionMode"] = true;
 		parent::__construct($container);
-
-		// template configurator
-		if ($container->hasService('venne.templateConfigurator')) {
-			$this->setTemplateConfigurator($container->venne->templateConfigurator);
-		}
-
-		// component verifer
-		if ($container->hasService('venne.componentVerifier')) {
-			$this->setComponentVerifer($container->venne->componentVerifier);
-		}
 	}
 
+
+	final public function setContext(\Nette\DI\Container $context, WidgetManager $widgetManager)
+	{
+		parent::__construct($context);
+
+		// widgetManager
+		$this->widgetManager = $widgetManager;
+
+		// template configurator
+		if ($context->hasService('venne.templateConfigurator')) {
+			$this->setTemplateConfigurator($context->venne->templateConfigurator);
+		}
+	}
 
 
 	/**
@@ -64,15 +73,10 @@ class Presenter extends \Nette\Application\UI\Presenter
 	}
 
 
-
-	/**
-	 * @param \Venne\Security\IComponentVerifier $componentVerifer
-	 */
-	public function setComponentVerifer($componentVerifer)
+	public function getTemplateConfigurator()
 	{
-		$this->componentVerifer = $componentVerifer;
+		return $this->templateConfigurator;
 	}
-
 
 
 	/**
@@ -82,11 +86,10 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function checkRequirements($element)
 	{
-		if ($this->componentVerifer && !$this->componentVerifer->isAllowed($element)) {
+		if (!$this->getUser()->isAllowed($this)) {
 			throw new ForbiddenRequestException;
 		}
 	}
-
 
 
 	/**
@@ -106,7 +109,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 	}
 
 
-
 	/**
 	 * @param \Nette\Templating\Template $template
 	 *
@@ -116,44 +118,41 @@ class Presenter extends \Nette\Application\UI\Presenter
 	{
 		if ($this->templateConfigurator !== NULL) {
 			$this->templateConfigurator->prepareFilters($template);
-
 		} else {
 			$template->registerFilter(new \Nette\Latte\Engine);
 		}
 	}
 
 
-
 	/**
 	 * Component factory. Delegates the creation of components to a createComponent<Name> method.
 	 *
-	 * @param  string	  component name
+	 * @param  string      component name
 	 * @return IComponent  the created component (optionally)
 	 */
 	public function createComponent($name)
 	{
 		$control = parent::createComponent($name);
 		if ($control) {
-			$method = 'createComponent' . ucfirst($name);
-			if (method_exists($this, $method)) {
-				$this->checkRequirements($this->getReflection()->getMethod($method));
-			}
+//			$method = 'createComponent' . ucfirst($name);
+//			if (method_exists($this, $method)) {
+//				$this->checkRequirements($this->getReflection()->getMethod($method));
+//			}
 
 			return $control;
 		}
 
-
-		// widget from DIC
-		$method = "create" . ucfirst($name) . "Widget";
-		if (method_exists($this->context, $method)) {
-			$context = $this->context;
-			return new WidgetMultiplier(function() use ($context, $method)
+		// widget from widgetManager
+		if($this->widgetManager->hasWidget($name)){
+			$factory = $this->widgetManager->getWidget($name);
+			return new WidgetMultiplier(function() use ($factory, $name)
 			{
-				return $context->$method();
+				return $factory->invoke();
 			});
 		}
-	}
 
+		throw new \Nette\InvalidArgumentException("Component or widget with name '$name' does not exist.");
+	}
 
 
 	/**
@@ -175,9 +174,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 				return parent::isLinkCurrent($destination, $args);
 			} else {
 				if (substr($destination, 0, 1) !== ":") {
-					$destination = strpos($destination, ":") === false
-						? ":" . $this->name . ":" . $destination
-						: ":" . substr($this->name, 0, strrpos($this->name, ":")) . ":" . $destination;
+					$destination = strpos($destination, ":") === false ? ":" . $this->name . ":" . $destination : ":" . substr($this->name, 0, strrpos($this->name, ":")) . ":" . $destination;
 				}
 
 				$reg = "/^" . str_replace("*", ".*", str_replace("#", "\/", $destination)) . "$/";
@@ -188,7 +185,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 	}
 
 
-
 	/**
 	 * Determines whether it URL to the current page.
 	 *
@@ -197,8 +193,8 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isUrlCurrent($url)
 	{
-		$path = $this->getContext()->httpRequest->getUrl()->getPath();
-		$basePath = $this->getContext()->httpRequest->getUrl()->getBasePath();
+		$path = $this->getHttpRequest()->getUrl()->getPath();
+		$basePath = $this->getHttpRequest()->getUrl()->getBasePath();
 		$link = reset(explode("?", $url));
 
 		if ($path == $basePath && $link == $basePath || (!$link && !$url) || ($link && $path == $link)) {
@@ -206,7 +202,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 		}
 		return false;
 	}
-
 
 
 	/**
@@ -263,22 +258,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 		}
 		return $this->user->isAllowed($class);
 	}
-
-
-
-	/**************************** services *********************************/
-
-
-	/**
-	 * Get AssetManager
-	 *
-	 * @return Venne\Assets\AssetManager
-	 */
-	public function getAssetManager()
-	{
-		return $this->getContext()->assets->assetManager;
-	}
-
 
 }
 
