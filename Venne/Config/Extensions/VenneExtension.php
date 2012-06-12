@@ -88,8 +88,6 @@ class VenneExtension extends CompilerExtension
 
 	public function beforeCompile()
 	{
-		$container = $this->getContainerBuilder();
-
 		$this->prepareComponents();
 
 		$this->registerMacroFactories();
@@ -108,6 +106,9 @@ class VenneExtension extends CompilerExtension
 		foreach ($this->getSortedServices($this->getContainerBuilder(), "subscriber") as $item) {
 			$initialize->addBody('$this->getService("eventManager")->addEventSubscriber($this->getService(?));', array($item));
 		}
+
+		$initialize->addBody('$this->parameters[\'baseUrl\'] = rtrim($this->getService("httpRequest")->getUrl()->getBaseUrl(), "/");');
+		$initialize->addBody('$this->parameters[\'basePath\'] = preg_replace("#https?://[^/]+#A", "", $this->parameters["baseUrl"]);');
 	}
 
 

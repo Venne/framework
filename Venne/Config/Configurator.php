@@ -172,12 +172,6 @@ class Configurator extends \Nette\Config\Configurator
 		$container->addService("configurator", $this);
 
 
-		// parameters
-		$baseUrl = rtrim($container->httpRequest->getUrl()->getBaseUrl(), '/');
-		$container->parameters['baseUrl'] = $baseUrl;
-		$container->parameters['basePath'] = preg_replace('#https?://[^/]+#A', '', $baseUrl);
-
-
 		// setup Application
 		$application = $container->application;
 		$application->catchExceptions = (bool) !$this->isDebugMode();
