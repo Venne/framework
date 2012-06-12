@@ -187,12 +187,6 @@ class Configurator extends \Nette\Config\Configurator
 				};
 
 
-		// initialize modules
-		foreach ($container->findByTag("module") as $module => $par) {
-			$container->{$module}->configure($container);
-		}
-
-
 		// set timer to router
 		$container->application->onStartup[] = function() {
 					\Venne\Panels\Stopwatch::start();
