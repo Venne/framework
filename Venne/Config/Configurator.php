@@ -50,7 +50,7 @@ class Configurator extends \Nette\Config\Configurator
 	public function __construct($parameters = NULL, $modules = NULL)
 	{
 		$this->parameters = $this->getDefaultParameters($parameters);
-		$this->modules = $this->getDefaultModules($modules);
+		$this->parameters['modules'] = $this->getDefaultModules($modules);
 		$this->setTempDirectory($this->parameters["tempDir"]);
 		$this->checkFlags();
 	}
@@ -71,12 +71,8 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function getDefaultModules($modules = NULL)
 	{
-		$ret = array();
-
 		$adapter = new NeonAdapter();
-		$ret = $adapter->load($this->parameters["configDir"] . "/modules.neon");
-
-		return is_array($modules) ? array_merge($ret, $modules) : $ret;
+		return $adapter->load($this->parameters["configDir"] . "/modules.neon");
 	}
 
 
@@ -84,7 +80,7 @@ class Configurator extends \Nette\Config\Configurator
 	protected function getModuleInstances()
 	{
 		if (!$this->moduleInstances) {
-			foreach ($this->modules as $module) {
+			foreach ($this->parameters['modules'] as $module=>$item) {
 				$class = "\\" . ucfirst($module) . "Module\\Module";
 				$this->moduleInstances[] = new $class;
 			}
@@ -123,7 +119,6 @@ class Configurator extends \Nette\Config\Configurator
 		$ret['flagsDir'] = isset($parameters['flagsDir']) ? $parameters['flagsDir'] : $ret['appDir'] . '/flags';
 		return $ret;
 	}
-
 
 
 	/**
