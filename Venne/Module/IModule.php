@@ -51,14 +51,6 @@ interface IModule
 
 
 
-	public function getForm(Container $container);
-
-
-
-	public function configure(Container $container);
-
-
-
 	public function install(Container $container);
 
 

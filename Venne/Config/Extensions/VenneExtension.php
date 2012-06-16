@@ -26,13 +26,16 @@ class VenneExtension extends CompilerExtension
 		'stopwatch' => array(
 			'debugger' => TRUE,
 		),
+		'moduleManager' => array(
+			'resourcesMode' => 'symlink'
+		)
 	);
 
 
 	public function loadConfiguration()
 	{
 		$container = $this->getContainerBuilder();
-		$config = $this->getConfig();
+		$config = $this->getConfig($this->defaults);
 
 
 		$container->getDefinition('nette.presenterFactory')
@@ -64,10 +67,15 @@ class VenneExtension extends CompilerExtension
 
 
 		// modules
+		$container->addDefinition($this->prefix('moduleManager'))
+			->setClass('Venne\Module\ModuleManager', array('@container', '%modules%', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
+
 		foreach ($container->parameters["modules"] as $module => $item) {
-			$container->addDefinition($module . "Module")
-				->addTag("module")
-				->setClass(ucfirst($module) . "Module\\Module");
+			if ($item['status'] == \Venne\Module\ModuleManager::MODULE_STATUS_INSTALLED) {
+				$container->addDefinition($module . "Module")
+					->addTag("module")
+					->setClass(ucfirst($module) . "Module\\Module");
+			}
 		}
 
 

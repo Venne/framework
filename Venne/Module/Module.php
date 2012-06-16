@@ -91,20 +91,6 @@ abstract class Module extends Object implements IModule
 
 
 
-	public function getForm(Container $container)
-	{
-		return NULL;
-	}
-
-
-
-	public function configure(Container $container)
-	{
-
-	}
-
-
-
 	public function install(Container $container)
 	{
 		

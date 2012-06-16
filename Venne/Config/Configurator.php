@@ -46,7 +46,6 @@ class Configurator extends \Nette\Config\Configurator
 	protected $compiler;
 
 
-
 	public function __construct($parameters = NULL, $modules = NULL)
 	{
 		$this->parameters = $this->getDefaultParameters($parameters);
@@ -54,7 +53,6 @@ class Configurator extends \Nette\Config\Configurator
 		$this->setTempDirectory($this->parameters["tempDir"]);
 		$this->checkFlags();
 	}
-
 
 
 	protected function checkFlags()
@@ -68,7 +66,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-
 	protected function getDefaultModules($modules = NULL)
 	{
 		$adapter = new NeonAdapter();
@@ -76,30 +73,30 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-
 	protected function getModuleInstances()
 	{
 		if (!$this->moduleInstances) {
-			foreach ($this->parameters['modules'] as $module=>$item) {
-				$class = "\\" . ucfirst($module) . "Module\\Module";
-				$this->moduleInstances[] = new $class;
+			foreach ($this->parameters['modules'] as $module => $item) {
+				if ($item['status'] == \Venne\Module\ModuleManager::MODULE_STATUS_INSTALLED) {
+					$class = "\\" . ucfirst($module) . "Module\\Module";
+					$this->moduleInstances[] = new $class;
+				}
 			}
 		}
 		return $this->moduleInstances;
 	}
 
 
-
 	protected function getDefaultParameters($parameters = NULL)
 	{
-		$parameters = (array) $parameters;
+		$parameters = (array)$parameters;
 		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
 			'wwwDir' => isset($_SERVER['SCRIPT_FILENAME']) ? dirname($_SERVER['SCRIPT_FILENAME']) : NULL,
 			'debugMode' => $debugMode,
 			'productionMode' => !$debugMode,
 			'environment' => isset($parameters["environment"]) ? $parameters["environment"] :
-					($debugMode ? self::DEVELOPMENT : self::PRODUCTION),
+				($debugMode ? self::DEVELOPMENT : self::PRODUCTION),
 			'consoleMode' => PHP_SAPI === 'cli',
 			'container' => array(
 				'class' => 'SystemContainer',
@@ -130,7 +127,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-
 	/**
 	 * @return \Nette\DI\Container
 	 */
@@ -142,7 +138,6 @@ class Configurator extends \Nette\Config\Configurator
 
 		return $this->container;
 	}
-
 
 
 	/**
@@ -169,25 +164,27 @@ class Configurator extends \Nette\Config\Configurator
 
 		// setup Application
 		$application = $container->application;
-		$application->catchExceptions = (bool) !$this->isDebugMode();
+		$application->catchExceptions = (bool)!$this->isDebugMode();
 		$application->errorPresenter = $container->parameters['website']['errorPresenter'];
-		$application->onShutdown[] = function() {
-					\Venne\Panels\Stopwatch::stop("shutdown");
-				};
+		$application->onShutdown[] = function()
+		{
+			\Venne\Panels\Stopwatch::stop("shutdown");
+		};
 
 
 		// set timer to router
-		$container->application->onStartup[] = function() {
-					\Venne\Panels\Stopwatch::start();
-				};
-		$container->application->onRequest[] = function() {
-					\Venne\Panels\Stopwatch::stop("routing");
-				};
+		$container->application->onStartup[] = function()
+		{
+			\Venne\Panels\Stopwatch::start();
+		};
+		$container->application->onRequest[] = function()
+		{
+			\Venne\Panels\Stopwatch::stop("routing");
+		};
 
 
 		return $container;
 	}
-
 
 
 	/**
@@ -197,7 +194,9 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		$this->compiler = parent::createCompiler();
 		$this->compiler
-				->addExtension('venne', new Venne\Config\Extensions\VenneExtension());
+			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
+			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
+		;
 
 		foreach ($this->getModuleInstances() as $instance) {
 			$instance->compile($this->compiler);
@@ -205,7 +204,6 @@ class Configurator extends \Nette\Config\Configurator
 
 		return $this->compiler;
 	}
-
 
 
 	protected function getConfigFiles()
@@ -229,7 +227,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-
 	/**
 	 * Enable robotLoader.
 	 */
@@ -238,11 +235,10 @@ class Configurator extends \Nette\Config\Configurator
 		$this->robotLoader = $this->createRobotLoader();
 		$this->robotLoader->ignoreDirs .= ', tests, test';
 		$this->robotLoader
-				->addDirectory($this->parameters["libsDir"])
-				->addDirectory($this->parameters["appDir"])
-				->register();
+			->addDirectory($this->parameters["libsDir"])
+			->addDirectory($this->parameters["appDir"])
+			->register();
 	}
-
 
 
 	public function buildContainer(& $dependencies = NULL)
@@ -251,15 +247,13 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
 		Nette\Diagnostics\Debugger::$strictMode = TRUE;
 		Nette\Diagnostics\Debugger::enable(
-				!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
+			!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
 		);
 	}
-
 
 
 	/**
