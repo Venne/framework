@@ -28,8 +28,6 @@ class Configurator extends \Nette\Config\Configurator
 {
 
 
-	const CACHE_NAMESPACE = 'Nette.Configurator';
-
 	/** @var array */
 	protected $modules = array();
 
@@ -51,18 +49,6 @@ class Configurator extends \Nette\Config\Configurator
 		$this->parameters = $this->getDefaultParameters($parameters);
 		$this->parameters['modules'] = $this->getDefaultModules($modules);
 		$this->setTempDirectory($this->parameters["tempDir"]);
-		$this->checkFlags();
-	}
-
-
-	protected function checkFlags()
-	{
-		// detect updated flag
-		if (file_exists($this->parameters['flagsDir'] . "/updated")) {
-			$cache = new Cache(new \Nette\Caching\Storages\PhpFileStorage($cacheDir), self::CACHE_NAMESPACE);
-			$cache->clean();
-			@unlink($this->parameters['flagsDir'] . "/updated");
-		}
 	}
 
 
@@ -113,7 +99,6 @@ class Configurator extends \Nette\Config\Configurator
 		$ret['configDir'] = isset($parameters['configDir']) ? $parameters['configDir'] : $ret['appDir'] . '/config';
 		$ret['wwwCacheDir'] = isset($parameters['wwwCacheDir']) ? $parameters['wwwCacheDir'] : $ret['wwwDir'] . '/cache';
 		$ret['resourcesDir'] = isset($parameters['resourcesDir']) ? $parameters['resourcesDir'] : $ret['wwwDir'] . '/resources';
-		$ret['flagsDir'] = isset($parameters['flagsDir']) ? $parameters['flagsDir'] : $ret['appDir'] . '/flags';
 		return $ret;
 	}
 
@@ -181,7 +166,6 @@ class Configurator extends \Nette\Config\Configurator
 		{
 			\Venne\Panels\Stopwatch::stop("routing");
 		};
-
 
 		return $container;
 	}
