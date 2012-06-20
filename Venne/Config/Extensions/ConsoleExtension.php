@@ -30,40 +30,6 @@ class ConsoleExtension extends CompilerExtension
 	{
 		$container = $this->getContainerBuilder();
 
-		$container->addDefinition($this->prefix('consoleCommandDBALRunSql'))
-			->setClass('Doctrine\DBAL\Tools\Console\Command\RunSqlCommand')
-			->addTag('commnad')
-			->setAutowired(FALSE);
-		$container->addDefinition($this->prefix('consoleCommandDBALImport'))
-			->setClass('Doctrine\DBAL\Tools\Console\Command\ImportCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-
-		// console commands - ORM
-		$container->addDefinition($this->prefix('consoleCommandORMCreate'))
-			->setClass('Doctrine\ORM\Tools\Console\Command\SchemaTool\CreateCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-		$container->addDefinition($this->prefix('consoleCommandORMUpdate'))
-			->setClass('Doctrine\ORM\Tools\Console\Command\SchemaTool\UpdateCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-		$container->addDefinition($this->prefix('consoleCommandORMDrop'))
-			->setClass('Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-		$container->addDefinition($this->prefix('consoleCommandORMGenerateProxies'))
-			->setClass('Doctrine\ORM\Tools\Console\Command\GenerateProxiesCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-		$container->addDefinition($this->prefix('consoleCommandORMRunDql'))
-			->setClass('Doctrine\ORM\Tools\Console\Command\RunDqlCommand')
-			->addTag('command')
-			->setAutowired(FALSE);
-
-		$container->addDefinition($this->prefix('consoleHelperset'))
-			->setClass('Symfony\Component\Console\Helper\HelperSet');
-
 		// console
 		$container->addDefinition($this->prefix('helperSet'))
 			->setClass('Symfony\Component\Console\Helper\HelperSet');
@@ -75,19 +41,6 @@ class ConsoleExtension extends CompilerExtension
 	}
 
 
-	/**
-	 * @param \Doctrine\ORM\EntityManager
-	 * @return \Symfony\Component\Console\Helper\HelperSet
-	 */
-	public static function createConsoleHelperSet(\Doctrine\ORM\EntityManager $em)
-	{
-		$helperSet = new \Symfony\Component\Console\Helper\HelperSet;
-		$helperSet->set(new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em), 'em');
-		$helperSet->set(new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()), 'db');
-		$helperSet->set(new \Symfony\Component\Console\Helper\DialogHelper, 'dialog');
-
-		return $helperSet;
-	}
 
 
 	public function beforeCompile()
