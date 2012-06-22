@@ -138,7 +138,7 @@ class ModuleManager extends Object
 		if (!file_exists($this->context->parameters['resourcesDir'] . "/{$name}Module")) {
 			umask(0000);
 			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-				@symlink("../../vendor/venne/{$name}/Resources/public", $this->resourcesDir . "/{$name}Module");
+				@symlink("../../vendor/venne/{$name}-module/Resources/public", $this->resourcesDir . "/{$name}Module");
 			} else {
 				@copy($module->getPath() . "/Resources/public", $this->resourcesDir . "/{$name}Module");
 			}
