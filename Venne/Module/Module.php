@@ -37,7 +37,9 @@ abstract class Module extends Object implements IModule
 	protected $dependencies = array();
 
 
-
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		if ($this->name !== NULL) {
@@ -48,59 +50,75 @@ abstract class Module extends Object implements IModule
 	}
 
 
-
+	/**
+	 * @return string
+	 */
 	public function getVersion()
 	{
 		return $this->version;
 	}
 
 
-
+	/**
+	 * @return string
+	 */
 	public function getDescription()
 	{
 		return $this->description;
 	}
 
 
-
+	/**
+	 * @return array
+	 */
 	public function getDependencies()
 	{
 		return $this->dependencies;
 	}
 
 
-
+	/**
+	 * @return string
+	 */
 	public function getPath()
 	{
 		return dirname($this->getReflection()->getFileName());
 	}
 
 
-
+	/**
+	 * @return string
+	 */
 	public function getNamespace()
 	{
 		return $this->getReflection()->getNamespaceName();
 	}
 
 
-
+	/**
+	 * @param Compiler $compiler
+	 */
 	public function compile(Compiler $compiler)
 	{
-		
+
 	}
 
 
-
+	/**
+	 * @param Container $container
+	 */
 	public function install(Container $container)
 	{
-		
+
 	}
 
 
-
+	/**
+	 * @param Container $container
+	 */
 	public function uninstall(Container $container)
 	{
-		
+
 	}
 
 }

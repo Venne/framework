@@ -225,12 +225,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-	public function buildContainer(& $dependencies = NULL)
-	{
-		return parent::buildContainer($dependencies);
-	}
-
-
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
 		Nette\Diagnostics\Debugger::$strictMode = TRUE;

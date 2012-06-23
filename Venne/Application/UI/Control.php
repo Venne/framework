@@ -41,7 +41,7 @@ class Control extends \Nette\Application\UI\Control
 
 
 	/**
-	 * @param \Venne\Templating\ITemplateConfigurator $configurator
+	 * @param ITemplateConfigurator $configurator
 	 */
 	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
@@ -49,9 +49,9 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
-	 * @return Kdyby\Templating\FileTemplate
+	 * @param string|NULL $class
+	 * @return \Nette\Templating\ITemplate
 	 */
 	protected function createTemplate($class = NULL)
 	{

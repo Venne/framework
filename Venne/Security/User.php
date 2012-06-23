@@ -23,7 +23,6 @@ class User extends \Nette\Security\User
 {
 
 
-
 	/**
 	 * Has a user effective access to the Resource?
 	 * If $resource is NULL, then the query applies to all resources.
@@ -45,10 +44,9 @@ class User extends \Nette\Security\User
 	}
 
 
-
 	/**
 	 * @param Presenter $presenter
-	 * @return boolean 
+	 * @return boolean
 	 */
 	protected function isPresenterAllowed(Presenter $presenter)
 	{
@@ -85,7 +83,10 @@ class User extends \Nette\Security\User
 	}
 
 
-
+	/**
+	 * @param Control $control
+	 * @return bool
+	 */
 	protected function isControlAllowed(Control $control)
 	{
 		return true;
