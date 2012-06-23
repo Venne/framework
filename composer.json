@@ -14,12 +14,6 @@
 		"doctrine/orm" : "2.2.1",
 		"symfony/console" : "2.0.x"
 	},
-	"repositories": [
-        {
-            "type": "vcs",
-            "url": "git://github.com/nette/nette.git"
-        }
-    ],
 	"autoload": {
         "psr-0": {"Venne": "libs/"}
     }
