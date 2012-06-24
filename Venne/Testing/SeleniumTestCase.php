@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests;
+namespace Venne\Testing;
 
 use Venne;
 use Nette;
@@ -18,13 +18,11 @@ use Nette\ObjectMixin;
 /**
  * @author	 Josef Kříž
  */
-class TestCase extends \PHPUnit_Framework_TestCase
+abstract class SeleniumTestCase extends \PHPUnit_Extensions_Selenium2TestCase
 {
 
 	/** @var \Nette\DI\Container */
 	protected $context;
-
-
 
 	/**
 	 * @param string $name
@@ -45,6 +43,15 @@ class TestCase extends \PHPUnit_Framework_TestCase
 	public function getContext()
 	{
 		return $this->context;
+	}
+
+
+	protected function setUp()
+	{
+		$parameters = $this->getContext()->parameters;
+
+		$this->setBrowser($parameters['selenium']['browser']);
+		$this->setBrowserUrl($parameters['selenium']['browserUrl']);
 	}
 
 

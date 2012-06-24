@@ -35,6 +35,6 @@ if(!isset($parameters["libsDir"])) {
 	die("You must load vendors first\n");
 }
 
-$configurator = new \Venne\Tests\Configurator($parameters);
+$configurator = new \Venne\Testing\Configurator($parameters);
 //$configurator->enableDebugger();
 $configurator->enableLoader();

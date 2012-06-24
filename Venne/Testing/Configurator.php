@@ -9,12 +9,12 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests;
+namespace Venne\Testing;
 
 use Venne;
 
 /**
- * @author	 Josef Kříž
+ * @author     Josef Kříž
  */
 class Configurator extends \Venne\Config\Configurator
 {
@@ -23,13 +23,11 @@ class Configurator extends \Venne\Config\Configurator
 	protected static $configurator;
 
 
-
 	public function __construct($parameters = NULL, $modules = NULL, $productionMode = NULL)
 	{
 		parent::__construct($parameters, $modules, $productionMode);
 		static::$configurator = $this;
 	}
-
 
 
 	/**
@@ -40,19 +38,6 @@ class Configurator extends \Venne\Config\Configurator
 	{
 		return static::$configurator->getContainer();
 	}
-	
-	
-	/**
-	 * Enable robotLoader.
-	 */
-	public function enableLoader()
-	{
-		$this->robotLoader = $this->createRobotLoader();
-		$this->robotLoader
-				->addDirectory($this->parameters["libsDir"])
-				->addDirectory($this->parameters["appDir"])
-				->addDirectory($this->parameters['venneDir'])
-				->register();
-	}
+
 
 }

@@ -12,7 +12,7 @@
 namespace Venne\Tests\Module;
 
 use Venne;
-use Venne\Tests\TestCase;
+use Venne\Testing\TestCase;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>

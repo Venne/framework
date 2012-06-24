@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests;
+namespace Venne\Testing;
 
 use Venne;
 use Nette;
@@ -18,7 +18,7 @@ use Nette\ObjectMixin;
 /**
  * @author	 Josef Kříž
  */
-class SeleniumTestCase extends \PHPUnit_Extensions_Selenium2TestCase
+abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 
 	/** @var \Nette\DI\Container */
