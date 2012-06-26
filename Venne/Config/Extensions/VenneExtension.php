@@ -69,6 +69,9 @@ class VenneExtension extends CompilerExtension
 		// modules
 		$container->addDefinition($this->prefix('moduleManager'))
 			->setClass('Venne\Module\ModuleManager', array('@container', '%modules%', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
+		$container->addDefinition($this->prefix('composerManager'))
+			->setClass('Venne\Module\Composer\ComposerManager', array($container->parameters['appDir'] . '/..'));
+
 
 		foreach ($container->parameters["modules"] as $module => $item) {
 			if ($item['status'] == \Venne\Module\ModuleManager::MODULE_STATUS_INSTALLED) {
@@ -91,6 +94,14 @@ class VenneExtension extends CompilerExtension
 
 		$container->getDefinition('router')
 			->addSetup('offsetSet', array(NULL, $cliRoute));
+
+		// Commands
+		foreach (array('Install', 'Update', 'AddRequire', 'RemoveRequire', 'Search') as $cmd) {
+			$container->addDefinition($this->prefix(lcfirst($cmd) . 'Command'))
+				->setClass("Venne\Module\Composer\Commands\\{$cmd}Command")
+				->addTag('command');
+		}
+
 	}
 
 

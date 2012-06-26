@@ -10,7 +10,7 @@ require_once $rootDir . '/Venne/loader.php';
 
 $parameters = array(
 	"rootDir" => __DIR__,
-	"venneDir" => __DIR__ . '/../Venne',
+	"venneDir" => $rootDir . '/Venne',
 	"appDir" => __DIR__ . "/app",
 	"configDir" => __DIR__ . "/config",
 	"logDir" => __DIR__ . "/log",

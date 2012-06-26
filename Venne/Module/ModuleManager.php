@@ -75,21 +75,20 @@ class ModuleManager extends Object
 	 *
 	 * @return array
 	 */
-	 public function getModules($status = NULL)
-	 {
-		 if (!$status) {
-			 return $this->modules;
-		 }
+	public function getModules($status = NULL)
+	{
+		if (!$status) {
+			return $this->modules;
+		}
 
-		 $ret = array();
-		 foreach ($this->modules as $module => $item) {
-			 if ($item['status'] == $status) {
-				 $ret[$module] = $item;
-			 }
-		 }
-		 return $ret;
-	 }
-
+		$ret = array();
+		foreach ($this->modules as $module => $item) {
+			if ($item['status'] == $status) {
+				$ret[$module] = $item;
+			}
+		}
+		return $ret;
+	}
 
 
 	/**
@@ -117,7 +116,6 @@ class ModuleManager extends Object
 		$class = "\\" . ucfirst($name) . "Module\\Module";
 		return new $class;
 	}
-
 
 
 	/**
@@ -200,13 +198,13 @@ class ModuleManager extends Object
 	 *
 	 * @return array
 	 */
-	public function findAllModules()
+	public function findLocalModules()
 	{
 		$arr = array();
-		foreach ($this->context->robotLoader->getIndexedClasses() as $key=>$class) {
-			if(substr($key, strrpos($key, '\\') + 1) == 'Module'){
+		foreach ($this->context->robotLoader->getIndexedClasses() as $key => $class) {
+			if (substr($key, strrpos($key, '\\') + 1) == 'Module') {
 				$ref = \Nette\Reflection\ClassType::from($key);
-				if($ref->isInstantiable()){
+				if ($ref->isInstantiable()) {
 					$module = $ref->newInstance();
 					$arr[$module->getName()] = $module;
 				}
@@ -214,6 +212,48 @@ class ModuleManager extends Object
 		}
 
 		return $arr;
+	}
+
+
+	public function scanRepositoryModules()
+	{
+		$arr = array();
+
+		$modules = $this->context->venne->composerManager->runCommand('search venne');
+		$modules = explode("\n", $modules);
+		foreach ($modules as $module) {
+			$module = explode(" ", $module);
+			$module = $module[0];
+
+			if (strpos($module, '<highlight>venne</highlight>/') !== false && substr($module, -7) == '-module') {
+				$module = substr($module, 29, -7);
+				if (!isset($arr[$module])) {
+					$arr[$module] = true;
+				}
+			}
+		}
+
+		foreach ($arr as $name => $item) {
+			$values = array();
+			$data = $this->context->venne->composerManager->runCommand("show venne/{$name}-module");
+			$data = explode("\n", $data);
+			foreach ($data as $row) {
+				$row = explode(':', $row);
+				if (count($row) == 2) {
+					$values[trim($row[0])] = trim($row[1]);
+				}
+			}
+
+			$arr[$name] = $values;
+		}
+
+		file_put_contents($this->context->parameters['tempDir'] . '/modules-cache', json_encode($arr));
+	}
+
+
+	public function findRepositoryModules()
+	{
+		return json_decode(file_get_contents($this->context->parameters['tempDir'] . '/modules-cache'));
 	}
 
 }
