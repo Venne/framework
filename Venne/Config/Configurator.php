@@ -137,27 +137,20 @@ class Configurator extends \Nette\Config\Configurator
 			$this->addConfig($file, self::NONE);
 		}
 
-
 		// create container
 		$container = parent::createContainer();
-
 
 		// register robotLoader and configurator
 		$container->addService("robotLoader", $this->robotLoader);
 		$container->addService("configurator", $this);
 
-
 		// setup Application
 		$application = $container->application;
 		$application->catchExceptions = (bool)!$this->isDebugMode();
-		$application->errorPresenter = $container->parameters['website']['errorPresenter'];
 		$application->onShutdown[] = function()
 		{
 			\Venne\Panels\Stopwatch::stop("shutdown");
 		};
-
-
-		// set timer to router
 		$container->application->onStartup[] = function()
 		{
 			\Venne\Panels\Stopwatch::start();
