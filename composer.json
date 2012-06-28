@@ -13,7 +13,9 @@
 		"nette/nette" : "2.0.*",
 		"composer/composer" : "dev-master"
 	},
-	"autoload": {
-        "psr-0": {"Venne": "libs/"}
-    }
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.0.x-dev"
+		}
+	}
 }
