@@ -147,18 +147,6 @@ class Configurator extends \Nette\Config\Configurator
 		// setup Application
 		$application = $container->application;
 		$application->catchExceptions = (bool)!$this->isDebugMode();
-		$application->onShutdown[] = function()
-		{
-			\Venne\Panels\Stopwatch::stop("shutdown");
-		};
-		$container->application->onStartup[] = function()
-		{
-			\Venne\Panels\Stopwatch::start();
-		};
-		$container->application->onRequest[] = function()
-		{
-			\Venne\Panels\Stopwatch::stop("routing");
-		};
 
 		return $container;
 	}
