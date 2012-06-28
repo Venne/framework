@@ -1,5 +1,4 @@
-Disallow: /doctrine/dbal/tests
-Disallow: /doctrine/common/tests
-Disallow: /doctrine/orm/tests
-Disallow: /nette/nette/tests
-Disallow: /venne/venne/tests
+Disallow: /autoload.php
+Disallow: /composer/autoload_classmap.php
+Disallow: /composer/autoload_namespace.php
+Disallow: /composer/ClassLoader.php
