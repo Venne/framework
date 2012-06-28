@@ -235,4 +235,19 @@ class Configurator extends \Nette\Config\Configurator
 		return $this->compiler;
 	}
 
+
+	/**
+	 * @return Nette\Loaders\RobotLoader
+	 */
+	public function createRobotLoader()
+	{
+		if (!($cacheDir = $this->getCacheDirectory())) {
+			throw new Nette\InvalidStateException("Set path to temporary directory using setTempDirectory().");
+		}
+		$loader = new Venne\Loaders\RobotLoader;
+		$loader->setCacheStorage(new \Nette\Caching\Storages\FileStorage($cacheDir));
+		$loader->autoRebuild = !$this->parameters['productionMode'];
+		return $loader;
+	}
+
 }
