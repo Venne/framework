@@ -91,9 +91,18 @@ class VenneExtension extends CompilerExtension
 			->addSetup('offsetSet', array(NULL, $cliRoute));
 
 		// Commands
-		foreach (array('Install', 'Update', 'AddRequire', 'RemoveRequire', 'Search') as $cmd) {
-			$container->addDefinition($this->prefix(lcfirst($cmd) . 'Command'))
-				->setClass("Venne\Module\Composer\Commands\\{$cmd}Command")
+		$commands = array(
+			'composerInstall' => 'Venne\Module\Composer\Commands\Install',
+			'composerUpdate' => 'Venne\Module\Composer\Commands\Update',
+			'composerAdd' => 'Venne\Module\Composer\Commands\AddRequire',
+			'composerRemove' => 'Venne\Module\Composer\Commands\RemoveRequire',
+			'composerSearch' => 'Venne\Module\Composer\Commands\Search',
+			'install' => 'Venne\Module\Commands\Install',
+			'uninstall' => 'Venne\Module\Commands\Uninstall',
+		);
+		foreach ($commands as $name => $cmd) {
+			$container->addDefinition($this->prefix(lcfirst($name) . 'Command'))
+				->setClass("{$cmd}Command")
 				->addTag('command');
 		}
 
