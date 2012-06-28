@@ -51,11 +51,6 @@ class VenneExtension extends CompilerExtension
 		$container->getDefinition('session')
 			->addSetup("setSavePath", '%tempDir%/sessions');
 
-
-		$container->addDefinition("authenticator")
-			->setClass("Venne\Security\Authenticator", array("%administration.login.name%", "%administration.login.password%"));
-
-
 		// template
 		$container->addDefinition($this->prefix("templateConfigurator"))
 			->setClass("Venne\Templating\TemplateConfigurator");
