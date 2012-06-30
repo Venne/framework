@@ -46,7 +46,7 @@ class Configurator extends \Venne\Config\Configurator
 	public function enableLoader()
 	{
 		$this->robotLoader = $this->createRobotLoader();
-		$this->robotLoader->ignoreDirs .= ', tests, test';
+		$this->robotLoader->ignoreDirs .= ', tests, test, resources';
 		$this->robotLoader
 			->addDirectory($this->parameters["libsDir"])
 			->addDirectory($this->parameters["appDir"])
