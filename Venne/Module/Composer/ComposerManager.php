@@ -47,6 +47,7 @@ class ComposerManager extends Object
 		$input = new StringInput($string);
 		$output = new StreamOutput($file);
 
+		putenv("COMPOSER={$this->composerPath}/composer.json");
 		$this->application->run($input, $output);
 		\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_VERBOSE;
 
