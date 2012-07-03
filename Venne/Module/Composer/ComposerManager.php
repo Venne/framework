@@ -65,6 +65,11 @@ class ComposerManager extends Object
 
 	protected function saveConfig($data)
 	{
+		// defined as of PHP 5.4
+		if (!defined('JSON_PRETTY_PRINT')) {
+			define('JSON_PRETTY_PRINT', 128);
+		}
+		
 		file_put_contents($this->composerPath . '/composer.json', str_replace('\/', '/', json_encode($data, JSON_PRETTY_PRINT)));
 	}
 
