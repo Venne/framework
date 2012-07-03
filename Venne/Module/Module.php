@@ -112,7 +112,7 @@ abstract class Module extends Object implements IModule
 		// Add parameters to config.neon
 		$adapter = new \Nette\Config\Adapters\NeonAdapter();
 		$data = $adapter->load($container->parameters['configDir'] . '/config.neon');
-		$data = array_merge_recursive($data, $this->getConfigArray());
+		$data = \Nette\Utils\Arrays::mergeTree($data, $this->getConfigArray());
 		file_put_contents($container->parameters['configDir'] . '/config.neon', $adapter->dump($data));
 	}
 
