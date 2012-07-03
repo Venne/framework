@@ -109,7 +109,11 @@ abstract class Module extends Object implements IModule
 	 */
 	public function install(Container $container)
 	{
-
+		// Add parameters to config.neon
+		$adapter = new \Nette\Config\Adapters\NeonAdapter();
+		$data = $adapter->load($container->parameters['configDir'] . '/config.neon');
+		$data = array_merge_recursive($data, $this->getConfigArray());
+		file_put_contents($container->parameters['configDir'] . '/config.neon', $adapter->dump($data));
 	}
 
 
@@ -119,6 +123,15 @@ abstract class Module extends Object implements IModule
 	public function uninstall(Container $container)
 	{
 
+	}
+
+
+	/**
+	 * @return null|array
+	 */
+	protected function getConfigArray()
+	{
+		return array();
 	}
 
 }
