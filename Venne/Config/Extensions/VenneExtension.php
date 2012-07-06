@@ -165,7 +165,7 @@ class VenneExtension extends CompilerExtension
 		$config = $container->getDefinition($this->prefix('helpers'));
 
 		foreach ($container->findByTag('helper') as $factory => $meta) {
-			$config->addSetup('addHelper', array(substr($factory, strrpos($factory, ".") + 1, -6), $factory));
+			$config->addSetup('addHelper', array($meta, "@{$factory}"));
 		}
 	}
 

@@ -52,7 +52,7 @@ class Helpers extends \Nette\Object
 	public function loader($helper)
 	{
 		if (isset($this->helpers[$helper])) {
-			return callback($this->container->{$this->helpers[$helper]}, "filter");
+			return callback($this->helpers[$helper], "filter");
 		}
 	}
 
