@@ -13,7 +13,7 @@ namespace Venne\Config\Extensions;
 
 use Venne;
 use Nette\DI\ContainerBuilder;
-use Nette\Config\CompilerExtension;
+use Venne\Config\CompilerExtension;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -127,7 +127,7 @@ class VenneExtension extends CompilerExtension
 
 		$initialize = $class->methods['initialize'];
 
-		foreach ($this->getSortedServices($this->getContainerBuilder(), "subscriber") as $item) {
+		foreach ($this->getSortedServices('subscriber') as $item) {
 			$initialize->addBody('$this->getService("eventManager")->addEventSubscriber($this->getService(?));', array($item));
 		}
 
@@ -141,7 +141,7 @@ class VenneExtension extends CompilerExtension
 		$container = $this->getContainerBuilder();
 		$router = $container->getDefinition('router');
 
-		foreach ($this->getSortedServices($container, "route") as $route) {
+		foreach ($this->getSortedServices('route') as $route) {
 			$router->addSetup('$service[] = $this->getService(?)', array($route));
 		}
 	}
@@ -198,32 +198,6 @@ class VenneExtension extends CompilerExtension
 				->setAutowired(false);
 		}
 	}
-
-
-	/**
-	 * @param \Nette\DI\ContainerBuilder $container
-	 * @param $tag
-	 * @return array
-	 */
-	protected function getSortedServices(ContainerBuilder $container, $tag)
-	{
-		$items = array();
-		$ret = array();
-		foreach ($container->findByTag($tag) as $route => $meta) {
-			$priority = isset($meta['priority']) ? $meta['priority'] : (int)$meta;
-			$items[$priority][] = $route;
-		}
-
-		krsort($items);
-
-		foreach ($items as $items2) {
-			foreach ($items2 as $item) {
-				$ret[] = $item;
-			}
-		}
-		return $ret;
-	}
-
 
 }
 
