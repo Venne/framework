@@ -46,6 +46,9 @@ class VenneExtension extends CompilerExtension
 		$container->getDefinition('user')
 			->setClass('Venne\Security\User');
 
+		// http
+		$container->getDefinition('httpResponse')
+			->addSetup('setHeader', array('X-Powered-By', 'Nette Framework && Venne:Framework'));
 
 		// session
 		$container->getDefinition('session')
