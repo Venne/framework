@@ -25,7 +25,7 @@ use Venne\Module\ModuleManager;
 class UninstallCommand extends Command
 {
 
-	/** @var \CoreModule\Managers\ModuleManager */
+	/** @var ModuleManager */
 	protected $moduleManager;
 
 	function __construct(ModuleManager $moduleManager)
