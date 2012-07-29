@@ -24,8 +24,6 @@ class RenameCommand extends Command
 	/** @var Venne\Module\ModuleManager */
 	protected $moduleManager;
 
-	const PATH = "./vendor/venne/";
-
 	function __construct(ModuleManager $moduleManager)
 	{
 		parent::__construct();
@@ -63,7 +61,20 @@ class RenameCommand extends Command
 		$oldUpper = ucfirst($old);
 		$newUpper = ucfirst($new);
 
-		$modulePath = self::PATH.$oldLower."-module";
+		$class = "\\".$oldUpper."Module\Module";
+
+		if(!class_exists($class)){
+			$output->writeln("Class doesn't exists");
+			$output->writeln("Exiting...");
+			return;
+		}
+
+		/** @var $module \Venne\Module\IModule */
+		$module = new $class;
+		$modulePath = $module->getPath();
+
+
+		$newModulePath = dirname($module->getPath())."/$newLower-module";
 
 		if(!is_dir($modulePath)){
 			$output->writeln("Module doesn't exists");
@@ -77,7 +88,7 @@ class RenameCommand extends Command
 			$this->replace($file,$oldLower,$newLower);
 			$this->replace($file,$oldUpper,$newUpper);
 		}
-		rename($modulePath, self::PATH.$newLower."-module");
+		rename($modulePath, $newModulePath);
 		$output->writeln("Module successfully renamed.");
 	}
 
