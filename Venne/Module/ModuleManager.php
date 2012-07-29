@@ -23,9 +23,11 @@ class ModuleManager extends Object
 {
 
 	const RESOURCES_MODE_SYMLINK = 'symlink';
+
 	const RESOURCES_MODE_COPY = 'copy';
 
 	const MODULE_STATUS_INSTALLED = 'installed';
+
 	const MODULE_STATUS_PAUSED = 'paused';
 
 	/** @var array */
@@ -54,6 +56,7 @@ class ModuleManager extends Object
 		self::MODULE_STATUS_PAUSED,
 	);
 
+
 	/**
 	 * @param \Nette\DI\Container $context
 	 * @param array $modules
@@ -69,6 +72,7 @@ class ModuleManager extends Object
 		$this->setResourcesMode($resourcesMode);
 		$this->resourcesDir = $resourcesDir;
 	}
+
 
 	/**
 	 * Return modules by status.
@@ -253,8 +257,13 @@ class ModuleManager extends Object
 
 	public function findRepositoryModules()
 	{
-		return json_decode(file_get_contents($this->context->parameters['tempDir'] . '/modules-cache'));
-	}
+		$file = $this->context->parameters['tempDir'] . '/modules-cache';
 
+		if (!file_exists($file)) {
+			$this->scanRepositoryModules();
+		}
+
+		return json_decode(file_get_contents($file));
+	}
 }
 
