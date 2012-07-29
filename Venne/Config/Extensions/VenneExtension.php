@@ -99,6 +99,7 @@ class VenneExtension extends CompilerExtension
 			'composerSearch' => 'Venne\Module\Composer\Commands\Search',
 			'install' => 'Venne\Module\Commands\Install',
 			'uninstall' => 'Venne\Module\Commands\Uninstall',
+			'rename' => 'Venne\Module\Commands\Rename',
 			'cache' => 'Venne\Caching\Commands\Cache',
 		);
 		foreach ($commands as $name => $cmd) {
