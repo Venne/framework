@@ -11,23 +11,25 @@
 
 namespace Venne;
 
-use Nette\Diagnostics\Debugger, Nette\Application\Routers\SimpleRouter, Nette\Application\Routers\Route, Nette\Config\Adapters\NeonAdapter;
+use Venne;
 
-$nettePaths = array(
-	__DIR__ . "/../../../../nette.min.php",
-	__DIR__ . "/../../../nette/nette/Nette/loader.php",
-	__DIR__ . "/../vendor/nette/nette/Nette/loader.php",
-);
-foreach($nettePaths as $path){
-	if(file_exists($path)){
-		$nettePath = $path;
-		break;
+if (!defined('NETTE')) {
+	$nettePaths = array(
+		__DIR__ . "/../../../../nette.min.php",
+		__DIR__ . "/../../../nette/nette/Nette/loader.php",
+		__DIR__ . "/../vendor/nette/nette/Nette/loader.php",
+	);
+	foreach ($nettePaths as $path) {
+		if (file_exists($path)) {
+			$nettePath = $path;
+			break;
+		}
 	}
+	if (!$nettePath) {
+		die('You must load Nette Framework first');
+	}
+	include_once $nettePath;
 }
-if(!$nettePath){
-	die('You must load Nette Framework first');
-}
-include_once $nettePath;
 
 define('VENNE', TRUE);
 define('VENNE_DIR', __DIR__);
