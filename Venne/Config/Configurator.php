@@ -200,7 +200,6 @@ class Configurator extends \Nette\Config\Configurator
 		$this->robotLoader = $this->createRobotLoader();
 		$this->robotLoader->ignoreDirs .= ', tests, test, resources';
 		$this->robotLoader
-			->addDirectory($this->parameters["libsDir"])
 			->addDirectory($this->parameters["appDir"])
 			->register();
 	}
