@@ -12,6 +12,7 @@
 namespace Venne\Application;
 
 use Venne;
+use Nette\Utils\Strings;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -19,23 +20,36 @@ use Venne;
 class PresenterFactory extends \Nette\Application\PresenterFactory
 {
 
+	/** @var array */
+	protected $presentersByClass;
 
-	/** @var \Nette\DI\Container */
-	private $container;
+	/** @var array */
+	protected $presentersByName;
 
+	/** @var \Nette\DI\Container|\SystemContainer */
+	protected $container;
 
 
 	/**
 	 * @param \Nette\DI\Container $container
-	 * @param string $appDir
 	 */
-	public function __construct($appDir, \Nette\DI\Container $container)
+	function __construct($baseDir, \Nette\DI\Container $container)
 	{
-		parent::__construct($appDir, $container);
+		parent::__construct($baseDir, $container);
 
 		$this->container = $container;
 	}
 
+
+	/**
+	 * @param $name
+	 * @param $closure
+	 */
+	public function addPresenter($class, $name)
+	{
+		$this->presentersByClass[$class] = $name;
+		$this->presentersByName[$name] = $class;
+	}
 
 
 	/**
@@ -45,19 +59,22 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 */
 	public function createPresenter($name)
 	{
-		try {
-			$presenter = $this->container->getService($this->getPresenterService($name));
-		} catch (\Nette\DI\MissingServiceException $e) {
-			return parent::createPresenter($name);
+		$presenterName = $this->formatServiceNameFromPresenter($name);
+
+		if (isset($this->presentersByName[$presenterName])) {
+			$presenter = $this->container->getService($presenterName);
+
+			if (method_exists($presenter, 'setContext')) {
+				$this->container->callMethod(array($presenter, 'setContext'));
+			}
+		} else {
+			$presenter = parent::createPresenter($name);
 		}
-		
-		if (method_exists($presenter, 'setContext')) {
-			$this->container->callMethod(array($presenter, 'setContext'));
-		}
+
 		return $presenter;
 	}
-	
-	
+
+
 	/**
 	 * Formats service name from it's presenter name
 	 *
@@ -66,14 +83,76 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 * @param string $presenter
 	 * @return string
 	 */
-	public function getPresenterService(& $name)
+	public function formatServiceNameFromPresenter($presenter)
 	{
-		$arr = explode(":", $name);
-		array_walk($arr, function(&$item, $index) use (&$arr){
-			$arr[$index] = lcfirst($item);
-		});
-		return join(".", $arr) . 'Presenter';
+		return Strings::replace($presenter, '/(^|:)+(.)/', function ($match)
+		{
+			return (':' === $match[1] ? '.' : '') . strtolower($match[2]);
+		}) . 'Presenter';
 	}
 
+
+	/**
+	 * Formats service name from it's presenter name
+	 *
+	 * 'Bar:Foo:FooBar' => 'bar_foo_fooBarPresenter'
+	 *
+	 * @param string $presenter
+	 * @return string
+	 */
+	public function formatPresenterFromServiceName($name)
+	{
+		return Strings::replace(substr($name, 0, -9), '/(^|\\.)+(.)/', function ($match)
+		{
+			return ('.' === $match[1] ? ':' : '') . strtoupper($match[2]);
+		});
+	}
+
+
+	public function getPresenterClass(& $name)
+	{
+		if (isset($this->presentersByName[$name])) {
+			$service = $this->getPresenterService($name);
+
+			return get_class($this->container->getService($service));
+		} else {
+			return parent::getPresenterClass($name);
+		}
+	}
+
+
+	public function formatPresenterClass($presenter)
+	{
+		$name = $this->formatServiceNameFromPresenter($presenter);
+
+		if (isset($this->presentersByName[$name])) {
+			return get_class($this->container->getService($name));
+		} else {
+			return parent::formatPresenterClass($presenter);
+		}
+	}
+
+
+	public function unformatPresenterClass($class)
+	{
+		if (isset($this->presentersByClass[$class])) {
+			$name = $this->presentersByClass[$class];
+			return $this->formatPresenterFromServiceName($name);
+		} else {
+			return parent::unformatPresenterClass($class);
+		}
+	}
+
+
+	public function formatPresenterFile($presenter)
+	{
+		$service = $this->formatPresenterFromServiceName($presenter);
+
+		if ($this->container->hasService($service)) {
+			return get_class($this->container->getService($service));
+		}
+
+		return parent::formatPresenterFile($presenter);
+	}
 }
 

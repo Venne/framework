@@ -122,6 +122,7 @@ class VenneExtension extends CompilerExtension
 		$this->registerHelperFactories();
 		$this->registerRoutes();
 		$this->registerWidgets();
+		$this->registerPresenters();
 	}
 
 
@@ -187,6 +188,19 @@ class VenneExtension extends CompilerExtension
 			}
 
 			$config->addSetup('addWidget', array($meta, "@{$factory}"));
+		}
+	}
+
+
+	protected function registerPresenters()
+	{
+		$container = $this->getContainerBuilder();
+		$config = $container->getDefinition('nette.presenterFactory');
+
+		foreach ($container->findByTag('presenter') as $factory => $meta) {
+			$service = $container->getDefinition($factory);
+			$service->setAutowired(FALSE);
+			$config->addSetup('addPresenter', array($service->class, $factory));
 		}
 	}
 
