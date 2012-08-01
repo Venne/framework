@@ -27,6 +27,8 @@ use Nette\Config\Adapters\NeonAdapter;
 class Configurator extends \Nette\Config\Configurator
 {
 
+	/** @var string|array */
+	protected $sandbox;
 
 	/** @var array */
 	protected $modules = array();
@@ -44,11 +46,62 @@ class Configurator extends \Nette\Config\Configurator
 	protected $compiler;
 
 
-	public function __construct($parameters = NULL, $modules = NULL)
+	/**
+	 * @param $sandboxDir
+	 */
+	public function __construct($sandbox)
 	{
-		$this->parameters = $this->getDefaultParameters($parameters);
-		$this->parameters['modules'] = $this->getDefaultModules($modules);
+		$this->sandbox = $sandbox;
+
+		$this->parameters = $this->getSandboxParameters();
+		$this->validateConfiguration();
+		$this->parameters = $this->getDefaultParameters($this->parameters);
+		$this->parameters['modules'] = $this->getDefaultModules();
 		$this->setTempDirectory($this->parameters["tempDir"]);
+	}
+
+
+	protected function validateConfiguration()
+	{
+		$mandatoryConfigs = array("settings.php", "config.neon", 'modules.neon');
+
+		foreach ($mandatoryConfigs as $config) {
+			if (!file_exists($this->parameters['configDir'] . '/' . $config)) {
+				copy($this->parameters['configDir'] . '/' . $config . '.orig', $this->parameters['configDir'] . '/' . $config);
+			}
+		}
+	}
+
+
+	/**
+	 * @param $sandboxDir
+	 * @throws \InvalidArgumentException
+	 */
+	protected function getSandboxParameters()
+	{
+		$mandatoryParameters = array('wwwDir', 'appDir', 'libsDir', 'logDir', 'dataDir', 'tempDir', 'logDir', 'configDir', 'wwwCacheDir', 'resourcesDir');
+
+		if (!is_string($this->sandbox) && !is_array($this->sandbox)) {
+			throw new \InvalidArgumentException("SandboxDir must be string or array, " . gettype($this->sandboxDir) . " given.");
+		}
+
+		if (is_string($this->sandbox)) {
+			$file = $this->sandbox . '/sandbox.php';
+			if (!file_exists($file)) {
+				throw new \InvalidArgumentException('Sandbox must contain sandbox.php file with path configurations.');
+			}
+			$parameters = require $file;
+		} else {
+			$parameters = $this->sandbox;
+		}
+
+		foreach ($mandatoryParameters as $item) {
+			if (!isset($parameters[$item])) {
+				throw new \Nette\Application\ApplicationException("Sandbox parameters does not contain '{$item}' parameter.");
+			}
+		}
+
+		return $parameters;
 	}
 
 
@@ -78,7 +131,6 @@ class Configurator extends \Nette\Config\Configurator
 		$parameters = (array)$parameters;
 		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
-			'wwwDir' => isset($_SERVER['SCRIPT_FILENAME']) ? dirname($_SERVER['SCRIPT_FILENAME']) : NULL,
 			'debugMode' => $debugMode,
 			'productionMode' => !$debugMode,
 			'environment' => isset($parameters["environment"]) ? $parameters["environment"] :
@@ -89,17 +141,7 @@ class Configurator extends \Nette\Config\Configurator
 				'parent' => 'Nette\DI\Container',
 			)
 		);
-		$ret = $parameters + $ret;
-		$ret['appDir'] = isset($parameters['appDir']) ? $parameters['appDir'] : dirname($ret['wwwDir']) . '/app';
-		$ret['libsDir'] = isset($parameters['libsDir']) ? $parameters['libsDir'] : dirname($ret['wwwDir']) . '/vendor';
-		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['appDir'] . '/log';
-		$ret['dataDir'] = isset($parameters['dataDir']) ? $parameters['dataDir'] : $ret['appDir'] . '/data';
-		$ret['tempDir'] = isset($parameters['tempDir']) ? $parameters['tempDir'] : $ret['appDir'] . '/temp';
-		$ret['logDir'] = isset($parameters['logDir']) ? $parameters['logDir'] : $ret['appDir'] . '/log';
-		$ret['configDir'] = isset($parameters['configDir']) ? $parameters['configDir'] : $ret['appDir'] . '/config';
-		$ret['wwwCacheDir'] = isset($parameters['wwwCacheDir']) ? $parameters['wwwCacheDir'] : $ret['wwwDir'] . '/cache';
-		$ret['resourcesDir'] = isset($parameters['resourcesDir']) ? $parameters['resourcesDir'] : $ret['wwwDir'] . '/resources';
-		return $ret;
+		return ($ret + $parameters) + require $parameters['configDir'] . '/settings.php';
 	}
 
 
@@ -160,8 +202,7 @@ class Configurator extends \Nette\Config\Configurator
 		$this->compiler = parent::createCompiler();
 		$this->compiler
 			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
-			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
-		;
+			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension());
 
 		foreach ($this->getModuleInstances() as $instance) {
 			$instance->compile($this->compiler);
@@ -236,5 +277,4 @@ class Configurator extends \Nette\Config\Configurator
 		$loader->autoRebuild = !$this->parameters['productionMode'];
 		return $loader;
 	}
-
 }
