@@ -202,7 +202,8 @@ class Configurator extends \Nette\Config\Configurator
 		$this->compiler = parent::createCompiler();
 		$this->compiler
 			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
-			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension());
+			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
+			->addExtension('extensions', new \Venne\Config\Extensions\ExtensionsExtension());
 
 		foreach ($this->getModuleInstances() as $instance) {
 			$instance->compile($this->compiler);

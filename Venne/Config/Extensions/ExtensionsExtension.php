@@ -18,7 +18,7 @@ use Nette\Config\CompilerExtension;
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class AddonsExtension extends CompilerExtension
+class ExtensionsExtension extends CompilerExtension
 {
 
 	public function loadConfiguration()
@@ -26,15 +26,9 @@ class AddonsExtension extends CompilerExtension
 		$container = $this->getContainerBuilder();
 		$config = $this->getConfig();
 
-		foreach ($config as $name => $values) {
-			$module = new $values['class'];
-
-			$module->compile($this->compiler);
-
-			//$this->compiler->addExtension($name, new $values['class']);
+		foreach ($config as $name => $class) {
+			$this->compiler->compile($name, new $class);
 		}
-
 	}
-
 }
 
