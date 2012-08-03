@@ -27,7 +27,7 @@ class ExtensionsExtension extends CompilerExtension
 		$config = $this->getConfig();
 
 		foreach ($config as $name => $class) {
-			$this->compiler->compile($name, new $class);
+			$this->compiler->addExtension($name, new $class);
 		}
 	}
 }
