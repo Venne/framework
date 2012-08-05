@@ -56,7 +56,6 @@ class Configurator extends \Nette\Config\Configurator
 		$this->parameters = $this->getSandboxParameters();
 		$this->validateConfiguration();
 		$this->parameters = $this->getDefaultParameters($this->parameters);
-		$this->parameters['modules'] = $this->getDefaultModules();
 		$this->setTempDirectory($this->parameters["tempDir"]);
 	}
 
@@ -102,27 +101,6 @@ class Configurator extends \Nette\Config\Configurator
 		}
 
 		return $parameters;
-	}
-
-
-	protected function getDefaultModules($modules = NULL)
-	{
-		$adapter = new NeonAdapter();
-		return $adapter->load($this->parameters["configDir"] . "/modules.neon");
-	}
-
-
-	protected function getModuleInstances()
-	{
-		if (!$this->moduleInstances) {
-			foreach ($this->parameters['modules'] as $module => $item) {
-				if ($item['status'] == \Venne\Module\ModuleManager::MODULE_STATUS_INSTALLED) {
-					$class = "\\" . ucfirst($module) . "Module\\Module";
-					$this->moduleInstances[] = new $class;
-				}
-			}
-		}
-		return $this->moduleInstances;
 	}
 
 
@@ -204,11 +182,6 @@ class Configurator extends \Nette\Config\Configurator
 			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
 			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
 			->addExtension('extensions', new \Venne\Config\Extensions\ExtensionsExtension());
-
-		foreach ($this->getModuleInstances() as $instance) {
-			$instance->compile($this->compiler);
-		}
-
 		return $this->compiler;
 	}
 
@@ -223,22 +196,14 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function getConfigFiles()
 	{
-		$configs = array();
-
-		foreach ($this->getModuleInstances() as $instance) {
-			$paths = array(
-				$instance->getPath() . "/Resources/config/config.neon",
-				$this->parameters['configDir'] . "/" . $instance->getName() . "/config.neon"
-			);
-			foreach ($paths as $path) {
-				if (is_file($path)) {
-					$configs[] = $path;
-				}
-			}
+		$ret = array();
+		foreach (\Nette\Utils\Finder::findFiles('Resources/config/config.neon')
+					 ->from(array($this->parameters['libsDir'])) as $file) {
+			$ret[] = $file->getPath() . '/' . $file->getBasename();
 		}
-		$configs[] = $this->parameters['configDir'] . "/config.neon";
-		$configs[] = $this->parameters['configDir'] . "/config_" . $this->parameters["environment"] . ".neon";
-		return $configs;
+		$ret[] = $this->parameters['configDir'] . '/config.neon';
+		$ret[] = $this->parameters['configDir'] . "/config_{$this->parameters['environment']}.neon";
+		return $ret;
 	}
 
 

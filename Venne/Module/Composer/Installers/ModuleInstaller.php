@@ -16,6 +16,7 @@ use Venne\Module\ModuleManager;
 use Venne\Config\Configurator;
 use Nette\DI\Container;
 use Nette\Config\Adapters\NeonAdapter;
+use Nette\Config\Adapters\PhpAdapter;
 use Composer\IO\IOInterface;
 use Composer\Composer;
 use Composer\Package\PackageInterface;
@@ -62,9 +63,11 @@ class ModuleInstaller extends LibraryInstaller
 	protected function registerRobotLoader()
 	{
 		// Load nette
-		$loader = $this->vendorDir . '/nette/nette/Nette/loader.php';
-		if (file_exists($loader)) {
-			include_once $loader;
+		if (!defined('VENNE')) {
+			$loader = $this->vendorDir . '/nette/nette/Nette/loader.php';
+			if (file_exists($loader)) {
+				include_once $loader;
+			}
 		}
 
 		// Load Venne
@@ -141,7 +144,7 @@ class ModuleInstaller extends LibraryInstaller
 
 		// run extra installers
 		if (isset($extra['venne']['installers'])) {
-			foreach($extra['venne']['installers'] as $class){
+			foreach ($extra['venne']['installers'] as $class) {
 				$class = '\\' . $class;
 				$installer = new $class($this->io, $this->composer);
 				$this->composer->getInstallationManager()->addInstaller($installer);
@@ -151,9 +154,10 @@ class ModuleInstaller extends LibraryInstaller
 		// enable module in config
 		$modules = $this->loadModuleConfig();
 		if (!array_search($name, $modules)) {
-			$modules[$name] = array(
+			$modules['modules'][$name] = array(
 				'version' => $package->getVersion(),
 				'status' => 'installed',
+				'path' => $this->getInstallPath($package),
 			);
 		}
 		$this->saveModuleConfig($modules);
@@ -194,7 +198,7 @@ class ModuleInstaller extends LibraryInstaller
 
 		// run extra installers
 		if (isset($extra['venne']['installers'])) {
-			foreach($extra['venne']['installers'] as $class){
+			foreach ($extra['venne']['installers'] as $class) {
 				$class = '\\' . $class;
 				$installer = new $class($this->io, $this->composer);
 				$this->composer->getInstallationManager()->addInstaller($installer);
@@ -213,7 +217,7 @@ class ModuleInstaller extends LibraryInstaller
 
 		// remove module from config
 		$modules = $this->loadModuleConfig();
-		unset($modules[$name]);
+		unset($modules['modules'][$name]);
 		$this->saveModuleConfig($modules);
 	}
 
@@ -223,7 +227,7 @@ class ModuleInstaller extends LibraryInstaller
 	 */
 	protected function getModuleConfigPath()
 	{
-		return $this->getContainer()->parameters['configDir'] . '/modules.neon';
+		return $this->getContainer()->parameters['configDir'] . '/settings.php';
 	}
 
 
@@ -232,7 +236,7 @@ class ModuleInstaller extends LibraryInstaller
 	 */
 	protected function loadModuleConfig()
 	{
-		$config = new NeonAdapter();
+		$config = new PhpAdapter;
 		return $config->load($this->getModuleConfigPath());
 	}
 
@@ -242,7 +246,7 @@ class ModuleInstaller extends LibraryInstaller
 	 */
 	protected function saveModuleConfig($data)
 	{
-		$config = new NeonAdapter();
+		$config = new PhpAdapter;
 		file_put_contents($this->getModuleConfigPath(), $config->dump($data));
 	}
 

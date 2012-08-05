@@ -63,27 +63,15 @@ class VenneExtension extends CompilerExtension
 		$container->addDefinition($this->prefix("helpers"))
 			->setClass("Venne\Templating\Helpers");
 
-
 		// modules
 		$container->addDefinition($this->prefix('moduleManager'))
-			->setClass('Venne\Module\ModuleManager', array('@container', '%modules%', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
+			->setClass('Venne\Module\ModuleManager', array('@container', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
 		$container->addDefinition($this->prefix('composerManager'))
 			->setClass('Venne\Module\Composer\ComposerManager', array($container->parameters['appDir'] . '/..'));
-
-
-		foreach ($container->parameters["modules"] as $module => $item) {
-			if ($item['status'] == \Venne\Module\ModuleManager::MODULE_STATUS_INSTALLED) {
-				$container->addDefinition($module . "Module")
-					->addTag("module")
-					->setClass(ucfirst($module) . "Module\\Module");
-			}
-		}
-
 
 		// widgets
 		$container->addDefinition($this->prefix('widgetManager'))
 			->setClass('Venne\Widget\WidgetManager');
-
 
 		// CLI
 		$cliRoute = $container->addDefinition($this->prefix("CliRoute"))
@@ -100,9 +88,9 @@ class VenneExtension extends CompilerExtension
 			'composerAdd' => 'Venne\Module\Composer\Commands\AddRequire',
 			'composerRemove' => 'Venne\Module\Composer\Commands\RemoveRequire',
 			'composerSearch' => 'Venne\Module\Composer\Commands\Search',
-			'install' => 'Venne\Module\Commands\Install',
-			'uninstall' => 'Venne\Module\Commands\Uninstall',
-			'rename' => 'Venne\Module\Commands\Rename',
+	//		'install' => 'Venne\Module\Commands\Install',
+	//		'uninstall' => 'Venne\Module\Commands\Uninstall',
+	//		'rename' => 'Venne\Module\Commands\Rename',
 			'cache' => 'Venne\Caching\Commands\Cache',
 		);
 		foreach ($commands as $name => $cmd) {

@@ -15,6 +15,10 @@ use Venne;
 use Nette\Object;
 use Nette\DI\Container;
 use Nette\Utils\Strings;
+use Composer\Console\Application;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -29,9 +33,6 @@ class ModuleManager extends Object
 	const MODULE_STATUS_INSTALLED = 'installed';
 
 	const MODULE_STATUS_PAUSED = 'paused';
-
-	/** @var array */
-	protected $modules;
 
 	/** @var string */
 	protected $resourcesMode;
@@ -64,10 +65,9 @@ class ModuleManager extends Object
 	 * @param string $resourcesMode
 	 * @param string $resourcesDir
 	 */
-	public function __construct(Container $context, $modules, $moduleConfig, $resourcesMode, $resourcesDir)
+	public function __construct(Container $context, $moduleConfig, $resourcesMode, $resourcesDir)
 	{
 		$this->context = $context;
-		$this->modules = $modules;
 		$this->moduleConfig = $moduleConfig;
 		$this->setResourcesMode($resourcesMode);
 		$this->resourcesDir = $resourcesDir;
@@ -75,23 +75,26 @@ class ModuleManager extends Object
 
 
 	/**
-	 * Return modules by status.
+	 * Update dependencies by Composer.
 	 *
-	 * @return array
+	 * @param null|string $composerFile
 	 */
-	public function getModules($status = NULL)
+	public function updateByComposer($composerFile = NULL)
 	{
-		if (!$status) {
-			return $this->modules;
+		putenv("COMPOSER_VENDOR_DIR={$this->context->parameters['libsDir']}");
+		$composerFile = $composerFile ?: $this->context->parameters['appDir'] . '/../composer.json';
+
+		if($composerFile) {
+			putenv("COMPOSER=$composerFile");
 		}
 
-		$ret = array();
-		foreach ($this->modules as $module => $item) {
-			if ($item['status'] == $status) {
-				$ret[$module] = $item;
-			}
+		$data = $this->runCommand('update');
+
+		if($composerFile) {
+			putenv("COMPOSER=''");
 		}
-		return $ret;
+
+		return $data;
 	}
 
 
@@ -106,116 +109,6 @@ class ModuleManager extends Object
 		}
 
 		$this->resourcesMode = $resourcesMode;
-	}
-
-
-	/**
-	 * Factory for module
-	 *
-	 * @param string $name
-	 * @return Venne\Module\IModule
-	 */
-	public function getModuleInstance($name)
-	{
-		$class = "\\" . ucfirst($name) . "Module\\Module";
-		return new $class;
-	}
-
-
-	/**
-	 * Install module
-	 *
-	 * @param string $name
-	 * @param bool $checkDependencies
-	 * @return bool
-	 */
-	public function installModule($name, $withDependencies = null, $cleanCache = true)
-	{
-		$module = $this->getModuleInstance($name);
-
-		// run installation
-		$module->install($this->context);
-
-		// create resources in public
-		if (!file_exists($this->context->parameters['resourcesDir'] . "/{$name}Module")) {
-			umask(0000);
-			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-				@symlink($module->getPath() . "/Resources/public", $this->resourcesDir . "/{$name}Module");
-			} else {
-				@copy($module->getPath() . "/Resources/public", $this->resourcesDir . "/{$name}Module");
-			}
-		}
-
-		// enable module in config
-		$config = new \Nette\Config\Adapters\NeonAdapter();
-		$modules = $config->load($this->context->parameters["configDir"] . "/modules.neon");
-		if (!array_search($name, $modules)) {
-			$modules[$name] = array(
-				'version' => $module->getVersion(),
-				'status' => self::MODULE_STATUS_INSTALLED,
-			);
-		}
-		file_put_contents($this->context->parameters["configDir"] . "/modules.neon", $config->dump($modules));
-
-		// clean cache
-		$this->cleanCaches();
-	}
-
-
-	public function uninstallModule($name)
-	{
-		$module = $this->getModuleInstance($name);
-
-		// run uninstallation
-		$module->uninstall($this->context);
-
-		// remove resources in public
-		if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-			unlink($this->resourcesDir . "/{$name}Module");
-		} else {
-			\Venne\Utils\File::rmdir($this->resourcesDir . "/{$name}Module", true);
-		}
-
-		// remove module from config
-		$config = new \Nette\Config\Adapters\NeonAdapter();
-		$modules = $config->load($this->context->parameters["configDir"] . "/modules.neon");
-		unset($modules[$name]);
-		file_put_contents($this->context->parameters["configDir"] . "/modules.neon", $config->dump($modules));
-
-		// cleanCache
-		$this->cleanCaches();
-	}
-
-
-	/**
-	 * @param bool $clean
-	 */
-	protected function cleanCaches()
-	{
-		$this->context->robotLoader->rebuild();
-		$this->context->session->getSection("Venne.Security.Authorizator")->remove();
-	}
-
-
-	/**
-	 * Find all modules which are located in project.
-	 *
-	 * @return array
-	 */
-	public function findLocalModules()
-	{
-		$arr = array();
-		foreach ($this->context->robotLoader->getIndexedClasses() as $key => $class) {
-			if (substr($key, strrpos($key, '\\') + 1) == 'Module') {
-				$ref = \Nette\Reflection\ClassType::from($key);
-				if ($ref->isInstantiable()) {
-					$module = $ref->newInstance();
-					$arr[$module->getName()] = $module;
-				}
-			}
-		}
-
-		return $arr;
 	}
 
 
@@ -264,6 +157,34 @@ class ModuleManager extends Object
 		}
 
 		return json_decode(file_get_contents($file));
+	}
+
+	/*************************************************************************************/
+
+
+	/**
+	 * @param $string
+	 * @return string
+	 */
+	protected function runCommand($string)
+	{
+		$application = new Application();
+		$application->setAutoExit(false);
+
+		$filename = $this->context->parameters['tempDir'] . '/moduleManager-command';
+		$file = fopen($filename, "w");
+
+		$input = new StringInput($string);
+		$output = new StreamOutput($file);
+
+		$application->run($input, $output);
+		\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_VERBOSE;
+
+		fclose($file);
+
+		$data = file_get_contents($filename);
+		unlink($filename);
+		return $data;
 	}
 }
 
