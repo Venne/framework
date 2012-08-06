@@ -135,10 +135,12 @@ class ModuleInstaller extends LibraryInstaller
 	 */
 	public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
 	{
-		parent::install($repo, $package);
-
 		$this->repo = $repo;
 		$this->registerRobotLoader();
+		$container = $this->getContainer();
+
+		parent::install($repo, $package);
+
 		$name = $this->getModuleNameByPackage($package);
 		$extra = $package->getExtra();
 
@@ -153,7 +155,7 @@ class ModuleInstaller extends LibraryInstaller
 
 		// enable module in config
 		$modules = $this->loadModuleConfig();
-		if (!array_search($name, $modules)) {
+		if (!array_search($name, $modules['modules'])) {
 			$modules['modules'][$name] = array(
 				'version' => $package->getVersion(),
 				'status' => 'installed',
@@ -178,7 +180,7 @@ class ModuleInstaller extends LibraryInstaller
 		if (isset($extra['venne']['configuration'])) {
 			$adapter = new \Nette\Config\Adapters\NeonAdapter();
 			$data = $this->loadConfig();
-			$data = \Nette\Utils\Arrays::mergeTree($data, $extra['venne']['configuration']);
+			$data = array_merge_recursive($data, $extra['venne']['configuration']); //\Nette\Utils\Arrays::mergeTree($data, $extra['venne']['configuration']);
 			$this->saveConfig($data);
 		}
 	}
@@ -189,10 +191,12 @@ class ModuleInstaller extends LibraryInstaller
 	 */
 	public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
 	{
-		parent::uninstall($repo, $package);
-
 		$this->repo = $repo;
 		$this->registerRobotLoader();
+		$container = $this->getContainer();
+
+		parent::uninstall($repo, $package);
+
 		$name = $this->getModuleNameByPackage($package);
 		$extra = $package->getExtra();
 
