@@ -197,10 +197,6 @@ class Configurator extends \Nette\Config\Configurator
 	protected function getConfigFiles()
 	{
 		$ret = array();
-		foreach (\Nette\Utils\Finder::findFiles('Resources/config/config.neon')
-					 ->from(array($this->parameters['libsDir'])) as $file) {
-			$ret[] = $file->getPath() . '/' . $file->getBasename();
-		}
 		$ret[] = $this->parameters['configDir'] . '/config.neon';
 		$ret[] = $this->parameters['configDir'] . "/config_{$this->parameters['environment']}.neon";
 		return $ret;
