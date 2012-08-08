@@ -15,7 +15,6 @@
 		"composer/composer" : "dev-master"
 	},
 	"autoload": {
-		"files": ["Venne/loader.php"],
 		"psr-0": { "Venne": "" }
 	},
 	"extra": {
