@@ -30,12 +30,6 @@ class Configurator extends \Nette\Config\Configurator
 	/** @var string|array */
 	protected $sandbox;
 
-	/** @var array */
-	protected $modules = array();
-
-	/** @var Venne\Module\IModule[] */
-	protected $moduleInstances = array();
-
 	/** @var \Nette\DI\Container */
 	protected $container;
 
@@ -62,7 +56,7 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function validateConfiguration()
 	{
-		$mandatoryConfigs = array("settings.php", "config.neon", 'modules.neon');
+		$mandatoryConfigs = array('settings.php', 'config.neon');
 
 		foreach ($mandatoryConfigs as $config) {
 			if (!file_exists($this->parameters['configDir'] . '/' . $config)) {

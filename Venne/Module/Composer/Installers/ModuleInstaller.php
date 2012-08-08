@@ -38,13 +38,19 @@ class ModuleInstaller extends LibraryInstaller
 	protected $resourcesMode;
 
 	/** @var Container|\SystemContainer */
+	protected $container;
+
+	/** @var Container|\SystemContainer */
 	protected $_container;
 
 	/** @var string */
 	protected $rootDir;
 
-	/** @var InstalledRepositoryInterface */
+	/** @var \Composer\Repository\RepositoryInterface */
 	protected $repo;
+
+	/** @var array */
+	protected $actions = array();
 
 
 	/**
@@ -60,6 +66,182 @@ class ModuleInstaller extends LibraryInstaller
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
+	{
+		try {
+			$this->repo = $repo;
+			$this->registerRobotLoader();
+			$container = $this->getContainer();
+
+			parent::install($repo, $package);
+
+			$name = $this->getModuleNameByPackage($package);
+			$extra = $package->getExtra();
+
+
+			// enable module in config
+			$orig = $modules = $this->loadModuleConfig();
+			if (!array_search($name, $modules['modules'])) {
+				$modules['modules'][$name] = array(
+					'version' => $package->getVersion(),
+					'status' => 'installed',
+					'path' => $this->getInstallPath($package),
+				);
+			}
+			$this->saveModuleConfig($modules);
+			$this->actions[] = function($self) use ($orig)
+			{
+				$self->saveModuleConfig($orig);
+			};
+
+
+			// create resources dir
+			$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
+			$targetDir = $this->getInstallPath($package) . '/Resources/public';
+			if (!file_exists($resourcesDir) && file_exists($targetDir)) {
+				umask(0000);
+				if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
+					symlink($targetDir, $resourcesDir);
+				} else {
+					copy($targetDir, $resourcesDir);
+				}
+
+				$this->actions[] = function($self) use ($resourcesDir)
+				{
+					if ($self->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
+						unlink($resourcesDir);
+					} else {
+						\Venne\Utils\File::rmdir($resourcesDir, true);
+					}
+				};
+			}
+
+			// update main config.neon
+			if (isset($extra['venne']['configuration'])) {
+				$adapter = new \Nette\Config\Adapters\NeonAdapter();
+				$orig = $data = $this->loadConfig();
+				$data = array_merge_recursive($data, $extra['venne']['configuration']); //\Nette\Utils\Arrays::mergeTree($data, $extra['venne']['configuration']);
+				$this->saveConfig($data);
+
+				$this->actions[] = function($self) use ($orig)
+				{
+					$self->saveConfig($orig);
+				};
+			}
+
+			// run extra installers
+			if (isset($extra['venne']['installers'])) {
+				foreach ($extra['venne']['installers'] as $class) {
+					$class = '\\' . $class;
+
+					/** @var $class BaseInstaller */
+					$class = new $class($this->io, $this->composer, $container);
+					$class->install($repo, $package);
+				}
+			}
+		} catch (\Exception $e) {
+			$actions = array_reverse($this->actions);
+
+			try {
+				foreach ($actions as $action) {
+					$action($this);
+				}
+			} catch (\Exception $ex) {
+				echo $ex->getMessage();
+			}
+
+			parent::uninstall($repo, $package);
+
+			throw $e;
+		}
+	}
+
+
+	protected function getRecursiveDiff($arr1, $arr2)
+	{
+		foreach ($arr1 as $key => $item) {
+			if (!is_array($arr1[$key])) {
+
+				// if key is numeric, remove the same value
+				if (is_numeric($key)) {
+					if (($pos = array_search($arr1[$key], $arr2)) !== false) {
+						unset($arr1[$key]);
+					}
+				}
+
+				// else remove the same key
+				else{
+					if (isset($arr2[$key])) {
+						unset($arr1[$key]);
+					}
+				}
+
+			} elseif (isset($arr2[$key])) {
+				$arr1[$key] = $this->getRecursiveDiff($arr1[$key], $arr2[$key]);
+			}
+		}
+		return $arr1;
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
+	{
+		$this->repo = $repo;
+		$this->registerRobotLoader();
+		$container = $this->getContainer();
+
+		$name = $this->getModuleNameByPackage($package);
+		$extra = $package->getExtra();
+
+		// run extra installers
+		if (isset($extra['venne']['installers'])) {
+			foreach ($extra['venne']['installers'] as $class) {
+				$class = '\\' . $class;
+
+				/** @var $class BaseInstaller */
+				$class = new $class($this->io, $this->composer, $container);
+				$class->uninstall($repo, $package);
+			}
+		}
+
+		// update main config.neon
+		if (isset($extra['venne']['configuration'])) {
+			$adapter = new \Nette\Config\Adapters\NeonAdapter();
+			$orig = $data = $this->loadConfig();
+			$data = $this->getRecursiveDiff($data, $extra['venne']['configuration']);
+			$this->saveConfig($data);
+
+			$this->actions[] = function($self) use ($orig)
+			{
+				$self->saveConfig($orig);
+			};
+		}
+
+		// remove resources dir
+		$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
+		if (file_exists($resourcesDir)) {
+			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
+				unlink($resourcesDir);
+			} else {
+				\Venne\Utils\File::rmdir($resourcesDir, true);
+			}
+		}
+
+		// remove module from config
+		$modules = $this->loadModuleConfig();
+		unset($modules['modules'][$name]);
+		$this->saveModuleConfig($modules);
+
+		parent::uninstall($repo, $package);
+	}
+
+
 	protected function registerRobotLoader()
 	{
 		// Load nette
@@ -70,15 +252,10 @@ class ModuleInstaller extends LibraryInstaller
 			}
 		}
 
-		// Load Venne
-		$loader = new \Composer\Autoload\ClassLoader();
-		$loader->add('Venne', $this->vendorDir . '/venne/framework');
-		$loader->register();
-
 		// Find packages
 		$autoloads = array();
 		foreach ($this->repo->getPackages() as $pkg) {
-			if ($pkg->getName() != 'nette/nette' && $pkg->getName() != 'venne/framework') {
+			if ($pkg->getName() != 'nette/nette') {
 				$autoloads[] = array($pkg, parent::getInstallPath($pkg)); // FIXME: ugly!
 			}
 		}
@@ -98,15 +275,14 @@ class ModuleInstaller extends LibraryInstaller
 	{
 		if (!$this->_container) {
 			if (!defined('VENNE')) {
+				$this->registerRobotLoader();
 				\Nette\Diagnostics\Debugger::enable(\Nette\Diagnostics\Debugger::DEVELOPMENT);
 			}
 
 			$configurator = new Configurator($this->rootDir);
 			$configurator->enableLoader();
-
 			$this->_container = $configurator->getContainer();
 		}
-
 		return $this->_container;
 	}
 
@@ -127,102 +303,6 @@ class ModuleInstaller extends LibraryInstaller
 	protected function getModuleNameByPackage(PackageInterface $package)
 	{
 		return substr($package->getName(), 6, -7);
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
-	{
-		$this->repo = $repo;
-		$this->registerRobotLoader();
-		$container = $this->getContainer();
-
-		parent::install($repo, $package);
-
-		$name = $this->getModuleNameByPackage($package);
-		$extra = $package->getExtra();
-
-		// run extra installers
-		if (isset($extra['venne']['installers'])) {
-			foreach ($extra['venne']['installers'] as $class) {
-				$class = '\\' . $class;
-				$installer = new $class($this->io, $this->composer);
-				$this->composer->getInstallationManager()->addInstaller($installer);
-			}
-		}
-
-		// enable module in config
-		$modules = $this->loadModuleConfig();
-		if (!array_search($name, $modules['modules'])) {
-			$modules['modules'][$name] = array(
-				'version' => $package->getVersion(),
-				'status' => 'installed',
-				'path' => $this->getInstallPath($package),
-			);
-		}
-		$this->saveModuleConfig($modules);
-
-		// create resources dir
-		$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
-		$targetDir = $this->getInstallPath($package) . '/Resources/public';
-		if (!file_exists($resourcesDir) && file_exists($targetDir)) {
-			umask(0000);
-			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-				@symlink($targetDir, $resourcesDir);
-			} else {
-				@copy($targetDir, $resourcesDir);
-			}
-		}
-
-		// update main config.neon
-		if (isset($extra['venne']['configuration'])) {
-			$adapter = new \Nette\Config\Adapters\NeonAdapter();
-			$data = $this->loadConfig();
-			$data = array_merge_recursive($data, $extra['venne']['configuration']); //\Nette\Utils\Arrays::mergeTree($data, $extra['venne']['configuration']);
-			$this->saveConfig($data);
-		}
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
-	{
-		$this->repo = $repo;
-		$this->registerRobotLoader();
-		$container = $this->getContainer();
-
-		parent::uninstall($repo, $package);
-
-		$name = $this->getModuleNameByPackage($package);
-		$extra = $package->getExtra();
-
-		// run extra installers
-		if (isset($extra['venne']['installers'])) {
-			foreach ($extra['venne']['installers'] as $class) {
-				$class = '\\' . $class;
-				$installer = new $class($this->io, $this->composer);
-				$this->composer->getInstallationManager()->addInstaller($installer);
-			}
-		}
-
-		// remove resources dir
-		$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
-		if (file_exists($resourcesDir)) {
-			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-				unlink($resourcesDir);
-			} else {
-				\Venne\Utils\File::rmdir($resourcesDir, true);
-			}
-		}
-
-		// remove module from config
-		$modules = $this->loadModuleConfig();
-		unset($modules['modules'][$name]);
-		$this->saveModuleConfig($modules);
 	}
 
 
