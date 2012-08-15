@@ -145,11 +145,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 		// widget from widgetManager
 		if($this->widgetManager->hasWidget($name)){
-			$factory = $this->widgetManager->getWidget($name);
-			return new WidgetMultiplier(function() use ($factory, $name)
-			{
-				return $factory->invoke();
-			});
+			return $this->widgetManager->getWidget($name)->invoke();
 		}
 
 		throw new \Nette\InvalidArgumentException("Component or widget with name '$name' does not exist.");

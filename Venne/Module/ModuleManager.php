@@ -81,20 +81,7 @@ class ModuleManager extends Object
 	 */
 	public function updateByComposer($composerFile = NULL)
 	{
-		putenv("COMPOSER_VENDOR_DIR={$this->context->parameters['libsDir']}");
-		$composerFile = $composerFile ?: $this->context->parameters['appDir'] . '/../composer.json';
-
-		if($composerFile) {
-			putenv("COMPOSER=$composerFile");
-		}
-
-		$data = $this->runCommand('update');
-
-		if($composerFile) {
-			putenv("COMPOSER=''");
-		}
-
-		return $data;
+		return $this->runCommand('update', $composerFile);
 	}
 
 
@@ -116,7 +103,7 @@ class ModuleManager extends Object
 	{
 		$arr = array();
 
-		$modules = $this->context->venne->composerManager->runCommand('search venne');
+		$modules = $this->runCommand('search venne');
 		$modules = explode("\n", $modules);
 		foreach ($modules as $module) {
 			$module = explode(" ", $module);
@@ -132,7 +119,7 @@ class ModuleManager extends Object
 
 		foreach ($arr as $name => $item) {
 			$values = array();
-			$data = $this->context->venne->composerManager->runCommand("show venne/{$name}-module");
+			$data = $this->runCommand("show venne/{$name}-module");
 			$data = explode("\n", $data);
 			foreach ($data as $row) {
 				$row = explode(':', $row);
@@ -166,7 +153,7 @@ class ModuleManager extends Object
 	 * @param $string
 	 * @return string
 	 */
-	protected function runCommand($string)
+	protected function runCommand($string, $composerFile = NULL)
 	{
 		$application = new Application();
 		$application->setAutoExit(false);
@@ -177,6 +164,9 @@ class ModuleManager extends Object
 		$input = new StringInput($string);
 		$output = new StreamOutput($file);
 
+		$composerFile = $composerFile ?: $this->context->parameters['appDir'] . '/../composer.json';
+		putenv("COMPOSER={$composerFile}");
+		putenv("COMPOSER_VENDOR_DIR={$this->context->parameters['libsDir']}");
 		$application->run($input, $output);
 		\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_VERBOSE;
 

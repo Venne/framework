@@ -23,9 +23,6 @@ class VenneExtension extends CompilerExtension
 
 
 	public $defaults = array(
-		'stopwatch' => array(
-			'debugger' => TRUE,
-		),
 		'moduleManager' => array(
 			'resourcesMode' => 'symlink'
 		)
@@ -66,8 +63,6 @@ class VenneExtension extends CompilerExtension
 		// modules
 		$container->addDefinition($this->prefix('moduleManager'))
 			->setClass('Venne\Module\ModuleManager', array('@container', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
-		$container->addDefinition($this->prefix('composerManager'))
-			->setClass('Venne\Module\Composer\ComposerManager', array($container->parameters['appDir'] . '/..'));
 
 		// widgets
 		$container->addDefinition($this->prefix('widgetManager'))
@@ -83,14 +78,6 @@ class VenneExtension extends CompilerExtension
 
 		// Commands
 		$commands = array(
-			'composerInstall' => 'Venne\Module\Composer\Commands\Install',
-			'composerUpdate' => 'Venne\Module\Composer\Commands\Update',
-			'composerAdd' => 'Venne\Module\Composer\Commands\AddRequire',
-			'composerRemove' => 'Venne\Module\Composer\Commands\RemoveRequire',
-			'composerSearch' => 'Venne\Module\Composer\Commands\Search',
-	//		'install' => 'Venne\Module\Commands\Install',
-	//		'uninstall' => 'Venne\Module\Commands\Uninstall',
-	//		'rename' => 'Venne\Module\Commands\Rename',
 			'cache' => 'Venne\Caching\Commands\Cache',
 		);
 		foreach ($commands as $name => $cmd) {
