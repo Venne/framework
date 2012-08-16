@@ -57,8 +57,8 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	public function configure(Template $template)
 	{
 		// translator
-		if ($this->container->hasService("translator")) {
-			$template->setTranslator($this->container->translator);
+		if (($translator = $this->container->getByType('Nette\Localization\ITranslator', FALSE)) !== NULL) {
+			$template->setTranslator($translator);
 		}
 		$template->registerHelperLoader(array($this->container->venne->helpers, "loader"));
 	}
