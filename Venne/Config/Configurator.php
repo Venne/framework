@@ -113,7 +113,7 @@ class Configurator extends \Nette\Config\Configurator
 				'parent' => 'Nette\DI\Container',
 			)
 		);
-		return ($ret + $parameters) + require $parameters['configDir'] . '/settings.php';
+		return (require $parameters['configDir'] . '/settings.php') + $parameters + $ret;
 	}
 
 
