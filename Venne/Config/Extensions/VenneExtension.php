@@ -85,7 +85,6 @@ class VenneExtension extends CompilerExtension
 				->setClass("{$cmd}Command")
 				->addTag('command');
 		}
-
 	}
 
 
@@ -122,6 +121,9 @@ class VenneExtension extends CompilerExtension
 		$router = $container->getDefinition('router');
 
 		foreach ($this->getSortedServices('route') as $route) {
+			$definition = $container->getDefinition($route);
+			$definition->setAutowired(false);
+
 			$router->addSetup('$service[] = $this->getService(?)', array($route));
 		}
 	}
@@ -191,6 +193,5 @@ class VenneExtension extends CompilerExtension
 				->setAutowired(false);
 		}
 	}
-
 }
 
