@@ -179,8 +179,6 @@ class Control extends \Nette\Application\UI\Control
 	 */
 	public function render()
 	{
-		//$this->templateConfigurator->prepareFilters($this->template);
-
 		if (!$this->template->getFile()) {
 			$this->template->setFile($this->formatTemplateFile());
 		}

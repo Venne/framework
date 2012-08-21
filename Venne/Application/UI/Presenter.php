@@ -16,7 +16,6 @@ use Nette\Application\UI\InvalidLinkException;
 use Nette\Application\UI\PresenterComponentReflection;
 use Nette\Application\ForbiddenRequestException;
 use Venne\Templating\ITemplateConfigurator;
-use Venne\Security\IComponentVerifier;
 use Venne\Widget\WidgetManager;
 
 /**
@@ -133,13 +132,8 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function createComponent($name)
 	{
-		$control = parent::createComponent($name);
-		if ($control) {
-//			$method = 'createComponent' . ucfirst($name);
-//			if (method_exists($this, $method)) {
-//				$this->checkRequirements($this->getReflection()->getMethod($method));
-//			}
-
+		// parent
+		if (($control = parent::createComponent($name)) == true) {
 			return $control;
 		}
 
