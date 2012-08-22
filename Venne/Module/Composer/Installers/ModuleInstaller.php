@@ -30,12 +30,6 @@ use Composer\Autoload\AutoloadGenerator;
 class ModuleInstaller extends LibraryInstaller
 {
 
-	const RESOURCES_MODE_SYMLINK = 'symlink';
-
-	const RESOURCES_MODE_COPY = 'copy';
-
-	/** @var string */
-	protected $resourcesMode;
 
 	/** @var Container|\SystemContainer */
 	protected $container;
@@ -62,7 +56,6 @@ class ModuleInstaller extends LibraryInstaller
 
 		$this->rootDir = dirname($this->vendorDir);
 		$this->type = 'venne-module';
-		$this->resourcesMode = self::RESOURCES_MODE_SYMLINK;
 	}
 
 
@@ -103,15 +96,13 @@ class ModuleInstaller extends LibraryInstaller
 			$targetDir = $this->getInstallPath($package) . '/Resources/public';
 			if (!file_exists($resourcesDir) && file_exists($targetDir)) {
 				umask(0000);
-				if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
-					symlink($targetDir, $resourcesDir);
-				} else {
+				if (symlink($targetDir, $resourcesDir) == false) {
 					copy($targetDir, $resourcesDir);
 				}
 
 				$this->actions[] = function($self) use ($resourcesDir)
 				{
-					if ($self->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
+					if (is_link($resourcesDir)) {
 						unlink($resourcesDir);
 					} else {
 						\Venne\Utils\File::rmdir($resourcesDir, true);
@@ -170,15 +161,12 @@ class ModuleInstaller extends LibraryInstaller
 					if (($pos = array_search($arr1[$key], $arr2)) !== false) {
 						unset($arr1[$key]);
 					}
-				}
-
-				// else remove the same key
-				else{
+				} // else remove the same key
+				else {
 					if (isset($arr2[$key])) {
 						unset($arr1[$key]);
 					}
 				}
-
 			} elseif (isset($arr2[$key])) {
 				$arr1[$key] = $this->getRecursiveDiff($arr1[$key], $arr2[$key]);
 			}
@@ -226,7 +214,7 @@ class ModuleInstaller extends LibraryInstaller
 		// remove resources dir
 		$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
 		if (file_exists($resourcesDir)) {
-			if ($this->resourcesMode == self::RESOURCES_MODE_SYMLINK) {
+			if (is_link($resourcesDir)) {
 				unlink($resourcesDir);
 			} else {
 				\Venne\Utils\File::rmdir($resourcesDir, true);
