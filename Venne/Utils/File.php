@@ -42,7 +42,7 @@ class File extends Object
 				@unlink($file->getPathname());
 		}
 
-		@unlink($dirname);
+		@rmdir($dirname);
 		return true;
 	}
 
