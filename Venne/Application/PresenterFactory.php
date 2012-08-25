@@ -12,6 +12,7 @@
 namespace Venne\Application;
 
 use Venne;
+use Nette\DI\Container;
 use Nette\Utils\Strings;
 
 /**
@@ -26,14 +27,15 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	/** @var array */
 	protected $presentersByName;
 
-	/** @var \Nette\DI\Container|\SystemContainer */
+	/** @var Container|\SystemContainer */
 	protected $container;
 
 
 	/**
-	 * @param \Nette\DI\Container $container
+	 * @param $baseDir
+	 * @param Container $container
 	 */
-	function __construct($baseDir, \Nette\DI\Container $container)
+	function __construct($baseDir, Container $container)
 	{
 		parent::__construct($baseDir, $container);
 
@@ -42,8 +44,8 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 
 
 	/**
+	 * @param $class
 	 * @param $name
-	 * @param $closure
 	 */
 	public function addPresenter($class, $name)
 	{
@@ -109,6 +111,10 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	}
 
 
+	/**
+	 * @param $name
+	 * @return string
+	 */
 	public function getPresenterClass(& $name)
 	{
 		if (isset($this->presentersByName[$name])) {
@@ -121,6 +127,10 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	}
 
 
+	/**
+	 * @param $presenter
+	 * @return string
+	 */
 	public function formatPresenterClass($presenter)
 	{
 		$name = $this->formatServiceNameFromPresenter($presenter);
@@ -133,6 +143,10 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	}
 
 
+	/**
+	 * @param $class
+	 * @return string
+	 */
 	public function unformatPresenterClass($class)
 	{
 		if (isset($this->presentersByClass[$class])) {
@@ -144,6 +158,10 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	}
 
 
+	/**
+	 * @param $presenter
+	 * @return string
+	 */
 	public function formatPresenterFile($presenter)
 	{
 		$service = $this->formatPresenterFromServiceName($presenter);
