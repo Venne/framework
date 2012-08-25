@@ -81,7 +81,7 @@ class ModuleInstaller extends LibraryInstaller
 				$modules['modules'][$name] = array(
 					'version' => $package->getVersion(),
 					'status' => 'installed',
-					'path' => $this->getInstallPath($package),
+					'path' => str_replace($this->vendorDir, '%libsDir%', $this->getInstallPath($package)),
 				);
 			}
 			$this->saveModuleConfig($modules);
