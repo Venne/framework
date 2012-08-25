@@ -144,55 +144,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 	/**
-	 * Determines whether it links to the current page.
-	 *
-	 * @param  string   destination in format "[[module:]presenter:]action" or "signal!" or "this"
-	 * @param  array|mixed
-	 * @return bool
-	 * @throws InvalidLinkException
-	 */
-	public function isLinkCurrent($destination = NULL, $args = array())
-	{
-		if ($destination !== NULL) {
-			if (!is_array($args)) {
-				$args = func_get_args();
-				array_shift($args);
-			}
-			if (count($args) > 0) {
-				return parent::isLinkCurrent($destination, $args);
-			} else {
-				if (substr($destination, 0, 1) !== ":") {
-					$destination = strpos($destination, ":") === false ? ":" . $this->name . ":" . $destination : ":" . substr($this->name, 0, strrpos($this->name, ":")) . ":" . $destination;
-				}
-
-				$reg = "/^" . str_replace("*", ".*", str_replace("#", "\/", $destination)) . "$/";
-				return ((bool)preg_match($reg, ":" . $this->name . ":" . $this->view));
-			}
-		}
-		return $this->getPresenter()->getLastCreatedRequestFlag('current');
-	}
-
-
-	/**
-	 * Determines whether it URL to the current page.
-	 *
-	 * @param  string   $url
-	 * @return bool
-	 */
-	public function isUrlCurrent($url)
-	{
-		$path = $this->getHttpRequest()->getUrl()->getPath();
-		$basePath = $this->getHttpRequest()->getUrl()->getBasePath();
-		$link = reset(explode("?", $url));
-
-		if ($path == $basePath && $link == $basePath || (!$link && !$url) || ($link && $path == $link)) {
-			return true;
-		}
-		return false;
-	}
-
-
-	/**
 	 * @param type $destination
 	 */
 	public function isAllowed($destination)
