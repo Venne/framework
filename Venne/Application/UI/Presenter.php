@@ -135,7 +135,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 		}
 
 		// widget from widgetManager
-		if($this->widgetManager->hasWidget($name)){
+		if ($this->widgetManager->hasWidget($name)) {
 			return $this->widgetManager->getWidget($name)->invoke();
 		}
 
@@ -199,6 +199,5 @@ class Presenter extends \Nette\Application\UI\Presenter
 		}
 		return $this->user->isAllowed($class);
 	}
-
 }
 

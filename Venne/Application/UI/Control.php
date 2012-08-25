@@ -32,12 +32,10 @@ class Control extends \Nette\Application\UI\Control
 	private $startupCheck;
 
 
-
 	protected function startup()
 	{
 		$this->startupCheck = TRUE;
 	}
-
 
 
 	/**
@@ -65,7 +63,6 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
 	 * @param string $name
 	 *
@@ -82,7 +79,6 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
 	 * Descendant can override this method to customize template compile-time filters.
 	 *
@@ -97,7 +93,6 @@ class Control extends \Nette\Application\UI\Control
 			$template->registerFilter(new \Nette\Latte\Engine);
 		}
 	}
-
 
 
 	/**
@@ -121,7 +116,6 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
 	 * Formats component template files
 	 *
@@ -136,7 +130,6 @@ class Control extends \Nette\Application\UI\Control
 		);
 		return $list;
 	}
-
 
 
 	/**
@@ -159,7 +152,6 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
 	 * Checks authorization.
 	 *
@@ -173,7 +165,6 @@ class Control extends \Nette\Application\UI\Control
 	}
 
 
-
 	/**
 	 * Render control.
 	 */
@@ -185,6 +176,5 @@ class Control extends \Nette\Application\UI\Control
 
 		$this->template->render();
 	}
-
 }
 
