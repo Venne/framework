@@ -19,13 +19,7 @@ use Venne\Templating\ITemplateConfigurator;
 use Venne\Widget\WidgetManager;
 
 /**
- * Description of Presenter
- *
  * @author Josef Kříž <pepakriz@gmail.com>
- *
- * @property-read \SystemContainer|\Nette\DI\Container $context
- *
- * @method \SystemContainer|\Nette\DI\Container getContext() getContext()
  */
 class Presenter extends \Nette\Application\UI\Presenter
 {
@@ -49,17 +43,20 @@ class Presenter extends \Nette\Application\UI\Presenter
 	}
 
 
-	final public function setContext(\Nette\DI\Container $context, WidgetManager $widgetManager)
+	final public function injectContext(\Nette\DI\Container $context)
 	{
 		parent::__construct($context);
-
-		// widgetManager
-		$this->widgetManager = $widgetManager;
 
 		// template configurator
 		if ($context->hasService('venne.templateConfigurator')) {
 			$this->setTemplateConfigurator($context->venne->templateConfigurator);
 		}
+	}
+
+
+	public function injectWidgetManager(WidgetManager $widgetManager)
+	{
+		$this->widgetManager = $widgetManager;
 	}
 
 
