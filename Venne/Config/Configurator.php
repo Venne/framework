@@ -226,4 +226,13 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		return $this->compiler;
 	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isDebugMode()
+	{
+		return $this->parameters['debugMode'];
+	}
 }
