@@ -210,15 +210,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-	public function enableDebugger($logDirectory = NULL, $email = NULL)
-	{
-		Nette\Diagnostics\Debugger::$strictMode = TRUE;
-		Nette\Diagnostics\Debugger::enable(
-			!$this->parameters['debugMode'], $logDirectory ? : $this->parameters["logDir"], $email ? : $this->parameters["debugger"]["logEmail"]
-		);
-	}
-
-
 	/**
 	 * @return \Nette\Config\Compiler
 	 */
