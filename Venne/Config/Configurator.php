@@ -162,10 +162,6 @@ class Configurator extends \Nette\Config\Configurator
 		$container->addService("robotLoader", $this->robotLoader);
 		$container->addService("configurator", $this);
 
-		// setup Application
-		$application = $container->application;
-		$application->catchExceptions = (bool)!$this->isDebugMode();
-
 		return $container;
 	}
 
