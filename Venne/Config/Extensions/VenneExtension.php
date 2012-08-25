@@ -36,9 +36,6 @@ class VenneExtension extends CompilerExtension
 
 
 		// Application
-		$container->getDefinition('application')
-			->addSetup('$service->catchExceptions = ?', array((bool)!$container->parameters['debugMode']));
-
 		$container->getDefinition('nette.presenterFactory')
 			->setClass('Venne\Application\PresenterFactory', array(
 			isset($container->parameters['appDir']) ? $container->parameters['appDir'] : NULL
