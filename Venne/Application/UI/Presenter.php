@@ -82,7 +82,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function checkRequirements($element)
 	{
-		return;
 		if (!$this->getUser()->isAllowed($this)) {
 			throw new ForbiddenRequestException;
 		}
@@ -148,55 +147,23 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function isAllowed($destination)
 	{
-		return true;
-
-		if ($destination == "this") {
-			$action = "action" . ucfirst($this->action);
-			$class = $this->name;
-		} else if (substr($destination, -1, 1) == "!") {
-			$action = "handle" . ucfirst(substr($destination, 0, -1));
-			$class = str_replace(":", "Module\\", $this->name) . "Presenter";
-		} else {
-			$destination = explode(":", $destination);
-			if (count($destination) == 1) {
-				$action = "action" . ucfirst($destination[count($destination) - 1]);
-				$class = str_replace(":", "Module\\", $this->name) . "Presenter";
+		if($destination == 'this'){
+			$class = get_class($this);
+		} elseif (substr($destination, -1, 1) == '!') {
+			$class = get_class($this);
+		}  else {
+			if(substr($destination, 0, 1) === ':') {
+				$link = substr($destination, 1);
+				$link = substr($link, 0, strrpos($link, ':'));
 			} else {
-				if ($destination[0] == "") {
-					$action = "action" . ucfirst($destination[count($destination) - 1]);
-					unset($destination[count($destination) - 1]);
-					$destination = array_slice($destination, 1);
-					$class = "\\";
-					foreach ($destination as $key => $item) {
-						if ($key > 0) {
-							$class .= "\\";
-						}
-						if ($key == count($destination) - 1) {
-							$class .= $item . "Presenter";
-						} else {
-							$class .= $item . "Module";
-						}
-					}
-					$class = substr($class, 1);
-				} else {
-					$name = explode(":", $this->name);
-					unset($name[count($name) - 1]);
-					unset($destination[count($destination) - 1]);
-					$name = implode(":", $name);
-					$class = str_replace(":", "Module\\", $name) . "Module\\";
-					foreach ($destination as $key => $item) {
-						if ($key > 0) {
-							$class .= "\\";
-						}
-						if ($key == count($destination) - 1) {
-							$class .= $item . "Presenter";
-						} else {
-							$class .= $item . "Module";
-						}
-					}
-				}
+				$link = substr($this->name, 0, strrpos($this->name, ':'));
+				$link = $link . ($link ? ':' : '') . substr($destination, 0, strrpos($destination, ':'));
 			}
+
+			$presenterFactory = $this->getApplication()->getPresenterFactory();
+			$class = $presenterFactory->getPresenterClass($link);
 		}
+
 		return $this->user->isAllowed($class);
 	}
 }

@@ -55,6 +55,15 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 
 
 	/**
+	 * @return array
+	 */
+	public function getPresenters()
+	{
+		return $this->presentersByClass;
+	}
+
+
+	/**
 	 * Create new presenter instance.
 	 * @param  string  presenter name
 	 * @return IPresenter
