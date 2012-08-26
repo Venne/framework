@@ -96,7 +96,7 @@ class ModuleInstaller extends LibraryInstaller
 			$targetDir = $this->getInstallPath($package) . '/Resources/public';
 			if (!file_exists($resourcesDir) && file_exists($targetDir)) {
 				umask(0000);
-				if (symlink($targetDir, $resourcesDir) == false) {
+				if (symlink(\Venne\Utils\File::getRelativePath($resourcesDir, $targetDir), $resourcesDir) == false) {
 					copy($targetDir, $resourcesDir);
 				}
 
