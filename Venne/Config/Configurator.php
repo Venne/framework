@@ -114,7 +114,7 @@ class Configurator extends \Nette\Config\Configurator
 			)
 		);
 		$settings = require $parameters['configDir'] . '/settings.php';
-		foreach($settings['modules'] as &$module){
+		foreach ($settings['modules'] as &$module) {
 			$module['path'] = \Nette\DI\Helpers::expand($module['path'], $parameters);
 		}
 		return $settings + $parameters + $ret;
@@ -194,6 +194,18 @@ class Configurator extends \Nette\Config\Configurator
 		$ret[] = $this->parameters['configDir'] . '/config.neon';
 		$ret[] = $this->parameters['configDir'] . "/config_{$this->parameters['environment']}.neon";
 		return $ret;
+	}
+
+
+	/**
+	 * @param  string        error log directory
+	 * @param  string        administrator email
+	 * @return void
+	 */
+	public function enableDebugger($logDirectory = NULL, $email = NULL)
+	{
+		Nette\Diagnostics\Debugger::$strictMode = TRUE;
+		Nette\Diagnostics\Debugger::enable(!$this->isDebugMode(), $logDirectory, $email);
 	}
 
 
