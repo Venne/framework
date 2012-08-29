@@ -12,6 +12,8 @@
 namespace Venne\Application\UI;
 
 use Venne;
+use Nette\DI\Container;
+use Venne\Security\IControlVerifier;
 use Nette\Application\UI\InvalidLinkException;
 use Nette\Application\UI\PresenterComponentReflection;
 use Nette\Application\ForbiddenRequestException;
@@ -28,6 +30,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
 
+	/** @var IControlVerifier */
+	protected $controlVerifier;
+
 	/** @var WidgetManager */
 	protected $widgetManager;
 
@@ -37,23 +42,24 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 	public function __construct()
 	{
-		$container = new \Nette\DI\Container;
-		$container->parameters["productionMode"] = true;
-		parent::__construct($container);
+		$context = new \Nette\DI\Container;
+		$context->parameters['productionMode'] = TRUE;
+		parent::__construct($context);
 	}
 
 
-	final public function injectContext(\Nette\DI\Container $context)
+	/**
+	 * @param Container $context
+	 */
+	public function injectContext(Container $context)
 	{
 		parent::__construct($context);
-
-		// template configurator
-		if ($context->hasService('venne.templateConfigurator')) {
-			$this->setTemplateConfigurator($context->venne->templateConfigurator);
-		}
 	}
 
 
+	/**
+	 * @param WidgetManager $widgetManager
+	 */
 	public function injectWidgetManager(WidgetManager $widgetManager)
 	{
 		$this->widgetManager = $widgetManager;
@@ -61,9 +67,18 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 	/**
+	 * @param IControlVerifier $controlVerifier
+	 */
+	public function injectControlVerifier(IControlVerifier $controlVerifier = NULL)
+	{
+		$this->controlVerifier = $controlVerifier;
+	}
+
+
+	/**
 	 * @param ITemplateConfigurator $configurator
 	 */
-	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
+	public function injectTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
 		$this->templateConfigurator = $configurator;
 	}
@@ -82,8 +97,8 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 */
 	public function checkRequirements($element)
 	{
-		if (!$this->getUser()->isAllowed($this)) {
-			throw new ForbiddenRequestException;
+		if ($this->controlVerifier) {
+			$this->controlVerifier->checkRequirements($element);
 		}
 	}
 
@@ -145,26 +160,63 @@ class Presenter extends \Nette\Application\UI\Presenter
 	/**
 	 * @param type $destination
 	 */
-	public function isAllowed($destination)
+	public function isAllowed($resource = NULL, $privilege = NULL)
 	{
-		if($destination == 'this'){
+		return $this->getUser()->isAllowed($resource, $privilege);
+	}
+
+
+	/**
+	 * @param  string   destination in format "[[module:]presenter:]action" or "signal!" or "this"
+	 * @param  array|mixed
+	 * @return bool
+	 */
+	public function isAuthorized($destination, $args = array())
+	{
+		if ($destination == 'this') {
 			$class = get_class($this);
+			$action = $this->action;
 		} elseif (substr($destination, -1, 1) == '!') {
 			$class = get_class($this);
-		}  else {
-			if(substr($destination, 0, 1) === ':') {
+			$action = $this->action;
+			$do = substr($destination, 0, -1);
+		} else {
+			if (substr($destination, 0, 1) === ':') {
 				$link = substr($destination, 1);
 				$link = substr($link, 0, strrpos($link, ':'));
+				$action = substr($destination, strrpos($destination, ':') + 1);
 			} else {
 				$link = substr($this->name, 0, strrpos($this->name, ':'));
 				$link = $link . ($link ? ':' : '') . substr($destination, 0, strrpos($destination, ':'));
+				$action = substr($destination, strrpos($destination, ':') + 1);
 			}
+			$action = $action ? : 'default';
 
 			$presenterFactory = $this->getApplication()->getPresenterFactory();
 			$class = $presenterFactory->getPresenterClass($link);
 		}
 
-		return $this->user->isAllowed($class);
+		$schema = $this->controlVerifier->getControlVerifierReader()->getSchema($class);
+
+		if (isset($schema['action' . ucfirst($action)])) {
+			$resource = $schema['action' . ucfirst($action)]['resource'];
+			$privilege = $schema['action' . ucfirst($action)]['privilege'];
+
+			if (!$this->user->isAllowed($resource, $privilege)) {
+				return false;
+			}
+		}
+
+		if (isset($do) && isset($schema['handle' . ucfirst($action)])) {
+			$resource = $schema['handle' . ucfirst($action)]['resource'];
+			$privilege = $schema['handle' . ucfirst($action)]['privilege'];
+
+			if (!$this->user->isAllowed($resource, $privilege)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
 

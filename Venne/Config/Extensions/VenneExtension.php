@@ -41,6 +41,12 @@ class VenneExtension extends CompilerExtension
 			isset($container->parameters['appDir']) ? $container->parameters['appDir'] : NULL
 		));
 
+		$container->addDefinition($this->prefix('controlVerifier'))
+			->setClass('Venne\Security\ControlVerifiers\ControlVerifier');
+
+		$container->addDefinition($this->prefix('controlVerifierReader'))
+			->setClass('Venne\Security\ControlVerifierReaders\AnnotationReader');
+
 		$container->getDefinition('user')
 			->setClass('Venne\Security\User');
 
@@ -55,7 +61,6 @@ class VenneExtension extends CompilerExtension
 		// template
 		$container->addDefinition($this->prefix("templateConfigurator"))
 			->setClass("Venne\Templating\TemplateConfigurator");
-
 
 		// helpers
 		$container->addDefinition($this->prefix("helpers"))

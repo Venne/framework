@@ -153,19 +153,6 @@ class Control extends \Nette\Application\UI\Control
 
 
 	/**
-	 * Checks authorization.
-	 *
-	 * @return void
-	 */
-	public function checkRequirements($element)
-	{
-		if (!$this->getPresenter()->getUser()->isAllowed($this)) {
-			throw new ForbiddenRequestException;
-		}
-	}
-
-
-	/**
 	 * Render control.
 	 */
 	public function render()
