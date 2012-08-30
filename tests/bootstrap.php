@@ -37,6 +37,6 @@ if(!isset($parameters["libsDir"])) {
 
 require_once $parameters['libsDir'] . '/autoload.php';
 
-$configurator = new \Venne\Testing\Configurator($parameters);
-//$configurator->enableDebugger();
-//$configurator->enableLoader();
+$configurator = new \Venne\Testing\Configurator(__DIR__);
+$configurator->enableDebugger();
+$configurator->enableLoader();

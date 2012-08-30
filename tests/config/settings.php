@@ -2,10 +2,10 @@
 
 return array(
 	"environments" => array(
-		"development", "production", "console"
+		"development", "production", "console", "testing"
 	),
 	"debugMode" => true,
-	"environment" => "production",
+	"environment" => "testing",
 	"debugger" => array(
 		"logEmail" => null,
 	),
