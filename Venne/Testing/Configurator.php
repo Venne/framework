@@ -23,9 +23,9 @@ class Configurator extends \Venne\Config\Configurator
 	protected static $configurator;
 
 
-	public function __construct($parameters = NULL, $modules = NULL, $productionMode = NULL)
+	public function __construct($sandbox)
 	{
-		parent::__construct($parameters, $modules, $productionMode);
+		parent::__construct($sandbox);
 		static::$configurator = $this;
 	}
 

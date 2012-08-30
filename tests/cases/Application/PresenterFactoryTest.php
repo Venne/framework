@@ -25,19 +25,17 @@ class PresenterFactoryTest extends TestCase
 	protected $presenterFactory;
 
 
-
-	public function setup()
+	public function setUp()
 	{
-		$presenter = new \TestModule\HomePresenter();
-
 		$container = $this->getContext();
-		if (!$container->hasService("test.homePresenter")) {
-			$container->addService("test.homePresenter", $presenter);
+		$presenter = new \TestModule\HomePresenterClass($container);
+		if (!$container->hasService('test.homePresenter')) {
+			$container->addService('test.homePresenter', $presenter);
 		}
 
 		$this->presenterFactory = new Venne\Application\PresenterFactory(__DIR__, $container);
+		$this->presenterFactory->addPresenter('TestModule\HomePresenterClass', 'test.homePresenter');
 	}
-
 
 
 	/**
@@ -54,7 +52,6 @@ class PresenterFactoryTest extends TestCase
 	}
 
 
-
 	/**
 	 * @dataProvider dataServiceNamesAndPresenters
 	 *
@@ -63,28 +60,26 @@ class PresenterFactoryTest extends TestCase
 	 */
 	public function testServiceNameFormating($presenterName, $serviceName)
 	{
-		$this->assertEquals($serviceName, $this->presenterFactory->getPresenterService($presenterName), "Formating service name from presenter name");
+		$this->assertEquals($serviceName, $this->presenterFactory->formatServiceNameFromPresenter($presenterName), 'Formating service name from presenter name');
 	}
-
 
 
 	public function testCreatePresenter()
 	{
-		$this->assertInstanceOf("TestModule\HomePresenter", $this->presenterFactory->createPresenter("Test:Home"), "Creating presenter from service");
-		$this->assertInstanceOf("TestModule\MainPresenter", $this->presenterFactory->createPresenter("Test:Main"), "Creating presenter from class");
+		$this->assertInstanceOf('TestModule\HomePresenterClass', $this->presenterFactory->createPresenter('Test:Home'), 'Creating presenter from service');
+		$this->assertInstanceOf('TestModule\MainPresenter', $this->presenterFactory->createPresenter('Test:Main'), 'Creating presenter from class');
 	}
-
 }
 
 namespace TestModule;
 
-class HomePresenter extends \Venne\Application\UI\Presenter
+class HomePresenterClass extends \Nette\Application\UI\Presenter
 {
-	
+
 }
 
-class MainPresenter extends \Venne\Application\UI\Presenter
+class MainPresenter extends \Nette\Application\UI\Presenter
 {
-	
+
 }
 

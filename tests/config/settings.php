@@ -9,4 +9,5 @@ return array(
 	"debugger" => array(
 		"logEmail" => null,
 	),
+	"modules" => array(),
 );

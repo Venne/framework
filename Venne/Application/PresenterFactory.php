@@ -129,7 +129,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	public function getPresenterClass(& $name)
 	{
 		if (isset($this->presentersByName[$name])) {
-			$service = $this->getPresenterService($name);
+			$service = $this->formatServiceNameFromPresenter($name);
 
 			return get_class($this->container->getService($service));
 		} else {
