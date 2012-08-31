@@ -59,6 +59,10 @@ class VenneExtension extends CompilerExtension
 			->addSetup("setSavePath", '%tempDir%/sessions');
 
 		// template
+		$latte = $container->getDefinition('nette.latte')
+			->setClass('Venne\Latte\Engine')
+			->setShared(FALSE);
+
 		$container->addDefinition($this->prefix("templateConfigurator"))
 			->setClass("Venne\Templating\TemplateConfigurator");
 
