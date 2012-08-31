@@ -50,6 +50,10 @@ class VenneExtension extends CompilerExtension
 		$container->getDefinition('user')
 			->setClass('Venne\Security\User');
 
+		// cache
+		$container->addDefinition($this->prefix('cacheManager'))
+			->setClass('Venne\Caching\CacheManager', array('@cacheStorage', '%tempDir%/cache', '%tempDir%/sessions'));
+
 		// http
 		$container->getDefinition('httpResponse')
 			->addSetup('setHeader', array('X-Powered-By', 'Nette Framework && Venne:Framework'));
