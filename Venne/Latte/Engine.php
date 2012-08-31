@@ -36,7 +36,6 @@ class Engine extends \Nette\Latte\Engine
 
 		\Nette\Latte\Macros\CoreMacros::install($this->compiler);
 		$this->compiler->addMacro('cache', new \Nette\Latte\Macros\CacheMacro($this->compiler));
-		\Venne\Latte\Macros\UIMacros::install($this->compiler);
 		\Nette\Latte\Macros\FormMacros::install($this->compiler);
 	}
 

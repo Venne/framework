@@ -12,6 +12,7 @@
 namespace Venne\Templating;
 
 use Venne;
+use Nette\Callback;
 use Nette\DI\Container;
 use Nette\Templating\Template;
 
@@ -32,14 +33,18 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	/** @var \Nette\Latte\Engine */
 	protected $latte;
 
+	/** @var Callback */
+	protected $latteFactory;
+
 
 
 	/**
 	 * @param \Nette\DI\Container $container
 	 */
-	public function __construct(Container $container)
+	public function __construct(Container $container, Callback $latteFactory)
 	{
 		$this->container = $container;
+		$this->latteFactory = $latteFactory;
 	}
 
 
@@ -67,7 +72,7 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 
 	public function prepareFilters(Template $template)
 	{
-		$this->latte = new \Nette\Latte\Engine();
+		$this->latte = $this->latteFactory->invoke();
 		foreach ($this->macroFactories as $factory) {
 			$this->container->{Container::getMethodName($factory, false)}($this->latte->getCompiler());
 		}

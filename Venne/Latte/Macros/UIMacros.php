@@ -53,6 +53,8 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 
 		$me->addMacro('contentType', array($me, 'macroContentType'));
 		$me->addMacro('status', array($me, 'macroStatus'));
+
+		$me->addMacro('path', array($me, 'macroPath'));
 		return $me;
 	}
 
@@ -70,5 +72,12 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 		$writer = new PhpWriter($node->tokenizer);
 		return parent::macroExtends($node, $writer);
 	}
+
+
+	public function macroPath(MacroNode $node, PhpWriter $writer)
+	{
+		return $writer->write("echo \$basePath . '/' . \Venne\Module\Helpers::expandResource(%node.word)");
+	}
+
 }
 
