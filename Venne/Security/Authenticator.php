@@ -29,21 +29,23 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 	protected $adminPassword;
 
 
-
-	function __construct($adminLogin, $adminPassword)
+	/**
+	 * @param $adminLogin
+	 * @param $adminPassword
+	 */
+	public function __construct($adminLogin, $adminPassword)
 	{
 		$this->adminLogin = $adminLogin;
 		$this->adminPassword = $adminPassword;
 	}
 
 
-
 	/**
 	 * Performs an authentication
 	 *
 	 * @param  array
-	 * @return Nette\Security\Identity
-	 * @throws Nette\Security\AuthenticationException
+	 * @return \Nette\Security\Identity
+	 * @throws \Nette\Security\AuthenticationException
 	 */
 	public function authenticate(array $credentials)
 	{
@@ -58,5 +60,4 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 
 		throw new AuthenticationException("User '$username' not found.", self::IDENTITY_NOT_FOUND);
 	}
-
 }
