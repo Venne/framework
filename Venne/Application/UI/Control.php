@@ -59,6 +59,7 @@ class Control extends \Nette\Application\UI\Control
 			$this->templateConfigurator->configure($template);
 		}
 
+		$template->setFile($this->formatTemplateFile());
 		return $template;
 	}
 
@@ -149,19 +150,6 @@ class Control extends \Nette\Application\UI\Control
 		}
 
 		throw new \Nette\InvalidStateException("No template files found");
-	}
-
-
-	/**
-	 * Render control.
-	 */
-	public function render()
-	{
-		if (!$this->template->getFile()) {
-			$this->template->setFile($this->formatTemplateFile());
-		}
-
-		$this->template->render();
 	}
 }
 
