@@ -27,17 +27,22 @@ class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 	/** @var \Nette\Callback */
 	private $callback;
 
+	/** @var \Nette\DI\Container|\SystemContainer */
+	protected $container;
 
 
 	/**
 	 * @param \Symfony\Component\Console\Application
 	 */
-	public function __construct(\Symfony\Component\Console\Application $console)
+	public function __construct(\Nette\DI\Container $container)
 	{
-		$this->callback = callback(function() use($console) {
-					$console->run();
+		$this->callback = callback(function() use($container) {
+					$container->console->console->run();
 				});
 	}
+
+
+
 
 
 
