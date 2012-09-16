@@ -209,8 +209,7 @@ class VenneExtension extends CompilerExtension
 
 		foreach ($container->findByTag("component") as $name => $item) {
 			$definition = $container->getDefinition($name);
-			$definition
-				->setAutowired(false);
+			$definition->setAutowired(false);
 		}
 	}
 }
