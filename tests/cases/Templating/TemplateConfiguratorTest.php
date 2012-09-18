@@ -25,19 +25,20 @@ class TemplateConfiguratorTest extends TestCase
 	protected $configurator;
 
 
-
 	public function setup()
 	{
 		$container = new Container;
 		$container->addService("venne.helpers", new \Venne\Templating\Helpers($container));
 		$container->addService('venne', new \Nette\DI\NestedAccessor($container, 'venne'));
-		$container->addService("latte", new \Nette\Latte\Engine());
 
-		$this->configurator = new \Venne\Templating\TemplateConfigurator($container);
+		$latteFactory = new \Nette\Callback(function () {
+			return new \Nette\Latte\Engine();
+		});
+
+		$this->configurator = new \Venne\Templating\TemplateConfigurator($container, $latteFactory);
 		$this->configurator->addFactory("fooMacro");
 		$this->configurator->addFactory("barMacro");
 	}
-
 
 
 	public function testConfigure()
@@ -54,7 +55,6 @@ class TemplateConfiguratorTest extends TestCase
 	}
 
 
-
 	public function testPrepareFilters()
 	{
 		$template = new \Nette\Templating\FileTemplate();
@@ -67,12 +67,10 @@ class TemplateConfiguratorTest extends TestCase
 			$this->assertInstanceOf('Nette\Callback', $callback);
 		}
 	}
-
 }
 
 class Container extends \Nette\DI\Container
 {
-
 
 
 	public function createFooMacro($engine)
@@ -81,11 +79,9 @@ class Container extends \Nette\DI\Container
 	}
 
 
-
 	public function createBarMacro($engine)
 	{
 		return new \Nette\Latte\Macros\UIMacros($engine);
 	}
-
 }
 
