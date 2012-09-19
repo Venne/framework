@@ -18,15 +18,11 @@ use Nette\ObjectMixin;
 /**
  * @author     Josef Kříž
  */
-abstract class SeleniumTestCase extends \PHPUnit_Extensions_SeleniumTestCase
+abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
 {
-
 
 	/** @var \Nette\DI\Container */
 	protected $context;
-
-	/** @var string */
-	protected $basePath;
 
 
 	/**
