@@ -316,7 +316,7 @@ class ModuleInstaller extends LibraryInstaller
 	/**
 	 * @param $data
 	 */
-	protected function saveModuleConfig($data)
+	public function saveModuleConfig($data)
 	{
 		$config = new PhpAdapter;
 		file_put_contents($this->getModuleConfigPath(), $config->dump($data));
@@ -345,7 +345,7 @@ class ModuleInstaller extends LibraryInstaller
 	/**
 	 * @param $data
 	 */
-	protected function saveConfig($data)
+	public function saveConfig($data)
 	{
 		$config = new NeonAdapter();
 		file_put_contents($this->getConfigPath(), $config->dump($data));
