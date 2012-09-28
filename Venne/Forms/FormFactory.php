@@ -96,7 +96,7 @@ class FormFactory extends Object
 		}
 
 		if (method_exists($this, 'handleAttached')) {
-			$form->onLoad[] = callback($this, 'handleAttached');
+			$form->onAttached[] = callback($this, 'handleAttached');
 		}
 
 		foreach ($form->getComponents(TRUE, 'Nette\Forms\ISubmitterControl') as $submitControl) {
