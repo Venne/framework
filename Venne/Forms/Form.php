@@ -31,6 +31,9 @@ class Form extends \Nette\Application\UI\Form implements IObjectContainer, ICont
 	/** @var array */
 	public $onAttached;
 
+	/** @var array */
+	public $onBeforeRender;
+
 	/** @var IMapper|NULL */
 	protected $mapper;
 
@@ -214,5 +217,21 @@ class Form extends \Nette\Application\UI\Form implements IObjectContainer, ICont
 		} else {
 			$this->onError($this);
 		}
+	}
+
+
+	public function render()
+	{
+		$this->onBeforeRender($this);
+
+		parent::render();
+	}
+
+
+	public function __toString()
+	{
+		$this->onBeforeRender($this);
+
+		return parent::__toString();
 	}
 }

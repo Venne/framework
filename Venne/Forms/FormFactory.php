@@ -99,6 +99,10 @@ class FormFactory extends Object
 			$form->onAttached[] = callback($this, 'handleAttached');
 		}
 
+		if (method_exists($this, 'handleBeforeRender')) {
+			$form->onBeforeRender[] = callback($this, 'handleBeforeRender');
+		}
+
 		foreach ($form->getComponents(TRUE, 'Nette\Forms\ISubmitterControl') as $submitControl) {
 			$name = ucfirst((\Nette\Utils\Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m)
 			{
