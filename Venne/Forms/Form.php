@@ -66,6 +66,34 @@ class Form extends \Nette\Application\UI\Form implements IObjectContainer, ICont
 	}
 
 
+	/**
+	 * @param $name
+	 * @return \Nette\Forms\Controls\SubmitButton
+	 */
+	public function addSaveButton($name)
+	{
+		return $this->addSubmit('_submit', $name);
+	}
+
+
+	/**
+	 * @return \Nette\Forms\Controls\SubmitButton
+	 */
+	public function getSaveButton()
+	{
+		return $this['_submit'];
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function hasSaveButton()
+	{
+		return isset($this['_submit']);
+	}
+
+
 	public function __call($name, $args)
 	{
 		if (substr($name, 0, 3) !== 'add') {
