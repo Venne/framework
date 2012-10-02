@@ -36,10 +36,11 @@ class File extends Object
 
 		$dirContent = Finder::find('*')->from($dirname)->childFirst();
 		foreach ($dirContent as $file) {
-			if ($file->isDir())
+			if ($file->isDir()) {
 				@rmdir($file->getPathname());
-			else
+			} else {
 				@unlink($file->getPathname());
+			}
 		}
 
 		@rmdir($dirname);
@@ -57,6 +58,8 @@ class File extends Object
 	 */
 	public static function getRelativePath($from, $to)
 	{
+		$from = substr($from, -1) !== '/' ? $from . '/' : $from;
+		$to = substr($to, -1) !== '/' ? $to . '/' : $to;
 		$from = explode('/', $from);
 		$to = explode('/', $to);
 		$relPath = $to;
@@ -67,7 +70,6 @@ class File extends Object
 			} else {
 				$remaining = count($from) - $depth;
 				if ($remaining > 1) {
-					// add traversals up to first matching dir
 					$padLength = (count($relPath) + $remaining - 1) * -1;
 					$relPath = array_pad($relPath, $padLength, '..');
 					break;
@@ -76,7 +78,8 @@ class File extends Object
 				}
 			}
 		}
-		return implode('/', $relPath);
+		$relPath = implode('/', $relPath);
+		return $relPath = substr($relPath, -1) === '/' ? substr($relPath, 0, -1) : $relPath;
 	}
 }
 
