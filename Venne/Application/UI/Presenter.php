@@ -39,6 +39,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 	/** @var \Nette\DI\Container */
 	private $context;
 
+	/** @var array */
+	protected $_flashes = array();
+
 
 	public function __construct()
 	{
@@ -100,6 +103,31 @@ class Presenter extends \Nette\Application\UI\Presenter
 		if ($this->controlVerifier) {
 			$this->controlVerifier->checkRequirements($element);
 		}
+	}
+
+
+	/**
+	 * Saves the message to template, that can be displayed after redirect.
+	 * @param  string
+	 * @param  string
+	 * @return \stdClass
+	 */
+	public function flashMessage($message, $type = 'info', $withoutSession = false)
+	{
+		if ($withoutSession) {
+			$this->_flashes[] = $flash = (object)array(
+				'message' => $message,
+				'type' => $type,
+			);
+		} else {
+			$flash = parent::flashMessage($message, $type);
+		}
+
+		$id = $this->getParameterId('flash');
+		$messages = $this->getPresenter()->getFlashSession()->$id;
+		$this->getTemplate()->flashes = array_merge((array)$messages, $this->_flashes);
+
+		return $flash;
 	}
 
 
