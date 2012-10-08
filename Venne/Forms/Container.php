@@ -33,7 +33,7 @@ class Container extends \Nette\Forms\Container implements IContainer
 
 		if (isset($this->getForm()->controlExtensions[$type])) {
 			$obj = $this->getForm()->controlExtensions[$type];
-			$args = array_merge(array($this->getForm()), $args);
+			$args = array_merge(array($this), $args);
 			return call_user_func_array(array($obj, $method), $args);
 		}
 
