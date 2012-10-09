@@ -60,6 +60,15 @@ class PresenterTest extends TestCase
 		$this->assertEquals('Venne\Tests\Application\UI\FooControl', get_class($this->presenter['foo']));
 		$this->assertEquals('Venne\Tests\Application\UI\Bar2Control', get_class($this->presenter['bar']));
 	}
+
+
+	/**
+	 * @expectedException Nette\InvalidArgumentException
+	 */
+	public function testCreateComponentException()
+	{
+		get_class($this->presenter['foo2']);
+	}
 }
 
 class Presenter extends \Venne\Application\UI\Presenter
