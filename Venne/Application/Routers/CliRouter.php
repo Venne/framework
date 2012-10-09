@@ -18,7 +18,7 @@ use Nette\Application\Request;
  *
  * For use Symfony Console
  *
- * @author	Patrik Votoček
+ * @author    Patrik Votoček
  */
 class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 {
@@ -36,14 +36,10 @@ class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 	 */
 	public function __construct(\Nette\DI\Container $container)
 	{
-		$this->callback = callback(function() use($container) {
-					$container->console->console->run();
-				});
+		$this->callback = callback(function () use ($container) {
+			$container->console->console->run();
+		});
 	}
-
-
-
-
 
 
 	/**
@@ -62,7 +58,6 @@ class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 	}
 
 
-
 	/**
 	 * This router is only unidirectional
 	 *
@@ -74,5 +69,4 @@ class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 	{
 		return NULL;
 	}
-
 }

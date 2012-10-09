@@ -37,10 +37,8 @@ class ConsoleExtension extends CompilerExtension
 		$container->addDefinition($this->prefix('console'))
 			->setClass('Symfony\Component\Console\Application')
 			->addSetup('setHelperSet', array('@console.helperSet'))
-			->addSetup('setCatchExceptions', false);
+			->addSetup('setCatchExceptions', !$container->parameters['debugMode']);
 	}
-
-
 
 
 	public function beforeCompile()
@@ -51,12 +49,13 @@ class ConsoleExtension extends CompilerExtension
 		$this->registerHelpers();
 	}
 
+
 	protected function registerHelpers()
 	{
 		$container = $this->getContainerBuilder();
 		$definition = $container->getDefinition($this->prefix('helperSet'));
 
-		foreach ($container->findByTag("commandHelper") as $item=>$meta) {
+		foreach ($container->findByTag("commandHelper") as $item => $meta) {
 			$definition->addSetup("set", array("@{$item}", $meta));
 		}
 	}
@@ -67,10 +66,9 @@ class ConsoleExtension extends CompilerExtension
 		$container = $this->getContainerBuilder();
 		$console = $container->getDefinition($this->prefix('console'));
 
-		foreach ($container->findByTag("command") as $item=>$meta) {
+		foreach ($container->findByTag("command") as $item => $meta) {
 			$console->addSetup("add", "@{$item}");
 		}
 	}
-
 }
 

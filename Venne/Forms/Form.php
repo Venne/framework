@@ -179,15 +179,6 @@ class Form extends \Nette\Application\UI\Form implements IObjectContainer, ICont
 
 
 	/**
-	 * @return array
-	 */
-	public function getInputs()
-	{
-		return $this->inputs;
-	}
-
-
-	/**
 	 * @param \Nette\ComponentModel\Container $obj
 	 */
 	protected function attached($obj)

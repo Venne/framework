@@ -14,9 +14,7 @@ namespace Venne\Application\UI;
 use Venne;
 use Nette\DI\Container;
 use Venne\Security\IControlVerifier;
-use Nette\Application\UI\InvalidLinkException;
 use Nette\Application\UI\PresenterComponentReflection;
-use Nette\Application\ForbiddenRequestException;
 use Venne\Templating\ITemplateConfigurator;
 use Venne\Widget\WidgetManager;
 
@@ -35,9 +33,6 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 	/** @var WidgetManager */
 	protected $widgetManager;
-
-	/** @var \Nette\DI\Container */
-	private $context;
 
 	/** @var array */
 	protected $_flashes = array();
