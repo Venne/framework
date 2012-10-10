@@ -39,6 +39,10 @@ class FormFactory extends Object
 	 */
 	public function createForm($data = NULL)
 	{
+		if (!$this->factory) {
+			throw new \Nette\InvalidArgumentException("Form factory has not been set");
+		}
+
 		/** @var $form Form */
 		$form = $this->factory->invoke();
 
@@ -55,12 +59,6 @@ class FormFactory extends Object
 		$this->attachHandlers($form);
 
 		return $form;
-	}
-
-
-	public function __invoke($class = NULL)
-	{
-		return $this->createForm($class);
 	}
 
 
@@ -104,8 +102,7 @@ class FormFactory extends Object
 		}
 
 		foreach ($form->getComponents(TRUE, 'Nette\Forms\ISubmitterControl') as $submitControl) {
-			$name = ucfirst((\Nette\Utils\Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m)
-			{
+			$name = ucfirst((\Nette\Utils\Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m) {
 				return strtoupper($m[1]);
 			})));
 
