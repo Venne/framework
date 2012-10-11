@@ -85,23 +85,22 @@ class ModuleInstaller extends LibraryInstaller
 				);
 			}
 			$this->saveModuleConfig($modules);
-			$this->actions[] = function($self) use ($orig)
-			{
+			$this->actions[] = function ($self) use ($orig) {
 				$self->saveModuleConfig($orig);
 			};
 
 
 			// create resources dir
-			$resourcesDir = $this->getContainer()->parameters['resourcesDir'] . "/{$name}Module";
+			$resourcesDir = $this->getContainer()->parameters['resourcesDir'];
+			$moduleDir = $resourcesDir . "/{$name}Module";
 			$targetDir = $this->getInstallPath($package) . '/Resources/public';
-			if (!file_exists($resourcesDir) && file_exists($targetDir)) {
+			if (!file_exists($moduleDir) && file_exists($targetDir)) {
 				umask(0000);
-				if (symlink(\Venne\Utils\File::getRelativePath($resourcesDir, $targetDir), $resourcesDir) == false) {
-					copy($targetDir, $resourcesDir);
+				if (symlink(\Venne\Utils\File::getRelativePath($resourcesDir, $targetDir), $moduleDir) === false) {
+					copy($targetDir, $moduleDir);
 				}
 
-				$this->actions[] = function($self) use ($resourcesDir)
-				{
+				$this->actions[] = function ($self) use ($resourcesDir) {
 					if (is_link($resourcesDir)) {
 						unlink($resourcesDir);
 					} else {
@@ -117,8 +116,7 @@ class ModuleInstaller extends LibraryInstaller
 				$data = array_merge_recursive($data, $extra['venne']['configuration']); //\Nette\Utils\Arrays::mergeTree($data, $extra['venne']['configuration']);
 				$this->saveConfig($data);
 
-				$this->actions[] = function($self) use ($orig)
-				{
+				$this->actions[] = function ($self) use ($orig) {
 					$self->saveConfig($orig);
 				};
 			}
@@ -205,8 +203,7 @@ class ModuleInstaller extends LibraryInstaller
 			$data = $this->getRecursiveDiff($data, $extra['venne']['configuration']);
 			$this->saveConfig($data);
 
-			$this->actions[] = function($self) use ($orig)
-			{
+			$this->actions[] = function ($self) use ($orig) {
 				$self->saveConfig($orig);
 			};
 		}
