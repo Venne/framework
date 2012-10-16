@@ -37,14 +37,40 @@ class FileTest extends TestCase
 
 
 	/**
+	 * @return array
+	 */
+	public function dataGetRelativePathWindows()
+	{
+		return array(
+			array(array('C:\\foo\\a\\', 'C:\\foo\\b'), '..\\b'),
+			array(array('C:\\foo\\a', 'C:\\foo\\b\\'), '..\\b'),
+			array(array('C:\\foo\\a\\', 'C:\\foo\\b\\'), '..\\b'),
+			array(array('C:\\foo\\a', 'C:\\foo\\b'), '..\\b'),
+		);
+	}
+
+
+	/**
 	 * @dataProvider dataGetRelativePath
 	 *
 	 * @param string $presenterName
 	 * @param string $serviceName
 	 */
-	public function testGetRelativePath($data, $target)
+	public function testGetRelativePathLinux($data, $target)
 	{
-		$this->assertEquals($target, File::getRelativePath($data[0], $data[1]));
+		$this->assertEquals($target, File::getRelativePath($data[0], $data[1]), '/');
+	}
+
+
+	/**
+	 * @dataProvider dataGetRelativePath
+	 *
+	 * @param string $presenterName
+	 * @param string $serviceName
+	 */
+	public function testGetRelativePathWindows($data, $target)
+	{
+		$this->assertEquals($target, File::getRelativePath($data[0], $data[1]), '\\');
 	}
 
 

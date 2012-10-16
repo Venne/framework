@@ -56,8 +56,15 @@ class File extends Object
 	 * @param $to
 	 * @return string
 	 */
-	public static function getRelativePath($from, $to)
+	public static function getRelativePath($from, $to, $directorySeparator = NULL)
 	{
+		$directorySeparator = $directorySeparator ? : ((substr(PHP_OS, 0, 3) === 'WIN') ? '\\' : '/');
+
+		if ($directorySeparator !== '/') {
+			$from = str_replace($directorySeparator, '/', $from);
+			$to = str_replace($directorySeparator, '/', $to);
+		}
+
 		$from = substr($from, -1) !== '/' ? $from . '/' : $from;
 		$to = substr($to, -1) !== '/' ? $to . '/' : $to;
 		$from = explode('/', $from);
@@ -79,7 +86,13 @@ class File extends Object
 			}
 		}
 		$relPath = implode('/', $relPath);
-		return $relPath = substr($relPath, -1) === '/' ? substr($relPath, 0, -1) : $relPath;
+		$relPath = substr($relPath, -1) === '/' ? substr($relPath, 0, -1) : $relPath;
+
+		if ($directorySeparator !== '/') {
+			$relPath = str_replace('/', $directorySeparator, $relPath);
+		}
+
+		return $relPath;
 	}
 }
 
