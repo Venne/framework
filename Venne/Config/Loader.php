@@ -32,9 +32,17 @@ class Loader extends \Nette\Config\Loader
 	public function load($file, $section = NULL)
 	{
 		$file = \Nette\DI\Helpers::expand($file, $this->parameters);
-		if($pos = strpos($file, '//')){
-			$file = substr($file, $pos + 1);
+
+		if (substr(PHP_OS, 0, 3) === 'WIN') {
+			if ($pos = strpos($file, ':\\')) {
+				$file = substr($file, $pos - 1);
+			}
+		} else {
+			if ($pos = strpos($file, '//')) {
+				$file = substr($file, $pos + 1);
+			}
 		}
+
 		return parent::load($file, $section);
 	}
 
