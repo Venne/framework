@@ -34,7 +34,7 @@ class Loader extends \Nette\Config\Loader
 		$file = \Nette\DI\Helpers::expand($file, $this->parameters);
 
 		if (substr(PHP_OS, 0, 3) === 'WIN') {
-			if ($pos = strpos($file, ':\\')) {
+			if ($pos = strrpos($file, ':\\')) {
 				$file = substr($file, $pos - 1);
 			}
 		} else {
