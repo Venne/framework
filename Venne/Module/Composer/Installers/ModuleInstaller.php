@@ -14,6 +14,7 @@ namespace Venne\Module\Composer\Installers;
 use Venne;
 use Venne\Module\ModuleManager;
 use Venne\Config\Configurator;
+use Venne\Utils\File;
 use Nette\DI\Container;
 use Nette\Config\Adapters\NeonAdapter;
 use Nette\Config\Adapters\PhpAdapter;
@@ -96,15 +97,15 @@ class ModuleInstaller extends LibraryInstaller
 			$targetDir = $this->getInstallPath($package) . '/Resources/public';
 			if (!file_exists($moduleDir) && file_exists($targetDir)) {
 				umask(0000);
-				if (symlink(\Venne\Utils\File::getRelativePath($resourcesDir, $targetDir), $moduleDir) === false) {
-					copy($targetDir, $moduleDir);
+				if (symlink(File::getRelativePath($resourcesDir, $targetDir), $moduleDir) === false) {
+					File::copy($targetDir, $moduleDir);
 				}
 
 				$this->actions[] = function ($self) use ($resourcesDir) {
 					if (is_link($resourcesDir)) {
 						unlink($resourcesDir);
 					} else {
-						\Venne\Utils\File::rmdir($resourcesDir, true);
+						File::rmdir($resourcesDir, true);
 					}
 				};
 			}
@@ -214,7 +215,7 @@ class ModuleInstaller extends LibraryInstaller
 			if (is_link($resourcesDir)) {
 				unlink($resourcesDir);
 			} else {
-				\Venne\Utils\File::rmdir($resourcesDir, true);
+				File::rmdir($resourcesDir, true);
 			}
 		}
 

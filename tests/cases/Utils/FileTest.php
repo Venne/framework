@@ -85,4 +85,20 @@ class FileTest extends TestCase
 
 		$this->assertTrue(File::rmdir($tmpDir . '/foo', true));
 	}
+
+
+	public function testCopy()
+	{
+		$tmpDir = $this->getContext()->parameters['tempDir'];
+		umask(0000);
+
+		mkdir($tmpDir . '/foo/bar', 0777, true);
+		touch($tmpDir . '/foo/bar/file');
+
+		$this->assertTrue(File::copy($tmpDir . '/foo', $tmpDir . '/foo2'));
+		$this->assertTrue(file_exists($tmpDir . '/foo2/bar/file'));
+
+		File::rmdir($tmpDir . '/foo', true);
+		File::rmdir($tmpDir . '/foo2', true);
+	}
 }

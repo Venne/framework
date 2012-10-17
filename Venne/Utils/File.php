@@ -49,6 +49,44 @@ class File extends Object
 
 
 	/**
+	 * Copy directory of file.
+	 *
+	 * @param $source
+	 * @param $dest
+	 * @return bool
+	 */
+	public static function copy($source, $dest, $mode = 0777)
+	{
+		if (is_file($source)) {
+			return copy($source, $dest);
+		}
+
+		$status = true;
+
+		if (!is_dir($dest)) {
+			umask(0000);
+			mkdir($dest, $mode, true);
+		}
+
+		$dir = dir($source);
+		while (false !== $entry = $dir->read()) {
+			if ($entry == '.' || $entry == '..') {
+				continue;
+			}
+
+			if ($dest !== "$source/$entry") {
+				if (self::copy("$source/$entry", "$dest/$entry", $mode) === false) {
+					$status = false;
+				}
+			}
+		}
+		$dir->close();
+
+		return $status;
+	}
+
+
+	/**
 	 * Get relative path.
 	 *
 	 * @static
