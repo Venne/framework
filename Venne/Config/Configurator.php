@@ -159,7 +159,9 @@ class Configurator extends \Nette\Config\Configurator
 		$container = parent::createContainer();
 
 		// register robotLoader and configurator
-		$container->addService("robotLoader", $this->robotLoader);
+		if ($this->robotLoader) {
+			$container->addService("robotLoader", $this->robotLoader);
+		}
 		$container->addService("configurator", $this);
 
 		return $container;
