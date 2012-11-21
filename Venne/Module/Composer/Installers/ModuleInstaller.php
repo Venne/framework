@@ -47,6 +47,9 @@ class ModuleInstaller extends LibraryInstaller
 	/** @var array */
 	protected $actions = array();
 
+	/** @var PackageInterface */
+	protected $mainPackage;
+
 
 	/**
 	 * {@inheritDoc}
@@ -67,6 +70,7 @@ class ModuleInstaller extends LibraryInstaller
 	{
 		try {
 			$this->repo = $repo;
+			$this->mainPackage = $package;
 			$this->registerRobotLoader();
 			$container = $this->getContainer();
 
@@ -248,7 +252,7 @@ class ModuleInstaller extends LibraryInstaller
 
 		// Class loader for custom installers
 		$generator = new AutoloadGenerator;
-		$map = $generator->parseAutoloads($autoloads);
+		$map = $generator->parseAutoloads($autoloads, $this->mainPackage);
 		$classLoader = $generator->createLoader($map);
 		$classLoader->register();
 	}
