@@ -12,13 +12,11 @@
 namespace Venne\Module;
 
 use Venne;
-use Nette\Object;
+use Venne\Utils\File;
 use Nette\DI\Container;
-use Nette\Utils\Strings;
-use Composer\Console\Application;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\StreamOutput;
+use Nette\Object;
+use Nette\Utils\Finder;
+use Nette\Config\Adapters\PhpAdapter;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -26,155 +24,343 @@ use Symfony\Component\Console\Output\StreamOutput;
 class ModuleManager extends Object
 {
 
-	const RESOURCES_MODE_SYMLINK = 'symlink';
+	const MODULE_CLASS = 'class';
 
-	const RESOURCES_MODE_COPY = 'copy';
+	const MODULE_PATH = 'path';
 
-	const MODULE_STATUS_INSTALLED = 'installed';
+	const MODULE_STATUS = 'status';
 
-	const MODULE_STATUS_PAUSED = 'paused';
+	const MODULE_VERSION = 'version';
 
-	/** @var string */
-	protected $resourcesMode;
+	const MODULE_AUTOLOAD = 'autoload';
 
-	/** @var string */
-	protected $moduleConfig;
+	const STATUS_UNINSTALLED = 'uninstalled';
 
-	/** @var string */
-	protected $resourcesDir;
+	const STATUS_INSTALLED = 'installed';
 
-	/** @var Container|SystemContainer */
+	const STATUS_FOR_INSTALL = 'forInstall';
+
+	const STATUS_FOR_UNINSTALL = 'forUninstall';
+
+	const STATUS_FOR_UPGRADE = 'forUpgrade';
+
+	/** @var Container */
 	protected $context;
 
 	/** @var string */
-	protected $resourceModes = array(
-		self::RESOURCES_MODE_SYMLINK,
-		self::RESOURCES_MODE_COPY,
-	);
+	protected $libsDir;
 
-	protected $moduleStatuses = array(
-		self::MODULE_STATUS_INSTALLED,
-		self::MODULE_STATUS_PAUSED,
-	);
+	/** @var string */
+	protected $configDir;
+
+	/** @var array */
+	protected $modules;
+
+	/** @var IModule[] */
+	protected $_findModules;
+
+	/** @var IModule[] */
+	protected $_modules;
 
 
 	/**
 	 * @param \Nette\DI\Container $context
-	 * @param array $modules
-	 * @param string $moduleConfig
-	 * @param string $resourcesMode
-	 * @param string $resourcesDir
+	 * @param $modules
+	 * @param $libsDir
+	 * @param $configDir
 	 */
-	public function __construct(Container $context, $moduleConfig, $resourcesMode, $resourcesDir)
+	public function __construct(Container $context, $modules, $libsDir, $configDir)
 	{
 		$this->context = $context;
-		$this->moduleConfig = $moduleConfig;
-		$this->setResourcesMode($resourcesMode);
-		$this->resourcesDir = $resourcesDir;
+		$this->modules = $modules;
+		$this->libsDir = $libsDir;
+		$this->configDir = $configDir;
+
+		$this->findModules();
 	}
 
 
-	/**
-	 * Update dependencies by Composer.
-	 *
-	 * @param null|string $composerFile
-	 */
-	public function updateByComposer($composerFile = NULL)
+	public function update()
 	{
-		return $this->runCommand('update', $composerFile);
-	}
-
-
-	/**
-	 * @param $resourcesMode
-	 * @throws \Nette\InvalidArgumentException
-	 */
-	public function setResourcesMode($resourcesMode)
-	{
-		if (array_search($resourcesMode, $this->resourceModes) === false) {
-			throw new \Nette\InvalidArgumentException;
+		// unregister
+		foreach ($this->getModulesForUnregister() as $name => $args) {
+			$this->unregister($name);
 		}
 
-		$this->resourcesMode = $resourcesMode;
+		// register
+		foreach ($this->getModulesForRegister() as $module) {
+			$this->register($module);
+		}
+
+		// uninstall
+		foreach ($this->getModulesForUninstall() as $module) {
+			$this->uninstall($module);
+		}
+
+		// upgrade
+		foreach ($this->getModulesForUpgrade() as $module) {
+			$this->upgrade($module);
+		}
+
+		// install
+		foreach ($this->getModulesForInstall() as $module) {
+			$this->install($module);
+		}
 	}
 
 
-	public function scanRepositoryModules()
+	/**
+	 * @param IModule $module
+	 */
+	protected function register(IModule $module)
 	{
-		$arr = array();
+		$modules = $this->loadModuleConfig();
+		if (!array_search($module->getName(), $modules['modules'])) {
+			$modules['modules'][$module->getName()] = array(
+				self::MODULE_STATUS => self::STATUS_UNINSTALLED,
+				self::MODULE_CLASS => $module->getClassName(),
+				self::MODULE_VERSION => $module->getVersion(),
+				self::MODULE_PATH => str_replace($this->libsDir, '%libsDir%', $module->getPath()),
+				self::MODULE_AUTOLOAD => str_replace($this->libsDir, '%libsDir%', $module->getAutoload()),
+			);
+		}
+		$this->saveModuleConfig($modules);
+		$this->modules = $modules['modules'];
+	}
 
-		$modules = $this->runCommand('search venne');
-		$modules = explode("\n", $modules);
-		foreach ($modules as $module) {
-			$module = explode(" ", $module);
-			$module = $module[0];
 
-			if (strpos($module, '<highlight>venne</highlight>/') !== false && substr($module, -7) == '-module') {
-				$module = substr($module, 29, -7);
-				if (!isset($arr[$module])) {
-					$arr[$module] = true;
+	/**
+	 * @param $name
+	 */
+	protected function unregister($name)
+	{
+		$modules = $this->loadModuleConfig();
+		unset($modules['modules'][$name]);
+		$this->saveModuleConfig($modules);
+		$this->modules = $modules['modules'];
+	}
+
+
+	/**
+	 * @param IModule $module
+	 */
+	protected function install(IModule $module)
+	{
+		foreach ($module->getInstallers() as $class) {
+			$installer = $this->context->createInstance($class);
+			$installer->install($module);
+		}
+
+		$modules = $this->loadModuleConfig();
+		$modules['modules'][$module->getName()][self::MODULE_STATUS] = self::STATUS_INSTALLED;
+		$this->saveModuleConfig($modules);
+	}
+
+
+	/**
+	 * @param IModule $module
+	 */
+	protected function uninstall(IModule $module)
+	{
+		foreach ($module->getInstallers() as $class) {
+			$installer = $this->context->createInstance($class);
+			$installer->uninstall($module);
+		}
+
+		$modules = $this->loadModuleConfig();
+		$modules['modules'][$module->getName()][self::MODULE_STATUS] = self::STATUS_UNINSTALLED;
+		$this->saveModuleConfig($modules);
+	}
+
+
+	/**
+	 * @param IModule $module
+	 */
+	protected function upgrade(IModule $module)
+	{
+		$modules = $this->loadModuleConfig();
+		$modules['modules'][$module->getName()][self::MODULE_STATUS] = self::STATUS_INSTALLED;
+		$this->saveModuleConfig($modules);
+	}
+
+
+	/**
+	 * @return IModule[]
+	 */
+	protected function findModules()
+	{
+		if ($this->_findModules === NULL) {
+			$this->_findModules = array();
+
+			foreach (Finder::findDirectories('*')->in($this->libsDir) as $dir) {
+				foreach (Finder::findDirectories('*')->in($dir) as $dir2) {
+					foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
+						$classes = get_declared_classes();
+						require_once $file->getPathname();
+						$class = array_diff(get_declared_classes(), $classes);
+						$class = end($class);
+
+						/** @var $module IModule */
+						$module = $this->createInstanceOfModule($class, dirname($file->getPathname()));
+
+						$this->_findModules[$module->getName()] = $module;
+					}
 				}
 			}
 		}
 
-		foreach ($arr as $name => $item) {
-			$values = array();
-			$data = $this->runCommand("show venne/{$name}-module");
-			$data = explode("\n", $data);
-			foreach ($data as $row) {
-				$row = explode(':', $row);
-				if (count($row) == 2) {
-					$values[trim($row[0])] = trim($row[1]);
-				}
-			}
-
-			$arr[$name] = $values;
-		}
-
-		file_put_contents($this->context->parameters['tempDir'] . '/modules-cache', json_encode($arr));
+		return $this->_findModules;
 	}
-
-
-	public function findRepositoryModules()
-	{
-		$file = $this->context->parameters['tempDir'] . '/modules-cache';
-
-		if (!file_exists($file)) {
-			$this->scanRepositoryModules();
-		}
-
-		return json_decode(file_get_contents($file));
-	}
-
-	/*************************************************************************************/
 
 
 	/**
-	 * @param $string
+	 * @return IModule[]
+	 */
+	protected function getModules()
+	{
+		if ($this->_modules === NULL) {
+			$this->_modules = array();
+
+			foreach ($this->modules as $name => $args) {
+				if (file_exists($args[self::MODULE_PATH])) {
+					$this->_modules[$name] = $this->createInstanceOfModule($args[self::MODULE_CLASS], $args[self::MODULE_PATH]);
+				}
+			}
+		}
+
+		return $this->_modules;
+	}
+
+
+	/**
+	 * @return IModule[]
+	 */
+	protected function getModulesForRegister()
+	{
+		$activModules = $this->getModules();
+		$modules = $this->findModules();
+		$diff = array_diff(array_keys($modules), array_keys($activModules));
+
+		$ret = array();
+		foreach ($diff as $name) {
+			$ret[$name] = $modules[$name];
+		}
+
+		return $ret;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function getModulesForUnregister()
+	{
+		$ret = array();
+		foreach ($this->modules as $name => $args) {
+			if (!file_exists($args[self::MODULE_PATH])) {
+				$ret[$name] = $args;
+			}
+		}
+		return $ret;
+	}
+
+
+	/**
+	 * @return IModule[]
+	 */
+	protected function getModulesForInstall()
+	{
+		$ret = array();
+		foreach ($this->findModules() as $name => $module) {
+			if ($this->getStatus($module) === self::STATUS_FOR_INSTALL) {
+				$ret[$name] = $module;
+			}
+		}
+		return $ret;
+	}
+
+
+	/**
+	 * @return IModule[]
+	 */
+	protected function getModulesForUninstall()
+	{
+		$ret = array();
+		foreach ($this->findModules() as $name => $module) {
+			if ($this->getStatus($module) === self::STATUS_FOR_UNINSTALL) {
+				$ret[$name] = $module;
+			}
+		}
+		return $ret;
+	}
+
+
+	/**
+	 * @return IModule[]
+	 */
+	protected function getModulesForUpgrade()
+	{
+		$ret = array();
+		foreach ($this->findModules() as $name => $module) {
+			if ($this->getStatus($module) === self::STATUS_FOR_UPGRADE) {
+				$ret[$name] = $module;
+			}
+		}
+		return $ret;
+	}
+
+
+	/**
+	 * @param IModule $module
 	 * @return string
 	 */
-	protected function runCommand($string, $composerFile = NULL)
+	protected function getStatus(IModule $module)
 	{
-		$application = new Application();
-		$application->setAutoExit(false);
+		return $this->modules[$module->getName()]['status'];
+	}
 
-		$filename = $this->context->parameters['tempDir'] . '/moduleManager-command';
-		$file = fopen($filename, "w");
 
-		$input = new StringInput($string);
-		$output = new StreamOutput($file);
+	protected function formatClass($class)
+	{
+		return '\\' . trim($class, '\\');
+	}
 
-		$composerFile = $composerFile ?: $this->context->parameters['appDir'] . '/../composer.json';
-		putenv("COMPOSER={$composerFile}");
-		putenv("COMPOSER_VENDOR_DIR={$this->context->parameters['libsDir']}");
-		$application->run($input, $output);
-		\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_VERBOSE;
 
-		fclose($file);
+	protected function createInstanceOfModule($class, $path)
+	{
+		if (!class_exists($class)) {
+			require_once $path . '/Module.php';
+		}
+		return new $class;
+	}
 
-		$data = file_get_contents($filename);
-		unlink($filename);
-		return $data;
+
+	/**
+	 * @return string
+	 */
+	protected function getModuleConfigPath()
+	{
+		return $this->configDir . '/settings.php';
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function loadModuleConfig()
+	{
+		$config = new PhpAdapter;
+		return $config->load($this->getModuleConfigPath());
+	}
+
+
+	/**
+	 * @param $data
+	 */
+	public function saveModuleConfig($data)
+	{
+		$config = new PhpAdapter;
+		file_put_contents($this->getModuleConfigPath(), $config->dump($data));
 	}
 }
 
