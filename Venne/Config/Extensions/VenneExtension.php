@@ -83,7 +83,7 @@ class VenneExtension extends CompilerExtension
 
 		// modules
 		$container->addDefinition($this->prefix('moduleManager'))
-			->setClass('Venne\Module\ModuleManager', array('@container', '%configDir%/modules.neon', $config['moduleManager']['resourcesMode'], '%resourcesDir%'));
+			->setClass('Venne\Module\ModuleManager', array('@container', '%modules%', '%libsDir%', '%configDir%'));
 
 		// widgets
 		$container->addDefinition($this->prefix('widgetManager'))
@@ -100,6 +100,13 @@ class VenneExtension extends CompilerExtension
 		// Commands
 		$commands = array(
 			'cache' => 'Venne\Caching\Commands\Cache',
+			'moduleUpdate' => 'Venne\Module\Commands\Update',
+			'moduleInstall' => 'Venne\Module\Commands\Install',
+			'moduleUninstall' => 'Venne\Module\Commands\Uninstall',
+			'moduleUpgrade' => 'Venne\Module\Commands\Upgrade',
+			'moduleRegister' => 'Venne\Module\Commands\Register',
+			'moduleUnregister' => 'Venne\Module\Commands\Unregister',
+			'moduleList' => 'Venne\Module\Commands\List',
 		);
 		foreach ($commands as $name => $cmd) {
 			$container->addDefinition($this->prefix(lcfirst($name) . 'Command'))

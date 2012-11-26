@@ -39,18 +39,43 @@ class Configurator extends \Nette\Config\Configurator
 	/** @var Compiler */
 	protected $compiler;
 
+	/** @var \Composer\Autoload\ClassLoader */
+	protected $classLoader;
+
 
 	/**
 	 * @param $sandboxDir
 	 */
-	public function __construct($sandbox)
+	public function __construct($sandbox, \Composer\Autoload\ClassLoader $classLoader = NULL)
 	{
 		$this->sandbox = $sandbox;
+		$this->classLoader = $classLoader;
 
 		$this->parameters = $this->getSandboxParameters();
 		$this->validateConfiguration();
 		$this->parameters = $this->getDefaultParameters($this->parameters);
 		$this->setTempDirectory($this->parameters["tempDir"]);
+
+		if ($this->classLoader) {
+			$this->registerModuleLoaders();
+		}
+	}
+
+
+	protected function registerModuleLoaders()
+	{
+		foreach ($this->parameters['modules'] as $name => $items) {
+			if (isset($items['autoload']['psr-0'])) {
+				foreach ($items['autoload']['psr-0'] as $key => $val) {
+					$this->classLoader->add($key, $items['path'] . '/' . $val);
+				}
+			}
+			if (isset($items['autoload']['files'])) {
+				foreach ($items['autoload']['files'] as $file) {
+					include_once $items['path'] . '/' . $file;
+				}
+			}
+		}
 	}
 
 
