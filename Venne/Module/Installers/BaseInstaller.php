@@ -142,6 +142,11 @@ class BaseInstaller extends Object implements IInstaller
 	}
 
 
+	/**
+	 * @param array $arr1
+	 * @param array $arr2
+	 * @return array
+	 */
 	protected function getRecursiveDiff($arr1, $arr2)
 	{
 		foreach ($arr1 as $key => $item) {
@@ -162,6 +167,13 @@ class BaseInstaller extends Object implements IInstaller
 				$arr1[$key] = $this->getRecursiveDiff($arr1[$key], $arr2[$key]);
 			}
 		}
+
+		foreach ($arr1 as $key => $item) {
+			if (is_array($item) && count($item) === 0) {
+				unset($arr1[$key]);
+			}
+		}
+
 		return $arr1;
 	}
 
