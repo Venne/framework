@@ -37,7 +37,13 @@ class ConsoleExtension extends CompilerExtension
 		$container->addDefinition($this->prefix('console'))
 			->setClass('Symfony\Component\Console\Application')
 			->addSetup('setHelperSet', array('@console.helperSet'))
-			->addSetup('setCatchExceptions', !$container->parameters['debugMode']);
+			->addSetup('setCatchExceptions', true);
+
+		// helpers
+		$container->addDefinition($this->prefix('dialogHelper'))
+			->setClass('Symfony\Component\Console\Helper\DialogHelper')
+			->addTag('commandHelper', 'dialog')
+			->setAutowired(FALSE);
 	}
 
 

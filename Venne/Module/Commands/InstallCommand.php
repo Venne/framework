@@ -13,6 +13,7 @@ namespace Venne\Module\Commands;
 
 use Venne;
 use Venne\Module\ModuleManager;
+use Venne\Module\DependencyResolver\Problem;
 use Nette\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,6 +50,7 @@ class InstallCommand extends Command
 		$this
 			->setName('venne:module:install')
 			->addArgument('module', InputArgument::REQUIRED, 'Module name')
+			->addOption('noconfirm', NULL, InputOption::VALUE_NONE, 'do not ask for any confirmation')
 			->setDescription('Install module.');
 	}
 
@@ -58,7 +60,34 @@ class InstallCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		/** @var $module IModule */
+		$module = $this->moduleManager->createInstance($input->getArgument('module'));
+
 		try {
+			/** @var $problem Problem */
+			$problem = $this->moduleManager->testInstall($module);
+		} catch (InvalidArgumentException $e) {
+			$output->writeln("<error>{$e->getMessage()}</error>");
+			return;
+		}
+
+		if (!$input->getOption('noconfirm') && count($problem->getSolutions()) > 0) {
+			$output->writeln("<info>install : {$module->getName()}</info>");
+			foreach ($problem->getSolutions() as $job) {
+				$output->writeln("<info>{$job->getAction()} : {$job->getModule()->getName()}</info>");
+			}
+
+			$dialog = $this->getHelperSet()->get('dialog');
+			if (!$dialog->askConfirmation($output, '<question>Continue with this actions?</question>', false)) {
+				return;
+			}
+		}
+
+		try {
+			foreach ($problem->getSolutions() as $job) {
+				$this->moduleManager->doAction($job->getAction(), $job->getModule());
+				$output->writeln("Module '{$job->getModule()->getName()}' has been installed.");
+			}
 			$this->moduleManager->install($this->moduleManager->createInstance($input->getArgument('module')));
 			$output->writeln("Module '{$input->getArgument('module')}' has been installed.");
 		} catch (InvalidArgumentException $e) {

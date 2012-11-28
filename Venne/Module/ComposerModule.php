@@ -27,7 +27,7 @@ class ComposerModule extends BaseModule
 	{
 		$this->loadComposerData();
 
-		return substr($this->composerData['name'], strpos($this->composerData['name'], '/') + 1, -7);
+		return $this->normalizeName($this->composerData['name']);
 	}
 
 
@@ -59,8 +59,8 @@ class ComposerModule extends BaseModule
 	{
 		$this->loadComposerData();
 
-		if (isset($this->composerData['extra']['branch-alias']['dev-master'])) {
-			return str_replace('-dev', '', $this->composerData['extra']['branch-alias']['dev-master']);
+		if (isset($this->composerData['version'])) {
+			return $this->composerData['version'];
 		}
 
 		return parent::getVersion();
@@ -91,11 +91,26 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return VersionConstraint[]
+	 */
 	public function getRequire()
 	{
 		$this->loadComposerData();
 
-		return $this->composerData['require'];
+		$ret = array();
+		foreach ($this->composerData['require'] as $name => $require) {
+			if (substr($name, -7) === '-module') {
+
+				if (substr($require, -4) === '-dev') {
+					$require = substr($require, 0, -4);
+				}
+
+				$ret[$this->normalizeName($name)] = str_replace('*', 'x', $require);
+			}
+		}
+
+		return $ret;
 	}
 
 
@@ -124,6 +139,18 @@ class ComposerModule extends BaseModule
 		if ($this->composerData === NULL) {
 			$this->composerData = json_decode(file_get_contents($this->getPath() . '/composer.json'), true);
 		}
+	}
+
+
+	/**
+	 * @param $name
+	 * @return string
+	 */
+	protected function normalizeName($name)
+	{
+
+
+		return substr($name, strpos($name, '/') + 1, -7);
 	}
 }
 
