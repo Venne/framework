@@ -49,6 +49,7 @@ class UninstallCommand extends Command
 		$this
 			->setName('venne:module:uninstall')
 			->addArgument('module', InputArgument::REQUIRED, 'Module name')
+			->addOption('noconfirm', NULL, InputOption::VALUE_NONE, 'do not ask for any confirmation')
 			->setDescription('Uninstall module.');
 	}
 
@@ -58,8 +59,35 @@ class UninstallCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		/** @var $module IModule */
+		$module = $this->moduleManager->createInstance($input->getArgument('module'));
+
 		try {
-			$this->moduleManager->uninstall($this->moduleManager->createInstance($input->getArgument('module')));
+			/** @var $problem Problem */
+			$problem = $this->moduleManager->testUninstall($module);
+		} catch (InvalidArgumentException $e) {
+			$output->writeln("<error>{$e->getMessage()}</error>");
+			return;
+		}
+
+		if (!$input->getOption('noconfirm') && count($problem->getSolutions()) > 0) {
+			foreach ($problem->getSolutions() as $job) {
+				$output->writeln("<info>{$job->getAction()} : {$job->getModule()->getName()}</info>");
+			}
+			$output->writeln("<info>uninstall : {$module->getName()}</info>");
+
+			$dialog = $this->getHelperSet()->get('dialog');
+			if (!$dialog->askConfirmation($output, '<question>Continue with this actions?</question>', false)) {
+				return;
+			}
+		}
+
+		try {
+			foreach ($problem->getSolutions() as $job) {
+				$this->moduleManager->doAction($job->getAction(), $job->getModule());
+				$output->writeln("Module '{$job->getModule()->getName()}' has been uninstalled.");
+			}
+			$this->moduleManager->uninstall($module);
 			$output->writeln("Module '{$input->getArgument('module')}' has been uninstalled.");
 		} catch (InvalidArgumentException $e) {
 			$output->writeln("<error>{$e->getMessage()}</error>");

@@ -88,7 +88,7 @@ class InstallCommand extends Command
 				$this->moduleManager->doAction($job->getAction(), $job->getModule());
 				$output->writeln("Module '{$job->getModule()->getName()}' has been installed.");
 			}
-			$this->moduleManager->install($this->moduleManager->createInstance($input->getArgument('module')));
+			$this->moduleManager->install($module);
 			$output->writeln("Module '{$input->getArgument('module')}' has been installed.");
 		} catch (InvalidArgumentException $e) {
 			$output->writeln("<error>{$e->getMessage()}</error>");

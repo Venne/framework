@@ -91,14 +91,33 @@ class Solver extends Object
 	 */
 	public function testUninstall(IModule $module, Problem $problem = NULL)
 	{
-		foreach ($this->installedModules as $sourceModule) {
+		$installedModules = $this->installedModules;
+		$modules = $this->modules;
+
+		foreach ($installedModules as $sourceModule) {
 			if ($sourceModule->getName() === $module->getName()) {
 				continue;
 			}
 
 			foreach ($sourceModule->getRequire() as $name => $require) {
 				if ($name == $module->getName()) {
-					throw new InvalidArgumentException("Module '{$sourceModule->getName()}' depend on '{$module->getName()}'.");
+
+					if ($problem) {
+
+						try {
+							$solver = new Solver($modules, $installedModules);
+							$solver->testUninstall($sourceModule, $problem, true);
+						} catch (InvalidArgumentException $e) {
+							throw new InvalidArgumentException("Module '{$sourceModule->getName()}' depend on '{$module->getName()}' which is not installed.");
+						}
+
+						$job = new Job('uninstall', $sourceModule);
+						if (!$problem->hasSolution($job)) {
+							$problem->addSolution($job);
+						}
+					} else {
+						throw new InvalidArgumentException("Module '{$sourceModule->getName()}' depend on '{$module->getName()}'.");
+					}
 				}
 			}
 		}
