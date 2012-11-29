@@ -171,9 +171,10 @@ class Configurator extends \Nette\Config\Configurator
 	/**
 	 * Loads configuration from file and process it.
 	 *
+	 * @param string $class
 	 * @return DI\Container
 	 */
-	public function createContainer()
+	public function createContainer($class = NULL)
 	{
 		// add config files
 		foreach ($this->getConfigFiles() as $file) {
@@ -190,6 +191,21 @@ class Configurator extends \Nette\Config\Configurator
 		$container->addService("configurator", $this);
 
 		return $container;
+	}
+
+
+	public function buildContainer(& $dependencies = NULL, $class = NULL)
+	{
+		if ($class) {
+			$_class = $this->parameters['container']['class'];
+			$this->parameters['container']['class'] = $class;
+		}
+
+		return parent::buildContainer($dependencies);
+
+		if ($class) {
+			$this->parameters['container']['class'] = $_class;
+		}
 	}
 
 

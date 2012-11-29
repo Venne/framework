@@ -12,6 +12,7 @@
 namespace Venne\Module;
 
 use Venne;
+use Venne\Config\Configurator;
 use Venne\Module\DependencyResolver\Solver;
 use Venne\Module\DependencyResolver\Problem;
 use Nette\InvalidArgumentException;
@@ -88,6 +89,9 @@ class ModuleManager extends Object
 	/** @var IModule[] */
 	protected $_modules;
 
+	/** @var int */
+	protected $_systemContainer = 1;
+
 
 	/**
 	 * @param \Nette\DI\Container $context
@@ -113,6 +117,23 @@ class ModuleManager extends Object
 		$this->modules = $data['modules'];
 		$this->_findModules = NULL;
 		$this->_modules = NULL;
+	}
+
+
+	/**
+	 * Reload system container.
+	 */
+	protected function reloadSystemContainer()
+	{
+		/** @var $configurator Configurator */
+		$configurator = $this->context->configurator;
+		$class = $this->context->parameters['container']['class'] . $this->_systemContainer++;
+		\Nette\Utils\LimitedScope::evaluate($configurator->buildContainer($dependencies, $class));
+
+		/** @var context Container */
+		$this->context = new $class;
+		$this->context->initialize();
+		$this->context->addService("configurator", $configurator);
 	}
 
 
@@ -333,6 +354,7 @@ class ModuleManager extends Object
 		$this->saveModuleConfig($modules);
 
 		$this->reloadInfo();
+		$this->reloadSystemContainer();
 	}
 
 
@@ -359,6 +381,7 @@ class ModuleManager extends Object
 		$this->setStatus($module, self::STATUS_UNINSTALLED);
 
 		$this->reloadInfo();
+		$this->reloadSystemContainer();
 	}
 
 
@@ -382,6 +405,7 @@ class ModuleManager extends Object
 		$this->setStatus($module, self::STATUS_INSTALLED);
 
 		$this->reloadInfo();
+		$this->reloadSystemContainer();
 	}
 
 
