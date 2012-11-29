@@ -20,6 +20,7 @@ use Nette\Application\Routers\SimpleRouter;
 use Nette\Application\Routers\Route;
 use Nette\Config\Compiler;
 use Nette\Config\Adapters\NeonAdapter;
+use Venne\Module\ModuleManager;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -65,14 +66,16 @@ class Configurator extends \Nette\Config\Configurator
 	protected function registerModuleLoaders()
 	{
 		foreach ($this->parameters['modules'] as $name => $items) {
-			if (isset($items['autoload']['psr-0'])) {
-				foreach ($items['autoload']['psr-0'] as $key => $val) {
-					$this->classLoader->add($key, $items['path'] . '/' . $val);
+			if ($items[ModuleManager::MODULE_STATUS] === ModuleManager::STATUS_INSTALLED) {
+				if (isset($items['autoload']['psr-0'])) {
+					foreach ($items['autoload']['psr-0'] as $key => $val) {
+						$this->classLoader->add($key, $items['path'] . '/' . $val);
+					}
 				}
-			}
-			if (isset($items['autoload']['files'])) {
-				foreach ($items['autoload']['files'] as $file) {
-					include_once $items['path'] . '/' . $file;
+				if (isset($items['autoload']['files'])) {
+					foreach ($items['autoload']['files'] as $file) {
+						include_once $items['path'] . '/' . $file;
+					}
 				}
 			}
 		}

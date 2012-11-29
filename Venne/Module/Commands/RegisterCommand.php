@@ -58,6 +58,8 @@ class RegisterCommand extends Command
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		$modules = $this->moduleManager->findModules();
+
 		try {
 			$this->moduleManager->register($this->moduleManager->createInstance($input->getArgument('module')));
 			$output->writeln("Module '{$input->getArgument('module')}' has been registered.");

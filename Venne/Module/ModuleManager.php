@@ -12,6 +12,7 @@
 namespace Venne\Module;
 
 use Venne;
+use Exception;
 use Venne\Config\Configurator;
 use Venne\Module\DependencyResolver\Solver;
 use Venne\Module\DependencyResolver\Problem;
@@ -145,16 +146,21 @@ class ModuleManager extends Object
 	 */
 	public function createInstance($name)
 	{
-		if (!isset($this->modules[$name])) {
-			throw new InvalidArgumentException("Module '{$name}' does not exist.");
+		if (isset($this->modules[$name])) {
+			$class = $this->modules[$name][self::MODULE_CLASS];
+			if (!class_exists($class)) {
+				$path = $this->context->expand($this->modules[$name][self::MODULE_PATH]);
+				require_once $path . '/Module.php';
+			}
+			return new $class;
 		}
 
-		$class = $this->modules[$name][self::MODULE_CLASS];
-		if (!class_exists($class)) {
-			$path = $this->context->expand($this->modules[$name][self::MODULE_PATH]);
-			require_once $path . '/Module.php';
+		$modules = $this->findModules();
+		if (isset($modules[$name])) {
+			return $modules[$name];
 		}
-		return new $class;
+
+		throw new InvalidArgumentException("Module '{$name}' does not exist.");
 	}
 
 
@@ -310,9 +316,9 @@ class ModuleManager extends Object
 	 */
 	public function unregister($name)
 	{
-		//if ($this->getStatus($module) === self::STATUS_UNREGISTERED) {
-		//	throw new InvalidArgumentException("Module '{$module->getName()}' is already unregistered");
-		//}
+		if (!isset($this->modules[$name])) {
+			throw new InvalidArgumentException("Module '{$name}' is already unregistered");
+		}
 
 		$modules = $this->loadModuleConfig();
 		unset($modules['modules'][$name]);
@@ -327,18 +333,33 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 */
-	public function install(IModule $module)
+	public function install(IModule $module, $force = false)
 	{
 		if ($this->getStatus($module) === self::STATUS_INSTALLED) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' is already installed");
 		}
 
-		$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
-		$dependencyResolver->testInstall($module);
+		if (!$force) {
+			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver->testInstall($module);
+		}
 
 		foreach ($module->getInstallers() as $class) {
-			$installer = $this->context->createInstance($class);
-			$installer->install($module);
+			try {
+				$installer = $this->context->createInstance($class);
+				$installer->install($module);
+			} catch (Exception $e) {
+				foreach ($module->getInstallers() as $class2) {
+					if ($class === $class2) {
+						break;
+					}
+
+					$installer = $this->context->createInstance($class2);
+					$installer->uninstall($module);
+				}
+
+				throw $e;
+			}
 		}
 
 		$modules = $this->loadModuleConfig();
@@ -363,18 +384,33 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 */
-	public function uninstall(IModule $module)
+	public function uninstall(IModule $module, $force = false)
 	{
 		if ($this->getStatus($module) === self::STATUS_UNINSTALLED) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' is already uninstalled");
 		}
 
-		$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
-		$dependencyResolver->testUninstall($module);
+		if (!$force) {
+			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver->testUninstall($module);
+		}
 
 		foreach ($module->getInstallers() as $class) {
-			$installer = $this->context->createInstance($class);
-			$installer->uninstall($module);
+			try {
+				$installer = $this->context->createInstance($class);
+				$installer->uninstall($module);
+			} catch (Exception $e) {
+				foreach ($module->getInstallers() as $class2) {
+					if ($class === $class2) {
+						break;
+					}
+
+					$installer = $this->context->createInstance($class2);
+					$installer->install($module);
+				}
+
+				throw $e;
+			}
 		}
 
 		$this->setAction($module, self::ACTION_NONE);
@@ -391,18 +427,51 @@ class ModuleManager extends Object
 	 * @param IModule $module
 	 * @param bool $withDependencies
 	 */
-	public function upgrade(IModule $module, $withDependencies = false)
+	public function upgrade(IModule $module, $force = false)
 	{
-		$dependencyResolver = new Solver($this->getModules());
-		$dependencyResolver->testUpgrade($module);
+		if ($this->getStatus($module) !== self::STATUS_INSTALLED) {
+			throw new InvalidArgumentException("Module '{$module->getName()}' must be installed");
+		}
 
-//		foreach ($module->getInstallers() as $class) {
-//			$installer = $this->context->createInstance($class);
-//			$installer->upgrade($module);
-//		}
+		if ($module->getVersion() === $this->modules[$module->getName()][self::MODULE_VERSION]) {
+			throw new InvalidArgumentException("Module '{$module->getName()}' is current");
+		}
 
-		$this->setAction($module, self::ACTION_NONE);
-		$this->setStatus($module, self::STATUS_INSTALLED);
+		if (!$force) {
+			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver->testUpgrade($module);
+		}
+
+		foreach ($module->getInstallers() as $class) {
+			try {
+				/** @var $installer IInstaller */
+				$installer = $this->context->createInstance($class);
+				$installer->upgrade($module, $this->modules[$module->getName()][self::MODULE_VERSION], $module->getVersion());
+			} catch (Exception $e) {
+				foreach ($module->getInstallers() as $class2) {
+					if ($class === $class2) {
+						break;
+					}
+
+					$installer = $this->context->createInstance($class2);
+					$installer->downgrade($module, $module->getVersion(), $this->modules[$module->getName()][self::MODULE_VERSION]);
+				}
+
+				throw $e;
+			}
+		}
+
+		$modules = $this->loadModuleConfig();
+		$modules['modules'][$module->getName()] = array(
+			self::MODULE_STATUS => self::STATUS_INSTALLED,
+			self::MODULE_ACTION => self::ACTION_NONE,
+			self::MODULE_CLASS => $module->getClassName(),
+			self::MODULE_VERSION => $module->getVersion(),
+			self::MODULE_PATH => str_replace($this->libsDir, '%libsDir%', $module->getPath()),
+			self::MODULE_AUTOLOAD => str_replace($this->libsDir, '%libsDir%', $module->getAutoload()),
+			self::MODULE_REQUIRE => $module->getRequire(),
+		);
+		$this->saveModuleConfig($modules);
 
 		$this->reloadInfo();
 		$this->reloadSystemContainer();

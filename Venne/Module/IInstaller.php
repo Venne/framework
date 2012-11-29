@@ -37,5 +37,11 @@ interface IInstaller
 	 * @param IModule $module
 	 */
 	public function upgrade(IModule $module, $from, $to);
+
+
+	/**
+	 * @param IModule $module
+	 */
+	public function downgrade(IModule $module, $from, $to);
 }
 

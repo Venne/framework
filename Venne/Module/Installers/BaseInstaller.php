@@ -138,7 +138,16 @@ class BaseInstaller extends Object implements IInstaller
 	 */
 	public function upgrade(IModule $module, $from, $to)
 	{
-		// TODO: Implement upgrade() method.
+	}
+
+
+	/**
+	 * @param \Venne\Module\IModule $module
+	 * @param $from
+	 * @param $to
+	 */
+	public function downgrade(IModule $module, $from, $to)
+	{
 	}
 
 

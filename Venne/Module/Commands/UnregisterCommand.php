@@ -59,7 +59,7 @@ class UnregisterCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		try {
-			$this->moduleManager->unregister($name);
+			$this->moduleManager->unregister($input->getArgument('module'));
 			$output->writeln("Module '{$input->getArgument('module')}' has been unregistered.");
 		} catch (InvalidArgumentException $e) {
 			$output->writeln("<error>{$e->getMessage()}</error>");
