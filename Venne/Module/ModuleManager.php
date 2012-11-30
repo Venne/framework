@@ -22,6 +22,7 @@ use Nette\DI\Container;
 use Nette\Object;
 use Nette\Utils\Finder;
 use Nette\Config\Adapters\PhpAdapter;
+use Venne\Caching\CacheManager;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -75,6 +76,9 @@ class ModuleManager extends Object
 	/** @var Container */
 	protected $context;
 
+	/** @var CacheManager */
+	protected $cacheManager;
+
 	/** @var string */
 	protected $libsDir;
 
@@ -96,12 +100,14 @@ class ModuleManager extends Object
 
 	/**
 	 * @param \Nette\DI\Container $context
+	 * @param \Venne\Caching\CacheManager $cacheManager
 	 * @param $libsDir
 	 * @param $configDir
 	 */
-	public function __construct(Container $context, $libsDir, $configDir)
+	public function __construct(Container $context, CacheManager $cacheManager, $libsDir, $configDir)
 	{
 		$this->context = $context;
+		$this->cacheManager = $cacheManager;
 		$this->libsDir = $libsDir;
 		$this->configDir = $configDir;
 
@@ -376,6 +382,7 @@ class ModuleManager extends Object
 
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
+		$this->cacheManager->clean();
 	}
 
 
@@ -418,6 +425,7 @@ class ModuleManager extends Object
 
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
+		$this->cacheManager->clean();
 	}
 
 
@@ -475,6 +483,7 @@ class ModuleManager extends Object
 
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
+		$this->cacheManager->clean();
 	}
 
 
