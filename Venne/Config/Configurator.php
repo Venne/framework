@@ -100,7 +100,7 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	protected function getSandboxParameters()
 	{
-		$mandatoryParameters = array('wwwDir', 'appDir', 'libsDir', 'logDir', 'dataDir', 'tempDir', 'logDir', 'configDir', 'wwwCacheDir', 'resourcesDir');
+		$mandatoryParameters = array('wwwDir', 'appDir', 'libsDir', 'logDir', 'dataDir', 'tempDir', 'logDir', 'configDir', 'wwwCacheDir', 'publicDir', 'resourcesDir');
 
 		if (!is_string($this->sandbox) && !is_array($this->sandbox)) {
 			throw new \InvalidArgumentException("SandboxDir must be string or array, " . gettype($this->sandboxDir) . " given.");
