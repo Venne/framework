@@ -13,13 +13,15 @@ namespace Venne\Config;
 
 use Venne;
 use Nette;
-use Nette\Caching\Cache;
 use Nette\DI;
+use Nette\Caching\Cache;
+use Nette\Config\Compiler;
+use Nette\Config\Adapters\NeonAdapter;
 use Nette\Diagnostics\Debugger;
 use Nette\Application\Routers\SimpleRouter;
 use Nette\Application\Routers\Route;
-use Nette\Config\Compiler;
-use Nette\Config\Adapters\NeonAdapter;
+use Nette\InvalidArgumentException;
+use Nette\Application\ApplicationException;
 use Venne\Module\ModuleManager;
 
 /**
@@ -52,13 +54,17 @@ class Configurator extends \Nette\Config\Configurator
 		$this->sandbox = $sandbox;
 		$this->classLoader = $classLoader;
 
-		$this->parameters = $this->getSandboxParameters();
-		$this->validateConfiguration();
-		$this->parameters = $this->getDefaultParameters($this->parameters);
-		$this->setTempDirectory($this->parameters["tempDir"]);
+		try {
+			$this->parameters = $this->getSandboxParameters();
+			$this->validateConfiguration();
+			$this->parameters = $this->getDefaultParameters($this->parameters);
+			$this->setTempDirectory($this->parameters['tempDir']);
 
-		if ($this->classLoader) {
-			$this->registerModuleLoaders();
+			if ($this->classLoader) {
+				$this->registerModuleLoaders();
+			}
+		} catch (ApplicationException $e) {
+			die($e->getMessage());
 		}
 	}
 
@@ -88,7 +94,16 @@ class Configurator extends \Nette\Config\Configurator
 
 		foreach ($mandatoryConfigs as $config) {
 			if (!file_exists($this->parameters['configDir'] . '/' . $config)) {
-				copy($this->parameters['configDir'] . '/' . $config . '.orig', $this->parameters['configDir'] . '/' . $config);
+				$origFile = $this->parameters['configDir'] . '/' . $config . '.orig';
+				if (file_exists($origFile)) {
+					if (is_writable($this->parameters['configDir']) && file_exists($origFile)) {
+						copy($origFile, $this->parameters['configDir'] . '/' . $config);
+					} else {
+						throw new ApplicationException("Config directory is not writable.");
+					}
+				} else {
+					throw new ApplicationException("Configuration file '{$config}' does not exist.");
+				}
 			}
 		}
 	}
@@ -103,13 +118,13 @@ class Configurator extends \Nette\Config\Configurator
 		$mandatoryParameters = array('wwwDir', 'appDir', 'libsDir', 'logDir', 'dataDir', 'tempDir', 'logDir', 'configDir', 'wwwCacheDir', 'publicDir', 'resourcesDir');
 
 		if (!is_string($this->sandbox) && !is_array($this->sandbox)) {
-			throw new \InvalidArgumentException("SandboxDir must be string or array, " . gettype($this->sandboxDir) . " given.");
+			throw new InvalidArgumentException("SandboxDir must be string or array, " . gettype($this->sandboxDir) . " given.");
 		}
 
 		if (is_string($this->sandbox)) {
 			$file = $this->sandbox . '/sandbox.php';
 			if (!file_exists($file)) {
-				throw new \InvalidArgumentException('Sandbox must contain sandbox.php file with path configurations.');
+				throw new InvalidArgumentException('Sandbox must contain sandbox.php file with path configurations.');
 			}
 			$parameters = require $file;
 		} else {
@@ -118,7 +133,7 @@ class Configurator extends \Nette\Config\Configurator
 
 		foreach ($mandatoryParameters as $item) {
 			if (!isset($parameters[$item])) {
-				throw new \Nette\Application\ApplicationException("Sandbox parameters does not contain '{$item}' parameter.");
+				throw new ApplicationException("Sandbox parameters does not contain '{$item}' parameter.");
 			}
 		}
 
@@ -263,7 +278,7 @@ class Configurator extends \Nette\Config\Configurator
 		$this->robotLoader = $this->createRobotLoader();
 		$this->robotLoader->ignoreDirs .= ', tests, test, resources';
 		$this->robotLoader
-			->addDirectory($this->parameters["appDir"])
+			->addDirectory($this->parameters['appDir'])
 			->register();
 	}
 
