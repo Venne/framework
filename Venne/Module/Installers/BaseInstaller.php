@@ -15,6 +15,7 @@ use Venne;
 use Nette\Object;
 use Nette\DI\Container;
 use Venne\Utils\File;
+use Nette\Utils\Validators;
 use Nette\Config\Adapters\NeonAdapter;
 use Venne\Module\IModule;
 use Venne\Module\IInstaller;
@@ -158,29 +159,33 @@ class BaseInstaller extends Object implements IInstaller
 	 */
 	protected function getRecursiveDiff($arr1, $arr2)
 	{
+		$isList = Validators::isList($arr1);
+		$arr2IsList = Validators::isList($arr2);
+
 		foreach ($arr1 as $key => $item) {
 			if (!is_array($arr1[$key])) {
 
 				// if key is numeric, remove the same value
-				if (is_numeric($key)) {
-					if (($pos = array_search($arr1[$key], $arr2)) !== false) {
-						unset($arr1[$key]);
-					}
-				} // else remove the same key
-				else {
-					if (isset($arr2[$key])) {
-						unset($arr1[$key]);
-					}
-				}
+				if (is_numeric($key) && ($pos = array_search($arr1[$key], $arr2)) !== false) {
+					unset($arr1[$key]);
+				} //
+
+				// else remove the same key
+				else if ((!$isList && isset($arr2[$key])) || ($isList && $arr2IsList && array_search($item, $arr2) !== false)) {
+					unset($arr1[$key]);
+				} //
+
 			} elseif (isset($arr2[$key])) {
-				$arr1[$key] = $this->getRecursiveDiff($arr1[$key], $arr2[$key]);
+				$arr1[$key] = $item = $this->getRecursiveDiff($arr1[$key], $arr2[$key]);
+
+				if (is_array($item) && count($item) === 0) {
+					unset($arr1[$key]);
+				}
 			}
 		}
 
-		foreach ($arr1 as $key => $item) {
-			if (is_array($item) && count($item) === 0) {
-				unset($arr1[$key]);
-			}
+		if ($isList) {
+			$arr1 = array_merge($arr1);
 		}
 
 		return $arr1;
