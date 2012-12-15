@@ -15,6 +15,7 @@ use Venne;
 use Nette\Utils\Strings;
 use Venne\Templating\ITemplateConfigurator;
 use Venne\Security\IComponentVerifier;
+use Nette\Templating\FileTemplate;
 
 /**
  * Description of Control
@@ -59,7 +60,10 @@ class Control extends \Nette\Application\UI\Control
 			$this->templateConfigurator->configure($template);
 		}
 
-		$template->setFile($this->formatTemplateFile());
+		if ($template instanceof FileTemplate) {
+			$template->setFile($this->formatTemplateFile());
+		}
+
 		return $template;
 	}
 
