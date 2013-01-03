@@ -79,7 +79,7 @@ class ComposerModule extends BaseModule
 	{
 		$this->loadComposerData();
 
-		$ret = $this->composerData['autoload'];
+		$ret = isset($this->composerData['autoload']) ? $this->composerData['autoload'] : array();
 
 		if (file_exists(dirname($this->getReflection()->getFileName()) . '/vendor/autoload.php')) {
 			return array_merge($ret, array(
