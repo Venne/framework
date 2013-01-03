@@ -9,5 +9,6 @@ return array(
 	'tempDir'       => __DIR__ . '/temp',
 	'wwwDir'        => __DIR__ . '/www',
 	'wwwCacheDir'   => __DIR__ . '/www/cache',
+	'publicDir'		=> __DIR__ . '/www/public',
 	'resourcesDir'  => __DIR__ . '/www/resources',
 );
