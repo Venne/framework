@@ -37,7 +37,7 @@ class Objects extends Object
 			if (method_exists($object, $method = 'get' . ucfirst($propertyName))) {
 				return true;
 
-			} elseif (property_exists($object, $propertyName)) {
+			} elseif (isset($object->$propertyName)) {
 				return true;
 
 			} elseif (method_exists($object, $method = 'is' . ucfirst($propertyName))) {
@@ -65,7 +65,7 @@ class Objects extends Object
 			if (method_exists($object, $method = 'get' . ucfirst($propertyName))) {
 				return $object->$method();
 
-			} elseif (property_exists($object, $propertyName)) {
+			} elseif (isset($object->$propertyName)) {
 				return $object->$propertyName;
 
 			} elseif (method_exists($object, $method = 'is' . ucfirst($propertyName))) {
