@@ -72,6 +72,7 @@ class VenneExtension extends CompilerExtension
 			->setParameters(array('compiler'))
 			->setShared(FALSE)
 			->addSetup('injectModules', array('%modules%'))
+			->addSetup('injectPaths', array(array('appDir' => '%appDir%')))
 			->addTag('macro');
 
 		$container->addDefinition($this->prefix("templateConfigurator"))

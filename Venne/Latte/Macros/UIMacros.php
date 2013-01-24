@@ -13,11 +13,11 @@ namespace Venne\Latte\Macros;
 
 use Venne;
 use Nette,
-Nette\Latte,
-Nette\Latte\MacroNode,
-Nette\Latte\PhpWriter,
-Nette\Latte\CompileException,
-Nette\Utils\Strings;
+	Nette\Latte,
+	Nette\Latte\MacroNode,
+	Nette\Latte\PhpWriter,
+	Nette\Latte\CompileException,
+	Nette\Utils\Strings;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -27,6 +27,9 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 
 	/** @var array */
 	protected $modules;
+
+	/** @var array */
+	protected $paths;
 
 
 	public static function install(Latte\Compiler $compiler)
@@ -44,7 +47,7 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 		$me->addMacro('widget', array($me, 'macroControl')); // deprecated - use control
 		$me->addMacro('control', array($me, 'macroControl'));
 
-		$me->addMacro('href', NULL, NULL, function(MacroNode $node, PhpWriter $writer) use ($me) {
+		$me->addMacro('href', NULL, NULL, function (MacroNode $node, PhpWriter $writer) use ($me) {
 			return ' ?> href="<?php ' . $me->macroLink($node, $writer) . ' ?>"<?php ';
 		});
 		$me->addMacro('plink', array($me, 'macroLink'));
@@ -65,9 +68,15 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	}
 
 
+	public function injectPaths(array $paths)
+	{
+		$this->paths = $paths;
+	}
+
+
 	public function macroExtends(MacroNode $node, PhpWriter $writer)
 	{
-		$node->args = \Venne\Module\Helpers::expandPath($node->args, $this->modules);
+		$node->args = \Venne\Module\Helpers::expandPath($node->args, $this->modules, $this->paths);
 		$node->tokenizer = new \Nette\Latte\MacroTokenizer($node->args);
 		$writer = new PhpWriter($node->tokenizer);
 		return parent::macroExtends($node, $writer);
@@ -78,6 +87,5 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	{
 		return $writer->write("echo \$basePath . '/' . \Venne\Module\Helpers::expandResource(%node.word)");
 	}
-
 }
 

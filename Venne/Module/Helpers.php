@@ -27,20 +27,25 @@ final class Helpers
 	 * @return string
 	 * @throws \Nette\InvalidArgumentException
 	 */
-	public static function expandPath($path, array $modules)
+	public static function expandPath($path, & $modules, & $paths = NULL)
 	{
 		if (substr($path, 0, 1) !== '@') {
 			return $path;
 		}
 
-		$pos = strpos($path, 'Module');
-		$module = lcfirst(substr($path, 1, $pos - 1));
+		if (($pos = strpos($path, 'Module')) !== false) {
+			$module = lcfirst(substr($path, 1, $pos - 1));
 
-		if (!isset($modules[$module])) {
+			if (isset($modules[$module])) {
+				return $modules[$module]['path'] . substr($path, $pos + 6);
+			}
+
+			if (isset($paths[$module . 'Dir'])) {
+				return $paths[$module . 'Dir'] . substr($path, $pos + 6);
+			}
+
 			throw new \Nette\InvalidArgumentException("Module '{$module}' does not exist.");
 		}
-
-		return $modules[$module]['path'] . substr($path, $pos + 6);
 	}
 
 
