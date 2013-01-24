@@ -134,6 +134,18 @@ class ComposerModule extends BaseModule
 	}
 
 
+	public function getInstallers()
+	{
+		$this->loadComposerData();
+
+		if (isset($this->composerData['extra']['venne']['installers'])) {
+			return array_merge(parent::getInstallers(), $this->composerData['extra']['venne']['installers']);
+		}
+
+		return parent::getInstallers();
+	}
+
+
 	protected function loadComposerData()
 	{
 		if ($this->composerData === NULL) {
@@ -148,8 +160,6 @@ class ComposerModule extends BaseModule
 	 */
 	protected function normalizeName($name)
 	{
-
-
 		return substr($name, strpos($name, '/') + 1, -7);
 	}
 }
