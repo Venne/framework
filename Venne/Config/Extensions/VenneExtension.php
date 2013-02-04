@@ -38,8 +38,8 @@ class VenneExtension extends CompilerExtension
 		// Application
 		$container->getDefinition('nette.presenterFactory')
 			->setClass('Venne\Application\PresenterFactory', array(
-			isset($container->parameters['appDir']) ? $container->parameters['appDir'] : NULL
-		));
+				isset($container->parameters['appDir']) ? $container->parameters['appDir'] : NULL
+			));
 
 		$container->addDefinition($this->prefix('controlVerifier'))
 			->setClass('Venne\Security\ControlVerifiers\ControlVerifier');
@@ -93,7 +93,7 @@ class VenneExtension extends CompilerExtension
 		// CLI
 		$cliRoute = $container->addDefinition($this->prefix("CliRoute"))
 			->setClass("Venne\Application\Routers\CliRouter")
-			->setAutowired(false);
+			->setAutowired(FALSE);
 
 		$container->getDefinition('router')
 			->addSetup('offsetSet', array(NULL, $cliRoute));
@@ -151,7 +151,7 @@ class VenneExtension extends CompilerExtension
 
 		foreach ($this->getSortedServices('route') as $route) {
 			$definition = $container->getDefinition($route);
-			$definition->setAutowired(false);
+			$definition->setAutowired(FALSE);
 
 			$router->addSetup('$service[] = $this->getService(?)', array($route));
 		}
@@ -217,7 +217,7 @@ class VenneExtension extends CompilerExtension
 
 		foreach ($container->findByTag("component") as $name => $item) {
 			$definition = $container->getDefinition($name);
-			$definition->setAutowired(false);
+			$definition->setAutowired(FALSE);
 		}
 	}
 }
