@@ -85,6 +85,9 @@ class VenneExtension extends CompilerExtension
 		$container->addDefinition($this->prefix('moduleManager'))
 			->setClass('Venne\Module\ModuleManager', array('@container', '@venne.cacheManager', '%libsDir%', '%configDir%'));
 
+		$container->addDefinition($this->prefix('templateManager'))
+			->setClass('Venne\Module\TemplateManager', array('%modules%'));
+
 		// widgets
 		$container->addDefinition($this->prefix('widgetManager'))
 			->setClass('Venne\Widget\WidgetManager');
