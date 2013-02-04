@@ -19,6 +19,16 @@ use Venne;
 final class Helpers
 {
 
+	/** @var array */
+	private $modules;
+
+
+	public function __construct($modules)
+	{
+		$this->modules = & $modules;
+	}
+
+
 	/**
 	 * Expands @fooModule/path/....
 	 * @static
@@ -27,24 +37,20 @@ final class Helpers
 	 * @return string
 	 * @throws \Nette\InvalidArgumentException
 	 */
-	public static function expandPath($path, & $modules, & $paths = NULL)
+	public function expandPath($path, $localPrefix = '')
 	{
 		if (substr($path, 0, 1) !== '@') {
 			return $path;
 		}
 
-		if (($pos = strpos($path, 'Module')) !== false) {
+		if (($pos = strpos($path, 'Module')) !== FALSE) {
 			$module = lcfirst(substr($path, 1, $pos - 1));
 
-			if (isset($modules[$module])) {
-				return $modules[$module]['path'] . substr($path, $pos + 6);
+			if (!isset($this->modules[$module])) {
+				throw new \Nette\InvalidArgumentException("Module '{$module}' does not exist.");
 			}
 
-			if (isset($paths[$module . 'Dir'])) {
-				return $paths[$module . 'Dir'] . substr($path, $pos + 6);
-			}
-
-			throw new \Nette\InvalidArgumentException("Module '{$module}' does not exist.");
+			return $this->modules[$module]['path'] . ($localPrefix ? '/' . $localPrefix : '') . substr($path, $pos + 6);
 		}
 	}
 
@@ -57,7 +63,7 @@ final class Helpers
 	 * @return string
 	 * @throws \Nette\InvalidArgumentException
 	 */
-	public static function expandResource($path)
+	public function expandResource($path)
 	{
 		if (substr($path, 0, 1) !== '@') {
 			return $path;

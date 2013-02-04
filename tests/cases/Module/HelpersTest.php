@@ -21,12 +21,22 @@ use Venne\Module\Helpers;
 class HelpersTest extends TestCase
 {
 
+	/** @var Helpers */
+	protected $moduleHelpers;
 
 	/** @var array */
 	protected $parameters = array(
 		'foo' => array('path' => '/foo'),
 		'bar' => array('path' => '/modules/bar'),
 	);
+
+
+	protected function setUp()
+	{
+		parent::setUp();
+
+		$this->moduleHelpers = new Helpers($this->parameters);
+	}
 
 
 	/**
@@ -57,7 +67,7 @@ class HelpersTest extends TestCase
 	 */
 	public function testExpandPath($expect, $path)
 	{
-		$this->assertEquals($expect, Helpers::expandPath($path, $this->parameters));
+		$this->assertEquals($expect, $this->moduleHelpers->expandPath($path));
 	}
 
 
@@ -66,7 +76,7 @@ class HelpersTest extends TestCase
 	 */
 	public function testExpandPathException()
 	{
-		Helpers::expandPath('@cmsModule/foo', $this->parameters);
+		$this->moduleHelpers->expandPath('@cmsModule/foo');
 	}
 
 
@@ -98,7 +108,7 @@ class HelpersTest extends TestCase
 	 */
 	public function testExpandResource($expect, $path)
 	{
-		$this->assertEquals($expect, Helpers::expandResource($path));
+		$this->assertEquals($expect, $this->moduleHelpers->expandResource($path));
 	}
 }
 

@@ -71,8 +71,7 @@ class VenneExtension extends CompilerExtension
 			->setFactory('Venne\Latte\Macros\UIMacros::install', array('%compiler%'))
 			->setParameters(array('compiler'))
 			->setShared(FALSE)
-			->addSetup('injectModules', array('%modules%'))
-			->addSetup('injectPaths', array(array('appDir' => '%appDir%')))
+			->addSetup('injectHelper', array('@' . $this->prefix('moduleHelpers')))
 			->addTag('macro');
 
 		$container->addDefinition($this->prefix("templateConfigurator"))
@@ -114,6 +113,10 @@ class VenneExtension extends CompilerExtension
 				->setClass("{$cmd}Command")
 				->addTag('command');
 		}
+
+		// helpers
+		$container->addDefinition($this->prefix('moduleHelpers'))
+			->setClass('Venne\Module\Helpers', array('%modules%'));
 	}
 
 

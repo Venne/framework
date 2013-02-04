@@ -25,11 +25,14 @@ use Nette,
 class UIMacros extends \Nette\Latte\Macros\UIMacros
 {
 
-	/** @var array */
-	protected $modules;
+	/** @var Venne\Module\Helpers */
+	protected $moduleHelpers;
 
-	/** @var array */
-	protected $paths;
+
+	public function injectHelper(Venne\Module\Helpers $helper)
+	{
+		$this->moduleHelpers = $helper;
+	}
 
 
 	public static function install(Latte\Compiler $compiler)
@@ -62,21 +65,9 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	}
 
 
-	public function injectModules(array $modules)
-	{
-		$this->modules = $modules;
-	}
-
-
-	public function injectPaths(array $paths)
-	{
-		$this->paths = $paths;
-	}
-
-
 	public function macroExtends(MacroNode $node, PhpWriter $writer)
 	{
-		$node->args = \Venne\Module\Helpers::expandPath($node->args, $this->modules, $this->paths);
+		$node->args = $this->moduleHelpers->expandPath($node->args);
 		$node->tokenizer = new \Nette\Latte\MacroTokenizer($node->args);
 		$writer = new PhpWriter($node->tokenizer);
 		return parent::macroExtends($node, $writer);
