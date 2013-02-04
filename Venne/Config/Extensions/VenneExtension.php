@@ -25,7 +25,8 @@ class VenneExtension extends CompilerExtension
 	public $defaults = array(
 		'moduleManager' => array(
 			'resourcesMode' => 'symlink'
-		)
+		),
+		'session' => array()
 	);
 
 
@@ -59,8 +60,12 @@ class VenneExtension extends CompilerExtension
 			->addSetup('setHeader', array('X-Powered-By', 'Nette Framework && Venne:Framework'));
 
 		// session
-		$container->getDefinition('session')
-			->addSetup("setSavePath", '%tempDir%/sessions');
+		$session = $container->getDefinition('session');
+		foreach ($config['session'] as $key => $val) {
+			if ($val) {
+				$session->addSetup('set' . ucfirst($key), $val);
+			}
+		}
 
 		// template
 		$latte = $container->getDefinition('nette.latte')
