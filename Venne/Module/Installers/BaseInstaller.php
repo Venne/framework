@@ -62,7 +62,7 @@ class BaseInstaller extends Object implements IInstaller
 			if (!file_exists($moduleDir) && file_exists($targetDir)) {
 				umask(0000);
 				@mkdir(dirname($moduleDir), 0777, true);
-				if (symlink(File::getRelativePath(dirname($moduleDir), $targetDir), $moduleDir) === false) {
+				if (@symlink(File::getRelativePath(dirname($moduleDir), $targetDir), $moduleDir) && !file_exists($moduleDir)) {
 					File::copy($targetDir, $moduleDir);
 				}
 
