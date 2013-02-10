@@ -120,7 +120,7 @@ class ControlVerifier extends Object implements IControlVerifier
 	 */
 	protected function checkPresenter(\Nette\Application\UI\PresenterComponentReflection $element)
 	{
-		return true;
+		return TRUE;
 	}
 
 
