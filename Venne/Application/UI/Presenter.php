@@ -13,8 +13,9 @@ namespace Venne\Application\UI;
 
 use Venne;
 use Nette\DI\Container;
-use Venne\Security\IControlVerifier;
+use Nette\Application\ForbiddenRequestException;
 use Nette\Application\UI\PresenterComponentReflection;
+use Venne\Security\IControlVerifier;
 use Venne\Templating\ITemplateConfigurator;
 use Venne\Widget\WidgetManager;
 
@@ -203,6 +204,9 @@ class Presenter extends \Nette\Application\UI\Presenter
 			$class = get_class($this);
 			$action = $this->action;
 			$do = substr($destination, 0, -1);
+		} elseif (ctype_lower(substr($destination, 0, 1))) {
+			$class = get_class($this);
+			$action = $destination;
 		} else {
 			if (substr($destination, 0, 1) === ':') {
 				$link = substr($destination, 1);
@@ -222,20 +226,24 @@ class Presenter extends \Nette\Application\UI\Presenter
 		$schema = $this->controlVerifier->getControlVerifierReader()->getSchema($class);
 
 		if (isset($schema['action' . ucfirst($action)])) {
-			$resource = $schema['action' . ucfirst($action)]['resource'];
-			$privilege = $schema['action' . ucfirst($action)]['privilege'];
+			$classReflection = new \Nette\Reflection\ClassType($class);
+			$method = $classReflection->getMethod('action' . ucfirst($action));
 
-			if (!$this->user->isAllowed($resource, $privilege)) {
-				return false;
+			try {
+				$this->controlVerifier->checkRequirements($method);
+			} catch (ForbiddenRequestException $e) {
+				return FALSE;
 			}
 		}
 
-		if (isset($do) && isset($schema['handle' . ucfirst($action)])) {
-			$resource = $schema['handle' . ucfirst($action)]['resource'];
-			$privilege = $schema['handle' . ucfirst($action)]['privilege'];
+		if (isset($do) && isset($schema['handle' . ucfirst($do)])) {
+			$classReflection = new \Nette\Reflection\ClassType($class);
+			$method = $classReflection->getMethod('handle' . ucfirst($do));
 
-			if (!$this->user->isAllowed($resource, $privilege)) {
-				return false;
+			try {
+				$this->controlVerifier->checkRequirements($method);
+			} catch (ForbiddenRequestException $e) {
+				return FALSE;
 			}
 		}
 
