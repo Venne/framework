@@ -107,7 +107,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 * @param  string
 	 * @return \stdClass
 	 */
-	public function flashMessage($message, $type = 'info', $withoutSession = false)
+	public function flashMessage($message, $type = 'info', $withoutSession = FALSE)
 	{
 		if ($withoutSession) {
 			$this->_flashes[] = $flash = (object)array(
@@ -167,7 +167,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	public function createComponent($name)
 	{
 		// parent
-		if (($control = parent::createComponent($name)) == true) {
+		if (($control = parent::createComponent($name)) == TRUE) {
 			return $control;
 		}
 
@@ -239,7 +239,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 			}
 		}
 
-		return true;
+		return TRUE;
 	}
 }
 
