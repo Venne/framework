@@ -133,31 +133,38 @@ class ControlVerifier extends Object implements IControlVerifier
 		$class = $element->class;
 		$name = $element->name;
 		$schema = $this->reader->getSchema($class);
-
-		// resource & privilege
-		if (isset($schema[$name]['resource']) && $schema[$name]['resource']) {
-			if (!$this->user->isAllowed($schema[$name]['resource'], $schema[$name]['privilege'])) {
-				throw new ForbiddenRequestException("Access denied for resource: {$schema[$name]['resource']}" . ($schema[$name]['privilege'] ? " and privilege: {$schema[$name]['privilege']}" : ''));
-			}
-		}
-
-		// roles
-		if (isset($schema[$name]['roles']) && count($schema[$name]['roles']) > 0) {
-			$userRoles = $this->user->getRoles();
-			$roles = $schema[$name]['roles'];
-
-			if (count(array_intersect($userRoles, $roles)) == 0) {
-				throw new ForbiddenRequestException("Access denied for your roles: '" . implode(', ', $userRoles) . "'. Require one of: '" . implode(', ', $roles) . "'");
-			}
-		}
+		$exception = NULL;
 
 		// users
 		if (isset($schema[$name]['users']) && count($schema[$name]['users']) > 0) {
 			$users = $schema[$name]['users'];
 
 			if (!in_array($this->user->getId(), $users)) {
-				throw new ForbiddenRequestException("Access denied for your username: '{$this->user->getId()}'. Require: '" . implode(', ', $users) . "'");
+				$exception = "Access denied for your username: '{$this->user->getId()}'. Require: '" . implode(', ', $users) . "'";
+			} else {
+				return;
 			}
+		} // roles
+		else if (isset($schema[$name]['roles']) && count($schema[$name]['roles']) > 0) {
+			$userRoles = $this->user->getRoles();
+			$roles = $schema[$name]['roles'];
+
+			if (count(array_intersect($userRoles, $roles)) == 0) {
+				$exception = "Access denied for your roles: '" . implode(', ', $userRoles) . "'. Require one of: '" . implode(', ', $roles) . "'";
+			} else {
+				return;
+			}
+		} // resource & privilege
+		else if (isset($schema[$name]['resource']) && $schema[$name]['resource']) {
+			if (!$this->user->isAllowed($schema[$name]['resource'], $schema[$name]['privilege'])) {
+				$exception = "Access denied for resource: {$schema[$name]['resource']}" . ($schema[$name]['privilege'] ? " and privilege: {$schema[$name]['privilege']}" : '');
+			} else {
+				return;
+			}
+		}
+
+		if ($exception) {
+			throw new ForbiddenRequestException($exception);
 		}
 	}
 }
