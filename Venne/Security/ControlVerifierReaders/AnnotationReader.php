@@ -35,7 +35,7 @@ class AnnotationReader extends Object implements IControlVerifierReader
 			$schema = array();
 			$ref = ClassType::from($class);
 
-			if($ref->hasAnnotation('secured')){
+			if ($ref->hasAnnotation('secured')) {
 				foreach ($ref->getMethods() as $method) {
 					$name = $method->getName();
 					if (substr($name, 0, 6) !== 'action' && substr($name, 0, 6) !== 'handle') {
@@ -88,8 +88,7 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	{
 		if (isset($secured['roles'])) {
 			$roles = explode(',', $secured['roles']);
-			array_walk($roles, function(&$val)
-			{
+			array_walk($roles, function (&$val) {
 				$val = trim($val);
 			});
 			return $roles;
@@ -102,8 +101,7 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	{
 		if (isset($secured['users'])) {
 			$users = explode(',', $secured['users']);
-			array_walk($users, function(&$val)
-			{
+			array_walk($users, function (&$val) {
 				$val = trim($val);
 			});
 
