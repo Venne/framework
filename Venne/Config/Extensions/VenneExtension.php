@@ -115,6 +115,8 @@ class VenneExtension extends CompilerExtension
 			'moduleRegister' => 'Venne\Module\Commands\Register',
 			'moduleUnregister' => 'Venne\Module\Commands\Unregister',
 			'moduleList' => 'Venne\Module\Commands\List',
+			'moduleCreate' => 'Venne\Module\Commands\Create',
+			'moduleDelete' => 'Venne\Module\Commands\Delete',
 		);
 		foreach ($commands as $name => $cmd) {
 			$container->addDefinition($this->prefix(lcfirst($name) . 'Command'))
