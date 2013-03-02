@@ -234,7 +234,8 @@ class Configurator extends \Nette\Config\Configurator
 		$this->compiler
 			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
 			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
-			->addExtension('extensions', new \Venne\Config\Extensions\ExtensionsExtension());
+			->addExtension('extensions', new \Venne\Config\Extensions\ExtensionsExtension())
+			->addExtension('proxy', new Venne\Config\Extensions\ProxyExtension());
 		return $this->compiler;
 	}
 

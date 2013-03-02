@@ -73,7 +73,7 @@ class ModuleManager extends Object
 		self::ACTION_UPGRADE => 'Upgrade',
 	);
 
-	/** @var Container */
+	/** @var Container|\SystemContainer */
 	protected $context;
 
 	/** @var CacheManager */
@@ -351,6 +351,9 @@ class ModuleManager extends Object
 		}
 
 		foreach ($module->getInstallers() as $class) {
+
+			$this->reloadSystemContainer();
+
 			try {
 				$installer = $this->context->createInstance($class);
 				$installer->install($module);
@@ -403,6 +406,9 @@ class ModuleManager extends Object
 		}
 
 		foreach ($module->getInstallers() as $class) {
+
+			$this->reloadSystemContainer();
+
 			try {
 				$installer = $this->context->createInstance($class);
 				$installer->uninstall($module);
