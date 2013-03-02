@@ -280,7 +280,7 @@ class ModuleManager extends Object
 	 * @param bool $withDependencies
 	 * @return mixed
 	 */
-	public function doAction($action, IModule $module, $withDependencies = false)
+	public function doAction($action, IModule $module, $withDependencies = FALSE)
 	{
 		return $this->{$action}($module, $withDependencies);
 	}
@@ -339,7 +339,7 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 */
-	public function install(IModule $module, $force = false)
+	public function install(IModule $module, $force = FALSE)
 	{
 		if ($this->getStatus($module) === self::STATUS_INSTALLED) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' is already installed");
@@ -394,7 +394,7 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 */
-	public function uninstall(IModule $module, $force = false)
+	public function uninstall(IModule $module, $force = FALSE)
 	{
 		if ($this->getStatus($module) === self::STATUS_UNINSTALLED) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' is already uninstalled");
@@ -441,7 +441,7 @@ class ModuleManager extends Object
 	 * @param IModule $module
 	 * @param bool $withDependencies
 	 */
-	public function upgrade(IModule $module, $force = false)
+	public function upgrade(IModule $module, $force = FALSE)
 	{
 		if ($this->getStatus($module) !== self::STATUS_INSTALLED) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' must be installed");
@@ -798,7 +798,7 @@ class ModuleManager extends Object
 		$namespace = 0;
 		$tokens = token_get_all(file_get_contents($file));
 		$count = count($tokens);
-		$dlm = false;
+		$dlm = FALSE;
 		for ($i = 2; $i < $count; $i++) {
 			if ((isset($tokens[$i - 2][1]) && ($tokens[$i - 2][1] == "phpnamespace" || $tokens[$i - 2][1] == "namespace")) ||
 				($dlm && $tokens[$i - 1][0] == T_NS_SEPARATOR && $tokens[$i][0] == T_STRING)
@@ -806,10 +806,10 @@ class ModuleManager extends Object
 				if (!$dlm) $namespace = 0;
 				if (isset($tokens[$i][1])) {
 					$namespace = $namespace ? $namespace . "\\" . $tokens[$i][1] : $tokens[$i][1];
-					$dlm = true;
+					$dlm = TRUE;
 				}
 			} elseif ($dlm && ($tokens[$i][0] != T_NS_SEPARATOR) && ($tokens[$i][0] != T_STRING)) {
-				$dlm = false;
+				$dlm = FALSE;
 			}
 			if (($tokens[$i - 2][0] == T_CLASS || (isset($tokens[$i - 2][1]) && $tokens[$i - 2][1] == "phpclass"))
 				&& $tokens[$i - 1][0] == T_WHITESPACE && $tokens[$i][0] == T_STRING
