@@ -545,32 +545,32 @@ class ModuleManager extends Object
 	public function findModules()
 	{
 		if ($this->_findModules === NULL) {
-
-			$_this = $this;
 			$this->_findModules = array();
-
-			$f = function($file) use($_this) {
-				$class = $_this->getModuleClassByFile($file->getPathname());
-				$module = $_this->createInstanceOfModule($class, dirname($file->getPathname()));
-				$_this->_findModules[$module->getName()] = $module;
-			};
 
 			foreach (Finder::findDirectories('*')->in($this->libsDir) as $dir) {
 				foreach (Finder::findDirectories('*')->in($dir) as $dir2) {
 					foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
-						$f($file);
+						$this->findModulesClosure($file);
 					}
 				}
 			}
 
 			foreach (Finder::findDirectories('*')->in($this->modulesDir) as $dir2) {
 				foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
-					$f($file);
+					$this->findModulesClosure($file);
 				}
 			}
 		}
 
 		return $this->_findModules;
+	}
+
+
+	private function findModulesClosure($file)
+	{
+		$class = $this->getModuleClassByFile($file->getPathname());
+		$module = $this->createInstanceOfModule($class, dirname($file->getPathname()));
+		$this->_findModules[$module->getName()] = $module;
 	}
 
 
