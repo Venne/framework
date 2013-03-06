@@ -145,9 +145,7 @@ class Configurator extends \Nette\Config\Configurator
 		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
 			'debugMode' => $debugMode,
-			'productionMode' => !$debugMode,
-			'environment' => isset($parameters["environment"]) ? $parameters["environment"] :
-				($debugMode ? self::DEVELOPMENT : self::PRODUCTION),
+			'environment' => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : ($debugMode ? 'development' : 'production'),
 			'consoleMode' => PHP_SAPI === 'cli',
 			'container' => array(
 				'class' => 'SystemContainer',
@@ -155,10 +153,16 @@ class Configurator extends \Nette\Config\Configurator
 			)
 		);
 		$settings = require $parameters['configDir'] . '/settings.php';
+		if (file_exists($parameters['configDir'] . "/settings_{$ret['environment']}.php")) {
+			$s = require $parameters['configDir'] . "/settings_{$ret['environment']}.php";
+			$settings = $s + $settings;
+		}
 		foreach ($settings['modules'] as &$module) {
 			$module['path'] = \Nette\DI\Helpers::expand($module['path'], $parameters);
 		}
-		return $settings + $parameters + $ret;
+		$parameters = $settings + $parameters + $ret;
+		$parameters['productionMode'] = !$parameters['debugMode'];
+		return $parameters;
 	}
 
 
@@ -194,6 +198,11 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		// add config files
 		foreach ($this->getConfigFiles() as $file) {
+			if (!file_exists($file)) {
+				umask(0000);
+				@touch($file);
+			}
+
 			$this->addConfig($file, self::NONE);
 		}
 
@@ -266,8 +275,39 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
+		$debugMode = $this->isDebugMode();
+
+		if (
+			isset($this->parameters['debugModeLogin']['name']) &&
+			isset($this->parameters['debugModeLogin']['password'])
+		) {
+			if (isset($_GET['debugMode'])) {
+				if ($_GET['debugMode']) {
+					if (
+						!isset($_SERVER['PHP_AUTH_USER']) ||
+						$_SERVER['PHP_AUTH_USER'] !== $this->parameters['debugModeLogin']['name'] ||
+						$_SERVER['PHP_AUTH_PW'] !== $this->parameters['debugModeLogin']['password']
+					) {
+						header('WWW-Authenticate: Basic realm="Debug mode"');
+						header('HTTP/1.0 401 Unauthorized');
+						exit;
+					}
+				}
+			}
+
+			if (
+				isset($this->parameters['debugModeLogin']['name']) &&
+				isset($this->parameters['debugModeLogin']['password']) &&
+				isset($_SERVER['PHP_AUTH_USER']) &&
+				$_SERVER['PHP_AUTH_USER'] === $this->parameters['debugModeLogin']['name'] &&
+				$_SERVER['PHP_AUTH_PW'] === $this->parameters['debugModeLogin']['password']
+			) {
+				$debugMode = TRUE;
+			}
+		}
+
 		Nette\Diagnostics\Debugger::$strictMode = TRUE;
-		Nette\Diagnostics\Debugger::enable(!$this->isDebugMode(), $logDirectory ? : $this->parameters['logDir'], $email);
+		Nette\Diagnostics\Debugger::enable(!$debugMode, $logDirectory ? : $this->parameters['logDir'], $email);
 	}
 
 
