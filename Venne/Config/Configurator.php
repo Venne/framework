@@ -217,11 +217,13 @@ class Configurator extends \Nette\Config\Configurator
 			$this->parameters['container']['class'] = $class;
 		}
 
-		return parent::buildContainer($dependencies);
+		$container = parent::buildContainer($dependencies);
 
 		if ($class) {
 			$this->parameters['container']['class'] = $_class;
 		}
+
+		return $container;
 	}
 
 
