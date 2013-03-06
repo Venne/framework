@@ -85,6 +85,9 @@ class ModuleManager extends Object
 	/** @var string */
 	protected $configDir;
 
+	/** @var string */
+	protected $modulesDir;
+
 	/** @var array */
 	protected $modules;
 
@@ -99,17 +102,19 @@ class ModuleManager extends Object
 
 
 	/**
-	 * @param \Nette\DI\Container $context
-	 * @param \Venne\Caching\CacheManager $cacheManager
+	 * @param Container $context
+	 * @param CacheManager $cacheManager
 	 * @param $libsDir
 	 * @param $configDir
+	 * @param $modulesDir
 	 */
-	public function __construct(Container $context, CacheManager $cacheManager, $libsDir, $configDir)
+	public function __construct(Container $context, CacheManager $cacheManager, $libsDir, $configDir, $modulesDir)
 	{
 		$this->context = $context;
 		$this->cacheManager = $cacheManager;
 		$this->libsDir = $libsDir;
 		$this->configDir = $configDir;
+		$this->modulesDir = $modulesDir;
 
 		$this->reloadInfo();
 	}
@@ -540,15 +545,27 @@ class ModuleManager extends Object
 	public function findModules()
 	{
 		if ($this->_findModules === NULL) {
+
+			$_this = $this;
 			$this->_findModules = array();
+
+			$f = function($file) use($_this) {
+				$class = $_this->getModuleClassByFile($file->getPathname());
+				$module = $_this->createInstanceOfModule($class, dirname($file->getPathname()));
+				$_this->_findModules[$module->getName()] = $module;
+			};
 
 			foreach (Finder::findDirectories('*')->in($this->libsDir) as $dir) {
 				foreach (Finder::findDirectories('*')->in($dir) as $dir2) {
 					foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
-						$class = $this->getModuleClassByFile($file->getPathname());
-						$module = $this->createInstanceOfModule($class, dirname($file->getPathname()));
-						$this->_findModules[$module->getName()] = $module;
+						$f($file);
 					}
+				}
+			}
+
+			foreach (Finder::findDirectories('*')->in($this->modulesDir) as $dir2) {
+				foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
+					$f($file);
 				}
 			}
 		}

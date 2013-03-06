@@ -28,7 +28,7 @@ class CreateCommand extends Command
 {
 
 	/** @var string */
-	protected $libsDir;
+	protected $modulesDir;
 
 	/** @var ModuleManager */
 	protected $moduleManager;
@@ -42,7 +42,7 @@ class CreateCommand extends Command
 		parent::__construct();
 
 		$this->moduleManager = $moduleManager;
-		$this->libsDir = $container->parameters['libsDir'];
+		$this->modulesDir = $container->parameters['modulesDir'];
 	}
 
 
@@ -65,7 +65,7 @@ class CreateCommand extends Command
 	{
 		$module = $input->getArgument('module');
 		$modules = $this->moduleManager->getModules();
-		$path = "{$this->libsDir}/venne/{$module}-module";
+		$path = "{$this->modulesDir}/{$module}-module";
 		$namespace = ucfirst($module) . 'Module';
 
 		if (isset($modules[$module])) {
