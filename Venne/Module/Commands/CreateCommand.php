@@ -12,7 +12,6 @@
 namespace Venne\Module\Commands;
 
 use Nette\DI\Container;
-use Nette\Utils\PhpGenerator\ClassType;
 use Venne;
 use Venne\Module\ModuleManager;
 use Symfony\Component\Console\Command\Command;
