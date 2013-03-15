@@ -217,7 +217,7 @@ class VenneExtension extends CompilerExtension
 		$config = $container->getDefinition('nette.presenterFactory');
 
 		foreach ($container->findByTag('presenter') as $factory => $meta) {
-			$service = $container->getDefinition($factory);
+			$service = $container->getDefinition(substr($factory, -7) === 'Factory' ? substr($factory, 0, -7) : $factory);
 			$service->setAutowired(FALSE);
 			$config->addSetup('addPresenter', array($service->class, $factory));
 		}

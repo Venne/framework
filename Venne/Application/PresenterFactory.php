@@ -11,7 +11,7 @@
 
 namespace Venne\Application;
 
-use Venne;
+use Nette\Callback;
 use Nette\DI\Container;
 use Nette\Utils\Strings;
 
@@ -74,14 +74,17 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 
 		if (isset($this->presentersByName[$presenterName])) {
 			$presenter = $this->container->getService($presenterName);
-
-			foreach (array_reverse(get_class_methods($presenter)) as $method) {
-				if (substr($method, 0, 6) === 'inject') {
-					$this->container->callMethod(array($presenter, $method));
-				}
-			}
+			$presenter = $presenter instanceof Callback ? $presenter->invoke() : $presenter;
+		} else if (isset($this->presentersByName[$presenterName . 'Factory'])) {
+			$presenter = $this->container->getService($presenterName . 'Factory')->invoke();
 		} else {
-			$presenter = parent::createPresenter($name);
+			return parent::createPresenter($name);
+		}
+
+		foreach (array_reverse(get_class_methods($presenter)) as $method) {
+			if (substr($method, 0, 6) === 'inject') {
+				$this->container->callMethod(array($presenter, $method));
+			}
 		}
 
 		return $presenter;
@@ -98,8 +101,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 */
 	public function formatServiceNameFromPresenter($presenter)
 	{
-		return Strings::replace($presenter, '/(^|:)+(.)/', function ($match)
-		{
+		return Strings::replace($presenter, '/(^|:)+(.)/', function ($match) {
 			return (':' === $match[1] ? '.' : '') . strtolower($match[2]);
 		}) . 'Presenter';
 	}
@@ -115,8 +117,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 */
 	public function formatPresenterFromServiceName($name)
 	{
-		return Strings::replace(substr($name, 0, -9), '/(^|\\.)+(.)/', function ($match)
-		{
+		return Strings::replace(substr($name, 0, -9), '/(^|\\.)+(.)/', function ($match) {
 			return ('.' === $match[1] ? ':' : '') . strtoupper($match[2]);
 		});
 	}
@@ -128,10 +129,12 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 */
 	public function getPresenterClass(& $name)
 	{
-		if (isset($this->presentersByName[$name])) {
-			$service = $this->formatServiceNameFromPresenter($name);
+		$service = $this->formatServiceNameFromPresenter($name);
 
-			return get_class($this->container->getService($service));
+		if (isset($this->presentersByName[$service])) {
+			return $this->presentersByName[$service];
+		} else if (isset($this->presentersByName[$service . 'Factory'])) {
+			return $this->presentersByName[$service . 'Factory'];
 		} else {
 			return parent::getPresenterClass($name);
 		}
