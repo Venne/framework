@@ -78,7 +78,7 @@ class InstallCommand extends Command
 			}
 
 			$dialog = $this->getHelperSet()->get('dialog');
-			if (!$dialog->askConfirmation($output, '<question>Continue with this actions?</question>', false)) {
+			if (!$dialog->askConfirmation($output, '<question>Continue with this actions? [y/N]</question>', false)) {
 				return;
 			}
 		}
