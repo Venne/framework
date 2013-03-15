@@ -481,13 +481,17 @@ class ModuleManager extends Object
 		}
 
 		$modules = $this->loadModuleConfig();
+		$tr = array(
+			$this->libsDir => '%libsDir%',
+			$this->modulesDir => '%modulesDir%',
+		);
 		$modules['modules'][$module->getName()] = array(
 			self::MODULE_STATUS => self::STATUS_INSTALLED,
 			self::MODULE_ACTION => self::ACTION_NONE,
 			self::MODULE_CLASS => $module->getClassName(),
 			self::MODULE_VERSION => $module->getVersion(),
-			self::MODULE_PATH => str_replace($this->libsDir, '%libsDir%', $module->getPath()),
-			self::MODULE_AUTOLOAD => str_replace($this->libsDir, '%libsDir%', $module->getAutoload()),
+			self::MODULE_PATH => strtr($module->getPath(), $tr),
+			self::MODULE_AUTOLOAD => strtr($module->getAutoload(), $tr),
 			self::MODULE_REQUIRE => $module->getRequire(),
 		);
 		$this->saveModuleConfig($modules);
