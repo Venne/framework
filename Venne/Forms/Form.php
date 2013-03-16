@@ -243,7 +243,8 @@ class Form extends \Nette\Application\UI\Form implements IObjectContainer, ICont
 	{
 		$this->onBeforeRender($this);
 
-		parent::render();
+		$args = func_get_args();
+		call_user_func_array(array('parent', 'render'), $args);
 	}
 
 
