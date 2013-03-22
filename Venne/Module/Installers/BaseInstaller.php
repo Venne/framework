@@ -61,8 +61,8 @@ class BaseInstaller extends Object implements IInstaller
 			$targetDir = $module->getPath() . '/Resources/public';
 			if (!file_exists($moduleDir) && file_exists($targetDir)) {
 				umask(0000);
-				@mkdir(dirname($moduleDir), 0777, true);
-				if (@symlink(File::getRelativePath(dirname($moduleDir), $targetDir), $moduleDir) && !file_exists($moduleDir)) {
+				@mkdir(dirname($moduleDir), 0777, TRUE);
+				if (!@symlink(File::getRelativePath(dirname($moduleDir), $targetDir), $moduleDir) && !file_exists($moduleDir)) {
 					File::copy($targetDir, $moduleDir);
 				}
 
@@ -70,7 +70,7 @@ class BaseInstaller extends Object implements IInstaller
 					if (is_link($resourcesDir)) {
 						unlink($resourcesDir);
 					} else {
-						File::rmdir($resourcesDir, true);
+						File::rmdir($resourcesDir, TRUE);
 					}
 				};
 			}
@@ -126,7 +126,7 @@ class BaseInstaller extends Object implements IInstaller
 			if (is_link($resourcesDir)) {
 				unlink($resourcesDir);
 			} else {
-				File::rmdir($resourcesDir, true);
+				File::rmdir($resourcesDir, TRUE);
 			}
 		}
 	}
@@ -166,12 +166,12 @@ class BaseInstaller extends Object implements IInstaller
 			if (!is_array($arr1[$key])) {
 
 				// if key is numeric, remove the same value
-				if (is_numeric($key) && ($pos = array_search($arr1[$key], $arr2)) !== false) {
+				if (is_numeric($key) && ($pos = array_search($arr1[$key], $arr2)) !== FALSE) {
 					unset($arr1[$key]);
 				} //
 
 				// else remove the same key
-				else if ((!$isList && isset($arr2[$key])) || ($isList && $arr2IsList && array_search($item, $arr2) !== false)) {
+				else if ((!$isList && isset($arr2[$key])) || ($isList && $arr2IsList && array_search($item, $arr2) !== FALSE)) {
 					unset($arr1[$key]);
 				} //
 
