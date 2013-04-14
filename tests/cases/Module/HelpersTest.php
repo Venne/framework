@@ -28,6 +28,7 @@ class HelpersTest extends TestCase
 	protected $parameters = array(
 		'foo' => array('path' => '/foo'),
 		'bar' => array('path' => '/modules/bar'),
+		'win' => array('path' => 'C:\\win'),
 	);
 
 
@@ -55,6 +56,9 @@ class HelpersTest extends TestCase
 			array('/modules/bar', '@barModule'),
 			array('/modules/bar/test', '@barModule/test'),
 			array('/modules/bar/test', '@barModule/test'),
+			array('C:\\foo\\bar', 'C:\\foo\\bar'),
+			array('/foo/foo/bar', '@fooModule\\foo\\bar'),
+			array('C:/win/foo/bar', '@winModule\\foo\\bar'),
 		);
 	}
 

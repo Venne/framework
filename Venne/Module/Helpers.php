@@ -50,7 +50,8 @@ final class Helpers
 				throw new \Nette\InvalidArgumentException("Module '{$module}' does not exist.");
 			}
 
-			return $this->modules[$module]['path'] . ($localPrefix ? '/' . $localPrefix : '') . substr($path, $pos + 6);
+			$path = $this->modules[$module]['path'] . ($localPrefix ? '/' . $localPrefix : '') . substr($path, $pos + 6);
+			return \Nette\Utils\Strings::replace($path, '~\\\~', '/');
 		}
 	}
 
