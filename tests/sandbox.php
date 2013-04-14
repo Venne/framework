@@ -11,4 +11,5 @@ return array(
 	'wwwCacheDir'   => __DIR__ . '/www/cache',
 	'publicDir'		=> __DIR__ . '/www/public',
 	'resourcesDir'  => __DIR__ . '/www/resources',
+	'modulesDir'	=> __DIR__ . '/modules',
 );
