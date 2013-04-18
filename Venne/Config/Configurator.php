@@ -145,7 +145,15 @@ class Configurator extends \Nette\Config\Configurator
 		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
 			'debugMode' => $debugMode,
-			'environment' => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : ($debugMode ? 'development' : 'production'),
+			'environment' => isset($_SERVER['SERVER_NAME'])
+				? $_SERVER['SERVER_NAME']
+				: (function_exists('gethostname')
+					? gethostname()
+					: ($debugMode
+						? 'development'
+						: 'production'
+					)
+				),
 			'consoleMode' => PHP_SAPI === 'cli',
 			'container' => array(
 				'class' => 'SystemContainer',
@@ -153,10 +161,6 @@ class Configurator extends \Nette\Config\Configurator
 			)
 		);
 		$settings = require $parameters['configDir'] . '/settings.php';
-		if (file_exists($parameters['configDir'] . "/settings_{$ret['environment']}.php")) {
-			$s = require $parameters['configDir'] . "/settings_{$ret['environment']}.php";
-			$settings = $s + $settings;
-		}
 		foreach ($settings['modules'] as &$module) {
 			$module['path'] = \Nette\DI\Helpers::expand($module['path'], $parameters);
 		}
