@@ -45,7 +45,7 @@ class TemplateManager extends Object
 		if (file_exists($path)) {
 			foreach (\Nette\Utils\Finder::findDirectories("*")->in($path) as $file) {
 				if (file_exists($file->getPathname() . '/@layout.latte')) {
-					$data[$file->getBasename()] = "@{$module}Module/layouts/{$file->getBasename()}/@layout.latte";
+					$data[$file->getBasename()] = "@{$module}Module/{$file->getBasename()}/@layout.latte";
 				}
 			}
 		}
@@ -64,18 +64,17 @@ class TemplateManager extends Object
 	{
 		$data = array();
 
-		$prefix = ($layout ? "/layouts/$layout" : '');
+		$prefix = ($layout ? "/$layout" : '');
 		$suffix = ($subdir ? "/$subdir" : '');
-		$path = $this->modules[$module]['path'] . "/Resources$prefix/templates$suffix";
+		$path = $this->modules[$module]['path'] . "/Resources/layouts$prefix$suffix";
 
 		if (file_exists($path)) {
 			foreach (\Nette\Utils\Finder::find("*")->in($path) as $file) {
-				if (is_file($file->getPathname())) {
-					$p = str_replace('/', '.', $subdir);
-					$data[($p ? $p . '.' : '') . substr($file->getBasename(), 0, -6)] = "@{$module}Module$prefix/templates$suffix/{$file->getBasename()}";
-				} else {
-					$data += $this->getTemplatesByModule($module, $layout, ($subdir ? "{$subdir}/{$file->getBasename()}" : $file->getBasename()));
+				if ($file->getBasename() === '@layout.latte' || !is_file($file->getPathname())) {
+					continue;
 				}
+				$p = str_replace('/', '.', $subdir);
+				$data[($p ? $p . '.' : '') . substr($file->getBasename(), 0, -6)] = "@{$module}Module$prefix$suffix/{$file->getBasename()}";
 			}
 		}
 
