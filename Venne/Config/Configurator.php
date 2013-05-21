@@ -145,15 +145,7 @@ class Configurator extends \Nette\Config\Configurator
 		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
 		$ret = array(
 			'debugMode' => $debugMode,
-			'environment' => isset($_SERVER['SERVER_NAME'])
-				? $_SERVER['SERVER_NAME']
-				: (function_exists('gethostname')
-					? gethostname()
-					: ($debugMode
-						? 'development'
-						: 'production'
-					)
-				),
+			'environment' => ($e = static::detectEnvironment()) ? $e : ($debugMode ? 'development' : 'production'),
 			'consoleMode' => PHP_SAPI === 'cli',
 			'container' => array(
 				'class' => 'SystemContainer',
@@ -189,6 +181,21 @@ class Configurator extends \Nette\Config\Configurator
 		}
 
 		return $this->container;
+	}
+
+
+	/**
+	 * @return null|string
+	 */
+	public static function detectEnvironment()
+	{
+		return isset($_SERVER['SERVER_NAME']) ?
+			$_SERVER['SERVER_NAME']
+			: (
+				function_exists('gethostname')
+				? gethostname()
+				: NULL
+			);
 	}
 
 
