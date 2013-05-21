@@ -68,12 +68,10 @@ class VenneExtension extends CompilerExtension
 		}
 
 		// template
-		$container->addDefinition($this->prefix('UIMacros'))
-			->setFactory('Venne\Latte\Macros\UIMacros::install', array('%compiler%'))
-			->setParameters(array('compiler'))
-			->setShared(FALSE)
-			->addSetup('injectHelper', array('@' . $this->prefix('moduleHelpers')))
-			->addTag('macro');
+		$container->getDefinition('nette.latte')
+			->setClass('Venne\Latte\Engine')
+			->addSetup('$m = Venne\Latte\Macros\UIMacros::install(?->compiler); $m->injectHelper(?)', array('@self', '@venne.moduleHelpers'))
+			->setShared(FALSE);
 
 		$container->addDefinition($this->prefix("templateConfigurator"))
 			->setClass("Venne\Templating\TemplateConfigurator", array('@container', '@nette.latteFactory'));
