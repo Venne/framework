@@ -262,14 +262,6 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
-	protected function createLoader()
-	{
-		$loader = new Loader();
-		$loader->setParameters($this->parameters);
-		return $loader;
-	}
-
-
 	protected function getConfigFiles()
 	{
 		$ret = array();
