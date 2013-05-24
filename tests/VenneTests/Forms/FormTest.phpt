@@ -9,11 +9,13 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Forms;
+namespace VenneTests\Forms;
 
-use Venne;
+use Tester\Assert;
+use Tester\TestCase;
 use Venne\Forms\Form;
-use Venne\Testing\TestCase;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -40,34 +42,34 @@ class FormTest extends TestCase
 		$this->form->add('text', 'foo');
 		$this->form->add('textArea', 'bar');
 
-		$this->assertInstanceOf('Nette\Forms\Controls\TextInput', $this->form['foo']);
-		$this->assertInstanceOf('Nette\Forms\Controls\TextArea', $this->form['bar']);
+		Assert::type('Nette\Forms\Controls\TextInput', $this->form['foo']);
+		Assert::type('Nette\Forms\Controls\TextArea', $this->form['bar']);
 
-		$this->assertEquals('foo', $this->form['foo']->getName());
-		$this->assertEquals('bar', $this->form['bar']->getName());
+		Assert::equal('foo', $this->form['foo']->getName());
+		Assert::equal('bar', $this->form['bar']->getName());
 
 		unset($this->form['foo']);
 		unset($this->form['bar']);
 	}
 
 
-	/**
-	 * @expectedException Nette\InvalidArgumentException
-	 */
 	public function testAddException()
 	{
-		$this->form->add('text2', 'foo');
+		$form = $this->form;
+		Assert::exception(function () use ($form) {
+			$form->add('text2', 'foo');
+		}, 'Nette\InvalidArgumentException');
 	}
 
 
 	public function testAddSaveButton()
 	{
-		$this->assertFalse($this->form->hasSaveButton());
+		Assert::false($this->form->hasSaveButton());
 
 		$this->form->addSaveButton('Upload');
 
-		$this->assertTrue($this->form->hasSaveButton());
-		$this->assertEquals('Upload', $this->form->getSaveButton()->caption);
+		Assert::true($this->form->hasSaveButton());
+		Assert::equal('Upload', $this->form->getSaveButton()->caption);
 
 		unset($this->form['_save']);
 	}
@@ -78,34 +80,35 @@ class FormTest extends TestCase
 		$this->form->addFoo('a');
 		$this->form->addBar('b', 'c');
 
-		$this->assertInstanceOf('Nette\Forms\Controls\HiddenField', $this->form['a']);
-		$this->assertInstanceOf('Nette\Forms\Controls\TextInput', $this->form['b']);
+		Assert::type('Nette\Forms\Controls\HiddenField', $this->form['a']);
+		Assert::type('Nette\Forms\Controls\TextInput', $this->form['b']);
 	}
 
 
-	/**
-	 * @expectedException Nette\InvalidArgumentException
-	 */
 	public function testControlExtensionException()
 	{
-		$this->form->addUndefined('a');
+		$form = $this->form;
+		Assert::exception(function () use ($form) {
+			$form->addUndefined('a');
+		}, 'Nette\InvalidArgumentException');
 	}
 
 
 	public function testSetMapper()
 	{
-		$this->assertEquals($this->form, Mapper::$form);
+		Assert::same($this->form, Mapper::$form);
 	}
+
 
 	public function testMapper()
 	{
 		$presenter = new \Venne\Application\UI\Presenter();
 		$presenter->addComponent($this->form, 'form');
-		$this->assertEquals('load', Mapper::$status);
+		Assert::equal('load', Mapper::$status);
 
 		$this->form->setSubmittedBy($this->form['submit']);
 		$this->form->fireEvents();
-		$this->assertEquals('save', Mapper::$status);
+		Assert::equal('save', Mapper::$status);
 	}
 }
 
@@ -172,4 +175,4 @@ class Mapper implements \Venne\Forms\IMapper
 	}
 }
 
-
+\run(new FormTest);

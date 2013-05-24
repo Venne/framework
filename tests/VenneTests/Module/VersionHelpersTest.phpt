@@ -9,11 +9,13 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Module;
+namespace VenneTests\Module;
 
-use Venne;
-use Venne\Testing\TestCase;
+use Tester\Assert;
+use Tester\TestCase;
 use Venne\Module\VersionHelpers;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -44,10 +46,8 @@ class VersionHelpersTest extends TestCase
 	 */
 	public function testNormalizeRequire($expect, $path)
 	{
-		$this->assertEquals($expect, VersionHelpers::normalizeRequire($path));
+		Assert::equal($expect, VersionHelpers::normalizeRequire($path));
 	}
 }
 
-
-
-
+\run(new VersionHelpersTest);

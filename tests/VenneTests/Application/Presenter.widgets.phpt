@@ -9,15 +9,16 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Application\UI;
+namespace VenneTests\Application;
 
-use Venne;
-use Venne\Testing\TestCase;
+use Tester\Assert;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class PresenterTest extends TestCase
+class PresenterTest extends \Tester\TestCase
 {
 
 
@@ -27,7 +28,7 @@ class PresenterTest extends TestCase
 
 	public function setUp()
 	{
-		$this->presenter = new Presenter();
+		$this->presenter = new BasePresenter();
 
 		$widgetManager = new \Venne\Widget\WidgetManager();
 		$widgetManager->addWidget('foo', \Nette\Callback::create(function () {
@@ -41,37 +42,23 @@ class PresenterTest extends TestCase
 	}
 
 
-	/**
-	 * @return array
-	 */
-	public function dataServiceNamesAndPresenters()
-	{
-		return array(
-			array('FooPackage:Foo', 'fooPackage.fooPresenter'),
-			array('BarPackage:FooFoo', 'barPackage.fooFooPresenter'),
-			array('BarPackage:Foo:FooBar', 'barPackage.foo.fooBarPresenter'),
-			array('MocksBazPackage:Foo:FooBar', 'mocksBazPackage.foo.fooBarPresenter'),
-		);
-	}
-
-
 	public function testCreateComponent()
 	{
-		$this->assertEquals('Venne\Tests\Application\UI\FooControl', get_class($this->presenter['foo']));
-		$this->assertEquals('Venne\Tests\Application\UI\Bar2Control', get_class($this->presenter['bar']));
+		Assert::equal('VenneTests\Application\FooControl', get_class($this->presenter['foo']));
+		Assert::equal('VenneTests\Application\Bar2Control', get_class($this->presenter['bar']));
 	}
 
 
-	/**
-	 * @expectedException Nette\InvalidArgumentException
-	 */
 	public function testCreateComponentException()
 	{
-		get_class($this->presenter['foo2']);
+		$presenter = $this->presenter;
+		Assert::exception(function () use ($presenter) {
+			get_class($presenter['foo2']);
+		}, 'Nette\InvalidArgumentException');
 	}
 }
 
-class Presenter extends \Venne\Application\UI\Presenter
+class BasePresenter extends \Venne\Application\UI\Presenter
 {
 
 	public function createComponentBar()
@@ -96,4 +83,4 @@ class Bar2Control extends \Nette\Application\UI\Control
 
 }
 
-
+\run(new PresenterTest);

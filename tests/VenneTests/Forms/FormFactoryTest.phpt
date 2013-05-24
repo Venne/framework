@@ -9,11 +9,14 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Forms;
+namespace VenneTests\Forms;
 
-use Venne;
+use Tester\Assert;
+use Tester\TestCase;
 use Venne\Forms\Form;
-use Venne\Testing\TestCase;
+
+require __DIR__ . '/../bootstrap.php';
+
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -32,14 +35,12 @@ class FormFactoryTest extends TestCase
 	}
 
 
-	/**
-	 * @expectedException Nette\InvalidArgumentException
-	 */
 	public function testInvokeException()
 	{
-		$formFactory = clone $this->formFactory;
-
-		$formFactory->invoke();
+		$formFactory = $this->formFactory;
+		Assert::exception(function () use ($formFactory) {
+			$formFactory->invoke();
+		}, 'Nette\InvalidArgumentException');
 	}
 
 
@@ -50,12 +51,11 @@ class FormFactoryTest extends TestCase
 		$formFactory->injectFactory(new \Nette\Callback(function () {
 			return new \Venne\Forms\Form;
 		}));
-
-		$this->assertInstanceOf('\Venne\Forms\Form', $formFactory->invoke());
-		$this->assertInstanceOf('\Venne\Forms\Form', $formFactory->createForm());
-
 		$form = $formFactory->createForm();
-		$this->assertInstanceOf('\Venne\Tests\Forms\NullMapper', $form->getMapper());
+
+		Assert::type('\Venne\Forms\Form', $formFactory->invoke());
+		Assert::type('\Venne\Forms\Form', $formFactory->createForm());
+		Assert::type('\VenneTests\Forms\NullMapper', $form->getMapper());
 	}
 
 
@@ -63,14 +63,15 @@ class FormFactoryTest extends TestCase
 	{
 		$formFactory = clone $this->formFactory;
 
-		$this->assertNull($formFactory->status);
+		Assert::null($formFactory->status);
 
 		$formFactory->injectFactory(new \Nette\Callback(function () {
 			return new \Venne\Forms\Form;
 		}));
 
 		$formFactory->invoke();
-		$this->assertEquals('configure', $formFactory->status);
+
+		Assert::equal('configure', $formFactory->status);
 	}
 }
 
@@ -122,3 +123,29 @@ class NullMapper implements \Venne\Forms\IMapper
 	{
 	}
 }
+
+class ControlExtension implements \Venne\Forms\IControlExtension
+{
+
+	/**
+	 * @return array
+	 */
+	public function getControls(Form $form)
+	{
+		return array('foo', 'bar');
+	}
+
+
+	public function addFoo($form, $a)
+	{
+		return $form[$a] = new \Nette\Forms\Controls\HiddenField();
+	}
+
+
+	public function addBar($form, $a, $b)
+	{
+		return $form[$a] = new \Nette\Forms\Controls\TextInput($b);
+	}
+}
+
+\run(new FormFactoryTest);

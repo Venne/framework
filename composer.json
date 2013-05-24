@@ -13,8 +13,8 @@
 		"nette/nette":"2.0.*",
 		"symfony/console":"2.1.*"
 	},
-	"require-dev":{
-		"phpunit/phpunit":"3.7.*"
+	"require-dev": {
+		"nette/tester": "@dev"
 	},
 	"autoload":{
 		"psr-0":{

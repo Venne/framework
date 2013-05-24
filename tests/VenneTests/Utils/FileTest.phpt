@@ -9,11 +9,14 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Utils;
+namespace VenneTests\Utils;
 
-use Venne;
+use Doctrine\Tests\Common\Persistence\Mapping\TestEntity;
+use Tester\Assert;
+use Tester\TestCase;
 use Venne\Utils\File;
-use Venne\Testing\TestCase;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -58,7 +61,7 @@ class FileTest extends TestCase
 	 */
 	public function testGetRelativePathLinux($data, $target)
 	{
-		$this->assertEquals($target, File::getRelativePath($data[0], $data[1]), '/');
+		Assert::equal($target, File::getRelativePath($data[0], $data[1]), '/');
 	}
 
 
@@ -70,35 +73,35 @@ class FileTest extends TestCase
 	 */
 	public function testGetRelativePathWindows($data, $target)
 	{
-		$this->assertEquals($target, File::getRelativePath($data[0], $data[1]), '\\');
+		Assert::equal($target, File::getRelativePath($data[0], $data[1]), '\\');
 	}
 
 
 	public function testRmdir()
 	{
-		$tmpDir = $this->getContext()->parameters['tempDir'];
 		umask(0000);
 
-		mkdir($tmpDir . '/foo/bar', 0777, true);
-		touch($tmpDir . '/foo/bar/a');
-		touch($tmpDir . '/foo/b');
+		mkdir(TEMP_DIR . '/foo/bar', 0777, true);
+		touch(TEMP_DIR . '/foo/bar/a');
+		touch(TEMP_DIR . '/foo/b');
 
-		$this->assertTrue(File::rmdir($tmpDir . '/foo', true));
+		Assert::true(File::rmdir(TEMP_DIR . '/foo', true));
 	}
 
 
 	public function testCopy()
 	{
-		$tmpDir = $this->getContext()->parameters['tempDir'];
 		umask(0000);
 
-		mkdir($tmpDir . '/foo/bar', 0777, true);
-		touch($tmpDir . '/foo/bar/file');
+		mkdir(TEMP_DIR . '/foo/bar', 0777, true);
+		touch(TEMP_DIR . '/foo/bar/file');
 
-		$this->assertTrue(File::copy($tmpDir . '/foo', $tmpDir . '/foo2'));
-		$this->assertTrue(file_exists($tmpDir . '/foo2/bar/file'));
+		Assert::true(File::copy(TEMP_DIR . '/foo', TEMP_DIR . '/foo2'));
+		Assert::true(file_exists(TEMP_DIR . '/foo2/bar/file'));
 
-		File::rmdir($tmpDir . '/foo', true);
-		File::rmdir($tmpDir . '/foo2', true);
+		File::rmdir(TEMP_DIR . '/foo', true);
+		File::rmdir(TEMP_DIR . '/foo2', true);
 	}
 }
+
+\run(new FileTest);

@@ -9,10 +9,13 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Templating;
+namespace VenneTests\Templating;
 
-use Venne;
-use Venne\Testing\TestCase;
+use Tester\Assert;
+use Tester\TestCase;
+use Venne\Config\Configurator;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -25,7 +28,7 @@ class TemplateConfiguratorTest extends TestCase
 	protected $configurator;
 
 
-	public function setup()
+	public function setUp()
 	{
 		$container = new Container;
 		$container->addService("venne.helpers", new \Venne\Templating\Helpers($container));
@@ -48,9 +51,9 @@ class TemplateConfiguratorTest extends TestCase
 		$this->configurator->configure($template);
 
 		$callbacks = $template->getHelperLoaders();
-		$this->assertCount(1, $callbacks);
+		Assert::equal(1, count($callbacks));
 		foreach ($callbacks as $callback) {
-			$this->assertInstanceOf('Nette\Callback', $callback);
+			Assert::type('Nette\Callback', $callback);
 		}
 	}
 
@@ -62,9 +65,9 @@ class TemplateConfiguratorTest extends TestCase
 		$this->configurator->prepareFilters($template);
 
 		$callbacks = $template->getFilters();
-		$this->assertCount(1, $callbacks);
+		Assert::equal(1, count($callbacks));
 		foreach ($callbacks as $callback) {
-			$this->assertInstanceOf('Nette\Callback', $callback);
+			Assert::type('Nette\Callback', $callback);
 		}
 	}
 }
@@ -85,3 +88,4 @@ class Container extends \Nette\DI\Container
 	}
 }
 
+\run(new \VenneTests\Templating\TemplateConfiguratorTest);

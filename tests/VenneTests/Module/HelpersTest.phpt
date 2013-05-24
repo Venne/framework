@@ -9,11 +9,13 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Module;
+namespace VenneTests\Module;
 
-use Venne;
-use Venne\Testing\TestCase;
+use Tester\Assert;
+use Tester\TestCase;
 use Venne\Module\Helpers;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -71,16 +73,16 @@ class HelpersTest extends TestCase
 	 */
 	public function testExpandPath($expect, $path)
 	{
-		$this->assertEquals($expect, $this->moduleHelpers->expandPath($path));
+		Assert::equal($expect, $this->moduleHelpers->expandPath($path));
 	}
 
 
-	/**
-	 * @expectedException \Nette\InvalidArgumentException
-	 */
 	public function testExpandPathException()
 	{
-		$this->moduleHelpers->expandPath('@cmsModule/foo');
+		$moduleHelpers = $this->moduleHelpers;
+		Assert::exception(function () use ($moduleHelpers) {
+			$moduleHelpers->expandPath('@cmsModule/foo');
+		}, 'Nette\InvalidArgumentException');
 	}
 
 
@@ -112,10 +114,8 @@ class HelpersTest extends TestCase
 	 */
 	public function testExpandResource($expect, $path)
 	{
-		$this->assertEquals($expect, $this->moduleHelpers->expandResource($path));
+		Assert::equal($expect, $this->moduleHelpers->expandResource($path));
 	}
 }
 
-
-
-
+\run(new HelpersTest);

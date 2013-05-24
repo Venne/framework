@@ -9,10 +9,12 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Venne\Tests\Security;
+namespace VenneTests\Security;
 
-use Venne;
-use Venne\Testing\TestCase;
+use Tester\Assert;
+use Tester\TestCase;
+
+require __DIR__ . '/../bootstrap.php';
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -25,32 +27,31 @@ class AuthenticatorTest extends TestCase
 	protected $authenticator;
 
 
-
 	public function setup()
 	{
 		$this->authenticator = new \Venne\Security\Authenticator("foo", "bar");
 	}
 
 
-
 	public function testAuthenticate()
 	{
 		$identity = $this->authenticator->authenticate(array("foo", "bar"));
 
-		$this->assertInstanceOf("Nette\Security\Identity", $identity);
-		$this->assertEquals("foo", $identity->id);
-		$this->assertCount(1, $identity->roles);
-		$this->assertEquals("admin", $identity->roles[0]);
+		Assert::type('Nette\Security\Identity', $identity);
+		Assert::equal("foo", $identity->id);
+		Assert::equal(1, count($identity->roles));
+		Assert::equal("admin", $identity->roles[0]);
 	}
-	
-	
-	/**
-     * @expectedException Nette\Security\AuthenticationException
-     */
-    public function testAuthenticateException()
-    {
-		$this->authenticator->authenticate(array("foo", "bar2"));
-    }
+
+
+	public function testAuthenticateException()
+	{
+		$authenticator = $this->authenticator;
+		Assert::exception(function () use ($authenticator) {
+			$authenticator->authenticate(array("foo", "bar2"));
+		}, 'Nette\Security\AuthenticationException');
+	}
 
 }
 
+\run(new AuthenticatorTest);
