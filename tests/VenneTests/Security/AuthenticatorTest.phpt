@@ -48,8 +48,14 @@ class AuthenticatorTest extends TestCase
 	{
 		$authenticator = $this->authenticator;
 		Assert::exception(function () use ($authenticator) {
+			$authenticator->authenticate(array('', ''));
+		}, 'Nette\Security\AuthenticationException', 'The username or password is not filled.');
+		Assert::exception(function () use ($authenticator) {
+			$authenticator->authenticate(array("foo2", "bar"));
+		}, 'Nette\Security\AuthenticationException', 'The username is incorrect.');
+		Assert::exception(function () use ($authenticator) {
 			$authenticator->authenticate(array("foo", "bar2"));
-		}, 'Nette\Security\AuthenticationException');
+		}, 'Nette\Security\AuthenticationException', 'The password is incorrect.');
 	}
 
 }

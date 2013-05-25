@@ -51,13 +51,18 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 	{
 		list($username, $password) = $credentials;
 
-		if (!$username OR !$password)
-			throw new AuthenticationException("Invalid password.", self::INVALID_CREDENTIAL);
-
-		if ($this->adminLogin == $username && $this->adminPassword == $password) {
-			return new \Nette\Security\Identity($username, array("admin"));
+		if (!$username OR !$password) {
+			throw new AuthenticationException('The username or password is not filled.', self::INVALID_CREDENTIAL);
 		}
 
-		throw new AuthenticationException("User '$username' not found.", self::IDENTITY_NOT_FOUND);
+		if ($this->adminLogin != $username) {
+			throw new AuthenticationException('The username is incorrect.', self::INVALID_CREDENTIAL);
+		}
+
+		if ($this->adminPassword != $password) {
+			throw new AuthenticationException('The password is incorrect.', self::IDENTITY_NOT_FOUND);
+		}
+
+		return new \Nette\Security\Identity($username, array('admin'));
 	}
 }
