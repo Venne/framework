@@ -343,4 +343,18 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		return $this->parameters['debugMode'];
 	}
+
+
+	/**
+	 * Sets path to temporary directory.
+	 * @return Configurator  provides a fluent interface
+	 */
+	public function setTempDirectory($path)
+	{
+		$this->parameters['tempDir'] = $path;
+		if (($cacheDir = $this->getCacheDirectory()) && !is_dir($cacheDir)) {
+			@mkdir($cacheDir);
+		}
+		return $this;
+	}
 }
