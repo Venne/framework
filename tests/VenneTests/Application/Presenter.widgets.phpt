@@ -61,7 +61,7 @@ class PresenterTest extends \Tester\TestCase
 class BasePresenter extends \Venne\Application\UI\Presenter
 {
 
-	public function createComponentBar()
+	protected function createComponentBar()
 	{
 		return new Bar2Control();
 	}

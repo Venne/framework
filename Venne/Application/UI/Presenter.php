@@ -165,7 +165,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 * @param  string      component name
 	 * @return IComponent  the created component (optionally)
 	 */
-	public function createComponent($name)
+	protected function createComponent($name)
 	{
 		// parent
 		if (($control = parent::createComponent($name)) == TRUE) {
