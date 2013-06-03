@@ -11,13 +11,12 @@
 
 namespace Venne\Latte\Macros;
 
-use Venne;
-use Nette,
-	Nette\Latte,
-	Nette\Latte\MacroNode,
-	Nette\Latte\PhpWriter,
-	Nette\Latte\CompileException,
-	Nette\Utils\Strings;
+use Nette\Latte\Compiler;
+use Nette\Latte\MacroNode;
+use Nette\Latte\MacroTokenizer;
+use Nette\Latte\PhpWriter;
+use Nette\Utils\Strings;
+use Venne\Module\Helpers;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -25,17 +24,24 @@ use Nette,
 class UIMacros extends \Nette\Latte\Macros\UIMacros
 {
 
-	/** @var Venne\Module\Helpers */
+	/** @var Helpers */
 	protected $moduleHelpers;
 
 
-	public function injectHelper(Venne\Module\Helpers $helper)
+	/**
+	 * @param Helpers $helper
+	 */
+	public function injectHelper(Helpers $helper)
 	{
 		$this->moduleHelpers = $helper;
 	}
 
 
-	public static function install(Latte\Compiler $compiler)
+	/**
+	 * @param Compiler $compiler
+	 * @return void|static
+	 */
+	public static function install(Compiler $compiler)
 	{
 		$me = new static($compiler);
 		$me->addMacro('include', array($me, 'macroInclude'));
@@ -65,15 +71,24 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	}
 
 
+	/**
+	 * @param MacroNode $node
+	 * @param PhpWriter $writer
+	 */
 	public function macroExtends(MacroNode $node, PhpWriter $writer)
 	{
 		$node->args = $this->moduleHelpers->expandPath($node->args);
-		$node->tokenizer = new \Nette\Latte\MacroTokenizer($node->args);
+		$node->tokenizer = new MacroTokenizer($node->args);
 		$writer = new PhpWriter($node->tokenizer);
 		return parent::macroExtends($node, $writer);
 	}
 
 
+	/**
+	 * @param MacroNode $node
+	 * @param PhpWriter $writer
+	 * @return string
+	 */
 	public function macroPath(MacroNode $node, PhpWriter $writer)
 	{
 		return $writer->write("echo \$basePath . '/' . \$presenter->context->venne->moduleHelpers->expandResource(%node.word)");

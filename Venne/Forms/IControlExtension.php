@@ -11,7 +11,6 @@
 
 namespace Venne\Forms;
 
-use Venne;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -23,5 +22,4 @@ interface IControlExtension
 	 * @return array
 	 */
 	public function getControls(Form $form);
-
 }

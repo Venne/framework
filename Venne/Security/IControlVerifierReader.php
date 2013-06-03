@@ -11,8 +11,6 @@
 
 namespace Venne\Security;
 
-use Venne;
-
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */

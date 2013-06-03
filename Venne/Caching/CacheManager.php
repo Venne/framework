@@ -11,12 +11,12 @@
 
 namespace Venne\Caching;
 
-use Venne;
-use Venne\Utils\File;
-use Nette\Utils\Finder;
-use Nette\Object;
 use Nette\Caching\Cache;
 use Nette\Caching\Storages\FileStorage;
+use Nette\InvalidArgumentException;
+use Nette\Object;
+use Nette\Utils\Finder;
+use Venne\Utils\File;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -52,7 +52,7 @@ class CacheManager extends Object
 			$path = $file->getPathname();
 
 			if (is_dir($path)) {
-				File::rmdir($path, true);
+				File::rmdir($path, TRUE);
 			} else {
 				unlink($path);
 			}
@@ -62,16 +62,17 @@ class CacheManager extends Object
 
 	/**
 	 * @param $namespace
+	 * @throws \Nette\InvalidArgumentException
 	 */
 	public function cleanNamespace($namespace)
 	{
 		$dir = $this->getDirFromNamespace($namespace);
 
 		if (!file_exists($dir)) {
-			throw new \Nette\InvalidArgumentException("Namespace '{$namespace}' does not exist.");
+			throw new InvalidArgumentException("Namespace '{$namespace}' does not exist.");
 		}
 
-		File::rmdir($this->getDirFromNamespace($namespace), true);
+		File::rmdir($this->getDirFromNamespace($namespace), TRUE);
 	}
 
 
@@ -81,7 +82,7 @@ class CacheManager extends Object
 			$path = $file->getPathname();
 
 			if (is_dir($path)) {
-				File::rmdir($path, true);
+				File::rmdir($path, TRUE);
 			} else {
 				unlink($path);
 			}

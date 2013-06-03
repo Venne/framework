@@ -11,11 +11,10 @@
 
 namespace Venne\Module\DependencyResolver;
 
-use Venne;
-use Venne\Module\VersionHelpers;
-use Venne\Module\IModule;
 use Nette\InvalidArgumentException;
 use Nette\Object;
+use Venne\Module\IModule;
+use Venne\Module\VersionHelpers;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -45,7 +44,7 @@ class Solver extends Object
 	 * @param IModule $module
 	 * @throws InvalidArgumentException
 	 */
-	public function testInstall(IModule $module, Problem $problem = NULL, $isRecursion = false)
+	public function testInstall(IModule $module, Problem $problem = NULL)
 	{
 		$installedModules = $this->installedModules;
 		$modules = $this->modules;
@@ -59,7 +58,7 @@ class Solver extends Object
 
 					try {
 						$solver = new Solver($modules, $installedModules);
-						$solver->testInstall($modules[$name], $problem, true);
+						$solver->testInstall($modules[$name], $problem, TRUE);
 					} catch (InvalidArgumentException $e) {
 						throw new InvalidArgumentException("Module '{$module->getName()}' depend on '{$name}' which is not installed.");
 					}
@@ -106,7 +105,7 @@ class Solver extends Object
 
 						try {
 							$solver = new Solver($modules, $installedModules);
-							$solver->testUninstall($sourceModule, $problem, true);
+							$solver->testUninstall($sourceModule, $problem, TRUE);
 						} catch (InvalidArgumentException $e) {
 							throw new InvalidArgumentException("Module '{$sourceModule->getName()}' depend on '{$module->getName()}' which is not installed.");
 						}

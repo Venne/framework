@@ -11,16 +11,11 @@
 
 namespace Venne\Module\Commands;
 
-use Gedmo\Mapping\Driver\File;
 use Nette\DI\Container;
-use Nette\Utils\PhpGenerator\ClassType;
-use Venne;
-use Venne\Module\ModuleManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Command to execute DQL queries in a given EntityManager.

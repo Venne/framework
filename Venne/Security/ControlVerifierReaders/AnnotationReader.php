@@ -11,9 +11,9 @@
 
 namespace Venne\Security\ControlVerifierReaders;
 
-use Venne;
 use Nette\Object;
 use Nette\Reflection\ClassType;
+use Nette\Reflection\Method;
 use Venne\Security\IControlVerifierReader;
 
 /**
@@ -61,7 +61,12 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	}
 
 
-	protected function getSchemaOfResource(\Nette\Reflection\Method $method, $secured)
+	/**
+	 * @param Method $method
+	 * @param $secured
+	 * @return null|string
+	 */
+	protected function getSchemaOfResource(Method $method, $secured)
 	{
 		$ret = isset($secured['resource']) ? $secured['resource'] : NULL;
 		if (!$ret) {
@@ -72,7 +77,12 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	}
 
 
-	protected function getSchemaOfPrivilege(\Nette\Reflection\Method $method, $secured)
+	/**
+	 * @param Method $method
+	 * @param $secured
+	 * @return null|string
+	 */
+	protected function getSchemaOfPrivilege(Method $method, $secured)
 	{
 		$ret = isset($secured['privilege']) ? $secured['privilege'] : NULL;
 		if (!$ret) {
@@ -84,7 +94,12 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	}
 
 
-	protected function getSchemaOfRoles(\Nette\Reflection\Method $method, $secured)
+	/**
+	 * @param Method $method
+	 * @param $secured
+	 * @return array
+	 */
+	protected function getSchemaOfRoles(Method $method, $secured)
 	{
 		if (isset($secured['roles'])) {
 			$roles = explode(',', $secured['roles']);
@@ -97,7 +112,12 @@ class AnnotationReader extends Object implements IControlVerifierReader
 	}
 
 
-	protected function getSchemaOfUsers(\Nette\Reflection\Method $method, $secured)
+	/**
+	 * @param Method $method
+	 * @param $secured
+	 * @return array
+	 */
+	protected function getSchemaOfUsers(Method $method, $secured)
 	{
 		if (isset($secured['users'])) {
 			$users = explode(',', $secured['users']);

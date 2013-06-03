@@ -11,7 +11,6 @@
 
 namespace Venne\Config;
 
-use Venne;
 use Nette\DI\ContainerBuilder;
 
 /**
@@ -21,7 +20,7 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 {
 
 	/**
-	 * @param \Nette\DI\ContainerBuilder $container
+	 * @param ContainerBuilder $container
 	 * @param $tag
 	 * @return array
 	 */
@@ -45,6 +44,5 @@ class CompilerExtension extends \Nette\Config\CompilerExtension
 		}
 		return $ret;
 	}
-
 }
 

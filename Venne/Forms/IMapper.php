@@ -11,7 +11,6 @@
 
 namespace Venne\Forms;
 
-use Venne;
 use Nette\ComponentModel\IComponent;
 
 /**

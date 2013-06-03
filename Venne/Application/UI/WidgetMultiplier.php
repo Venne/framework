@@ -11,10 +11,9 @@
 
 namespace Venne\Application\UI;
 
-use Venne;
-use Nette\Object;
 use Nette\ComponentModel\IComponent;
 use Nette\ComponentModel\IContainer;
+use Nette\Object;
 
 /**
  * Widget for Venne:CMS
@@ -37,12 +36,10 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	protected $name;
 
 
-
 	public function __construct($factory)
 	{
 		$this->multiplier = new \Nette\Application\UI\Multiplier($factory);
 	}
-
 
 
 	public function __call($name, $args)
@@ -51,12 +48,10 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	public function offsetExists($offset)
 	{
 		return (bool)$this->getComponent($offset);
 	}
-
 
 
 	public function offsetGet($offset)
@@ -65,12 +60,10 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	public function offsetSet($offset, $value)
 	{
 		$this->addComponent($component, $name);
 	}
-
 
 
 	public function offsetUnset($offset)
@@ -82,7 +75,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	/**
 	 * @return string
 	 */
@@ -90,7 +82,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	{
 		return $this->getComponent(0)->getName();
 	}
-
 
 
 	/**
@@ -101,7 +92,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	{
 		return $this->parent;
 	}
-
 
 
 	/**
@@ -119,7 +109,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	/**
 	 * Adds the specified component to the IComponentContainer.
 	 * @param  IComponent
@@ -132,7 +121,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	/**
 	 * Removes a component from the IComponentContainer.
 	 * @param  IComponent
@@ -142,7 +130,6 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	{
 		$this->getComponent(0)->removeComponent($component);
 	}
-
 
 
 	/**
@@ -163,10 +150,9 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	/**
 	 * Iterates over a components.
-	 * @param  bool	recursive?
+	 * @param  bool    recursive?
 	 * @param  string  class types filter
 	 * @return \Iterator
 	 */
@@ -176,16 +162,13 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	}
 
 
-
 	/**
 	 * @param  string
 	 * @return void
 	 */
 	public function signalReceived($signal)
 	{
-
 	}
-
 
 
 	/**
@@ -195,9 +178,7 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	 */
 	public function loadState(array $params)
 	{
-
 	}
-
 
 
 	/**
@@ -207,7 +188,5 @@ class WidgetMultiplier extends Object implements \Nette\Application\UI\ISignalRe
 	 */
 	public function saveState(array & $params)
 	{
-
 	}
-
 }

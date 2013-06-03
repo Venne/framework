@@ -11,10 +11,9 @@
 
 namespace Venne\Caching\Storages;
 
-use Nette,
-Nette\Caching\Cache,
-Nette\Caching\ICacheStorage;
-
+use Nette;
+use Nette\Caching\Cache;
+use Nette\Caching\ICacheStorage;
 
 /**
  * APC caching storage.
@@ -25,6 +24,7 @@ Nette\Caching\ICacheStorage;
  */
 class ApcStorage implements ICacheStorage
 {
+
 	/**#@+ @internal cache structure */
 	const META_CALLBACKS = 'callbacks';
 

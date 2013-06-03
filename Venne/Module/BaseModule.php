@@ -11,7 +11,6 @@
 
 namespace Venne\Module;
 
-use Venne;
 use Nette\Object;
 
 /**
@@ -20,92 +19,136 @@ use Nette\Object;
 class BaseModule extends Object implements IModule
 {
 
-
+	/** @var string */
 	protected $name;
 
-	protected $description;
-
-	protected $keywords;
-
+	/** @var string */
 	protected $version;
 
+	/** @var string */
+	protected $description;
+
+	/** @var array */
+	protected $keywords = array();
+
+	/** @var array */
 	protected $license = array();
 
+	/** @var array */
 	protected $authors = array();
 
 
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		return $this->name;
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getDescription()
 	{
 		return $this->description;
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getKeywords()
 	{
 		return $this->keywords;
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getLicense()
 	{
 		return $this->license;
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getVersion()
 	{
 		return $this->version;
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getAuthors()
 	{
 		return $this->authors;
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getAutoload()
 	{
 		return array();
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getRequire()
 	{
 		return array();
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getConfiguration()
 	{
 		return array();
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getExtra()
 	{
 		return array();
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getPath()
 	{
 		return dirname($this->getReflection()->getFileName());
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getClassName()
 	{
 		return get_class($this);
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getInstallers()
 	{
 		return array('Venne\Module\Installers\BaseInstaller');

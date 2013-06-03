@@ -11,9 +11,8 @@
 
 namespace Venne\Module\DependencyResolver;
 
-use Venne;
-use Venne\Module\IModule;
 use Nette\Object;
+use Venne\Module\IModule;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>

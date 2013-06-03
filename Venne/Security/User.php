@@ -11,18 +11,16 @@
 
 namespace Venne\Security;
 
-use Venne;
-use Nette\Security\IAuthorizator;
-use Nette\Application\UI\Presenter;
 use Nette\Application\UI\Control;
+use Nette\Application\UI\Presenter;
 use Nette\Reflection\ClassType;
+use Nette\Security\IAuthorizator;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
 class User extends \Nette\Security\User
 {
-
 
 	/** @var array */
 	protected $_presenterAllowed = array();
@@ -34,7 +32,7 @@ class User extends \Nette\Security\User
 	/**
 	 * Has a user effective access to the Resource?
 	 * If $resource is NULL, then the query applies to all resources.
-	 * @param  string|Presenter  resource
+	 * @param  string|Presenter resource
 	 * @param  string  privilege
 	 * @return bool
 	 */
@@ -52,10 +50,7 @@ class User extends \Nette\Security\User
 			return $this->isControlAllowed($resource);
 		}
 
-		try {
-			return parent::isAllowed($resource, $privilege);
-		} catch (\Nette\InvalidStateException $e) {
-		}
+		return parent::isAllowed($resource, $privilege);
 	}
 
 
@@ -97,7 +92,7 @@ class User extends \Nette\Security\User
 
 		// is not secured
 		if (!$ref->hasAnnotation('secured')) {
-			return true;
+			return TRUE;
 		}
 
 		// resource & privilege
@@ -105,38 +100,36 @@ class User extends \Nette\Security\User
 		$resource = isset($secured['resource']) ? $secured['resource'] : $ref->getNamespaceName();
 		$privilege = isset($secured['privilege']) ? $secured['privilege'] : NULL;
 		if (!parent::isAllowed($resource, $privilege)) {
-			return false;
+			return FALSE;
 		}
 
 		// roles
 		if (isset($secured['roles'])) {
 			$userRoles = $this->getRoles();
 			$roles = explode(',', $secured['roles']);
-			array_walk($roles, function(&$val)
-			{
+			array_walk($roles, function (&$val) {
 				$val = trim($val);
 			});
 
 			if (count(array_intersect($userRoles, $roles)) == 0) {
-				return false;
+				return FALSE;
 			}
 		}
 
 		// users
 		if (isset($secured['users'])) {
 			$users = explode(',', $secured['users']);
-			array_walk($users, function(&$val)
-			{
+			array_walk($users, function (&$val) {
 				$val = trim($val);
 			});
 
-			$user = (array)$element->getAnnotation('User');
+			$users = (array)$element->getAnnotation('User');
 			if (in_array($this->getId(), $users)) {
-				return false;
+				return FALSE;
 			}
 		}
 
-		return true;
+		return TRUE;
 	}
 
 
@@ -150,14 +143,14 @@ class User extends \Nette\Security\User
 		$ref = ClassType::from($element->class);
 
 		if (!$this->isPresenterAllowedCached($classRef)) {
-			return false;
+			return FALSE;
 		}
 
 		$ref = $ref->getMethod($element->name);
 
 		// is not secured
 		if (!$ref->hasAnnotation('secured')) {
-			return true;
+			return TRUE;
 		}
 
 		// resource & privilege
@@ -169,38 +162,36 @@ class User extends \Nette\Security\User
 		}
 		$privilege = isset($secured['privilege']) ? $secured['privilege'] : $element->name;
 		if (!parent::isAllowed($resource, $privilege)) {
-			return false;
+			return FALSE;
 		}
 
 		// roles
 		if (isset($secured['roles'])) {
 			$userRoles = $this->getRoles();
 			$roles = explode(',', $secured['roles']);
-			array_walk($roles, function(&$val)
-			{
+			array_walk($roles, function (&$val) {
 				$val = trim($val);
 			});
 
 			if (count(array_intersect($userRoles, $roles)) == 0) {
-				return false;
+				return FALSE;
 			}
 		}
 
 		// users
 		if (isset($secured['users'])) {
 			$users = explode(',', $secured['users']);
-			array_walk($users, function(&$val)
-			{
+			array_walk($users, function (&$val) {
 				$val = trim($val);
 			});
 
-			$user = (array)$element->getAnnotation('User');
+			$users = (array)$element->getAnnotation('User');
 			if (in_array($this->getId(), $users)) {
-				return false;
+				return FALSE;
 			}
 		}
 
-		return true;
+		return TRUE;
 	}
 
 
@@ -210,6 +201,6 @@ class User extends \Nette\Security\User
 	 */
 	protected function isControlAllowed(Control $control)
 	{
-		return true;
+		return TRUE;
 	}
 }

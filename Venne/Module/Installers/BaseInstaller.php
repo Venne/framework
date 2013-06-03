@@ -11,14 +11,13 @@
 
 namespace Venne\Module\Installers;
 
-use Venne;
-use Nette\Object;
-use Nette\DI\Container;
-use Venne\Utils\File;
-use Nette\Utils\Validators;
 use Nette\Config\Adapters\NeonAdapter;
-use Venne\Module\IModule;
+use Nette\DI\Container;
+use Nette\Object;
+use Nette\Utils\Validators;
 use Venne\Module\IInstaller;
+use Venne\Module\IModule;
+use Venne\Utils\File;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -66,7 +65,7 @@ class BaseInstaller extends Object implements IInstaller
 					File::copy($targetDir, $moduleDir);
 				}
 
-				$this->actions[] = function ($self) use ($resourcesDir) {
+				$this->actions[] = function () use ($resourcesDir) {
 					if (is_link($resourcesDir)) {
 						unlink($resourcesDir);
 					} else {

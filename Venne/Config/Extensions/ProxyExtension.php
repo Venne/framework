@@ -14,7 +14,6 @@ namespace Venne\Config\Extensions;
 use Nette\Caching\Cache;
 use Nette\Caching\Storages\PhpFileStorage;
 use Nette\Utils\PhpGenerator\ClassType;
-use Nette\DI\ContainerBuilder;
 use Venne\Config\CompilerExtension;
 
 /**
@@ -23,9 +22,7 @@ use Venne\Config\CompilerExtension;
 class ProxyExtension extends CompilerExtension
 {
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	private $classesFile;
 
 
@@ -87,7 +84,7 @@ class ProxyExtension extends CompilerExtension
 
 
 	/**
-	 * @return \Nette\Caching\Cache
+	 * @return Cache
 	 */
 	private function getCache()
 	{

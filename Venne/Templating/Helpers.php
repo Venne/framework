@@ -11,10 +11,10 @@
 
 namespace Venne\Templating;
 
-use Venne;
+use Nette\DI\Container;
 
 /**
- * @author	 Josef Kříž
+ * @author     Josef Kříž
  */
 class Helpers extends \Nette\Object
 {
@@ -26,12 +26,10 @@ class Helpers extends \Nette\Object
 	protected $helpers = array();
 
 
-
-	function __construct(\Nette\DI\Container $container)
+	function __construct(Container $container)
 	{
 		$this->container = $container;
 	}
-
 
 
 	/**
@@ -43,11 +41,9 @@ class Helpers extends \Nette\Object
 	}
 
 
-
 	/**
 	 * Try to load the requested helper.
 	 * @param  string  helper name
-	 * @return callback
 	 */
 	public function loader($helper)
 	{
@@ -55,5 +51,4 @@ class Helpers extends \Nette\Object
 			return callback($this->helpers[$helper], "filter");
 		}
 	}
-
 }

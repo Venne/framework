@@ -11,14 +11,11 @@
 
 namespace Venne\Templating;
 
-use Venne;
-
 /**
- * @author	 Josef Kříž
+ * @author     Josef Kříž
  */
 interface IHelper
 {
 
 	public static function filter();
-
 }

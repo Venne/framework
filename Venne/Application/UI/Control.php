@@ -11,11 +11,10 @@
 
 namespace Venne\Application\UI;
 
-use Venne;
-use Nette\Utils\Strings;
-use Venne\Templating\ITemplateConfigurator;
-use Venne\Security\IComponentVerifier;
 use Nette\Templating\FileTemplate;
+use Nette\Utils\Strings;
+use Venne\Security\IComponentVerifier;
+use Venne\Templating\ITemplateConfigurator;
 
 /**
  * Description of Control
@@ -25,18 +24,11 @@ use Nette\Templating\FileTemplate;
 class Control extends \Nette\Application\UI\Control
 {
 
-
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
 
 	/** @var bool */
 	private $startupCheck;
-
-
-	protected function startup()
-	{
-		$this->startupCheck = TRUE;
-	}
 
 
 	/**
@@ -45,6 +37,28 @@ class Control extends \Nette\Application\UI\Control
 	public function setTemplateConfigurator(ITemplateConfigurator $configurator = NULL)
 	{
 		$this->templateConfigurator = $configurator;
+	}
+
+
+	/**
+	 * Descendant can override this method to customize template compile-time filters.
+	 *
+	 * @param  Nette\Templating\Template
+	 * @return void
+	 */
+	public function templatePrepareFilters($template)
+	{
+		if ($this->templateConfigurator !== NULL) {
+			$this->templateConfigurator->prepareFilters($template);
+		} else {
+			$template->registerFilter(new \Nette\Latte\Engine);
+		}
+	}
+
+
+	protected function startup()
+	{
+		$this->startupCheck = TRUE;
 	}
 
 
@@ -81,22 +95,6 @@ class Control extends \Nette\Application\UI\Control
 		}
 
 		return parent::createComponent($name);
-	}
-
-
-	/**
-	 * Descendant can override this method to customize template compile-time filters.
-	 *
-	 * @param  Nette\Templating\Template
-	 * @return void
-	 */
-	public function templatePrepareFilters($template)
-	{
-		if ($this->templateConfigurator !== NULL) {
-			$this->templateConfigurator->prepareFilters($template);
-		} else {
-			$template->registerFilter(new \Nette\Latte\Engine);
-		}
 	}
 
 

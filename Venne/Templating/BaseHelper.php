@@ -11,8 +11,6 @@
 
 namespace Venne\Templating;
 
-use Venne;
-use Nette;
 use Nette\Object;
 
 /**
@@ -21,17 +19,14 @@ use Nette\Object;
 class BaseHelper extends Object implements IHelper
 {
 
-
 	/** @var LatteHelper */
 	protected static $instance;
-
 
 
 	public function __construct()
 	{
 		self::$instance = $this;
 	}
-
 
 
 	/**
@@ -42,6 +37,5 @@ class BaseHelper extends Object implements IHelper
 	{
 		return call_user_func_array(array(self::$instance, "run"), func_get_args());
 	}
-
 }
 

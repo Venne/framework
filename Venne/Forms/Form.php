@@ -11,9 +11,8 @@
 
 namespace Venne\Forms;
 
-use Venne;
-use Venne\Forms\IMapper;
 use Venne\Forms\IControlExtension;
+use Venne\Forms\IMapper;
 use Venne\Forms\IObjectContainer;
 
 /**

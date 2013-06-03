@@ -11,8 +11,6 @@
 
 namespace Venne\Config\Extensions;
 
-use Venne;
-use Nette\DI\ContainerBuilder;
 use Nette\Config\CompilerExtension;
 
 /**
@@ -23,7 +21,6 @@ class ExtensionsExtension extends CompilerExtension
 
 	public function loadConfiguration()
 	{
-		$container = $this->getContainerBuilder();
 		$config = $this->getConfig();
 
 		foreach ($config as $name => $class) {

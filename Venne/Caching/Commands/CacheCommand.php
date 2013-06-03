@@ -11,13 +11,13 @@
 
 namespace Venne\Caching\Commands;
 
-use Venne;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Nette\Caching\Cache;
+use Nette\Caching\Storages\FileStorage;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to execute DQL queries in a given EntityManager.
@@ -28,7 +28,8 @@ class CacheCommand extends Command
 	/** @var Cache */
 	protected $cache;
 
-	function __construct(\Nette\Caching\Storages\FileStorage $fileStorage)
+
+	function __construct(FileStorage $fileStorage)
 	{
 		parent::__construct();
 
@@ -47,6 +48,7 @@ class CacheCommand extends Command
 			->addOption('tag', NULL, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Tags to invalidate');
 	}
 
+
 	/**
 	 * @see Console\Command\Command
 	 */
@@ -62,5 +64,4 @@ class CacheCommand extends Command
 			$output->writeln('Cache has been invalidated.');
 		}
 	}
-
 }

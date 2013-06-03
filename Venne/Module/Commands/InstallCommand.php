@@ -11,15 +11,13 @@
 
 namespace Venne\Module\Commands;
 
-use Venne;
-use Venne\Module\ModuleManager;
-use Venne\Module\DependencyResolver\Problem;
 use Nette\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Venne\Module\ModuleManager;
 
 /**
  * Command to execute DQL queries in a given EntityManager.
@@ -78,7 +76,7 @@ class InstallCommand extends Command
 			}
 
 			$dialog = $this->getHelperSet()->get('dialog');
-			if (!$dialog->askConfirmation($output, '<question>Continue with this actions? [y/N]</question>', false)) {
+			if (!$dialog->askConfirmation($output, '<question>Continue with this actions? [y/N]</question>', FALSE)) {
 				return;
 			}
 		}

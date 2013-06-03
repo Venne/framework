@@ -12,13 +12,11 @@
 namespace Venne\Module\Commands;
 
 use Nette\DI\Container;
-use Venne;
-use Venne\Module\ModuleManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Venne\Module\ModuleManager;
 
 /**
  * Command to execute DQL queries in a given EntityManager.
@@ -65,7 +63,6 @@ class CreateCommand extends Command
 		$module = $input->getArgument('module');
 		$modules = $this->moduleManager->getModules();
 		$path = "{$this->modulesDir}/{$module}-module";
-		$namespace = ucfirst($module) . 'Module';
 
 		if (isset($modules[$module])) {
 			$output->writeln("<error>Module '{$module}' already exists.</error>");
@@ -103,7 +100,6 @@ class CreateCommand extends Command
 
 namespace ' . ucfirst($name) . 'Module;
 
-use Venne;
 use Venne\Module\ComposerModule;
 
 class Module extends ComposerModule

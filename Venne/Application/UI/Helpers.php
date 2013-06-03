@@ -11,7 +11,6 @@
 
 namespace Venne\Application\UI;
 
-use Venne;
 use Nette;
 
 /**

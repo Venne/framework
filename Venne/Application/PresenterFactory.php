@@ -35,7 +35,7 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 * @param $baseDir
 	 * @param Container $container
 	 */
-	function __construct($baseDir, Container $container)
+	public function __construct($baseDir, Container $container)
 	{
 		parent::__construct($baseDir, $container);
 

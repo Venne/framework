@@ -11,22 +11,25 @@
 
 namespace Venne\Module;
 
-use Venne;
+use Nette\DI\Container;
 use Nette\Object;
+use Nette\Utils\Finder;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  *
- * @property \SystemContainer|\Nette\DI\Container $context
+ * @property \SystemContainer|Container $context
  */
 class TemplateManager extends Object
 {
-
 
 	/** @var array */
 	protected $modules;
 
 
+	/**
+	 * @param $modules
+	 */
 	public function __construct($modules)
 	{
 		$this->modules = & $modules;
@@ -43,7 +46,7 @@ class TemplateManager extends Object
 		$path = $this->modules[$module]['path'] . '/Resources/layouts';
 
 		if (file_exists($path)) {
-			foreach (\Nette\Utils\Finder::findDirectories("*")->in($path) as $file) {
+			foreach (Finder::findDirectories("*")->in($path) as $file) {
 				if (file_exists($file->getPathname() . '/@layout.latte')) {
 					$data[$file->getBasename()] = "@{$module}Module/{$file->getBasename()}/@layout.latte";
 				}
@@ -69,7 +72,7 @@ class TemplateManager extends Object
 		$path = $this->modules[$module]['path'] . "/Resources/layouts$prefix$suffix";
 
 		if (file_exists($path)) {
-			foreach (\Nette\Utils\Finder::find("*")->in($path) as $file) {
+			foreach (Finder::find("*")->in($path) as $file) {
 				if ($file->getBasename() === '@layout.latte' || !is_file($file->getPathname())) {
 					continue;
 				}

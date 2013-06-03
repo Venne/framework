@@ -11,10 +11,9 @@
 
 namespace Venne\Application\UI;
 
-use Venne;
-use Nette\DI\Container;
 use Nette\Application\ForbiddenRequestException;
 use Nette\Application\UI\PresenterComponentReflection;
+use Nette\DI\Container;
 use Venne\Security\IControlVerifier;
 use Venne\Templating\ITemplateConfigurator;
 use Venne\Widget\WidgetManager;
@@ -24,7 +23,6 @@ use Venne\Widget\WidgetManager;
  */
 class Presenter extends \Nette\Application\UI\Presenter
 {
-
 
 	/** @var ITemplateConfigurator */
 	protected $templateConfigurator;
@@ -195,7 +193,7 @@ class Presenter extends \Nette\Application\UI\Presenter
 	 * @param  array|mixed
 	 * @return bool
 	 */
-	public function isAuthorized($destination, $args = array())
+	public function isAuthorized($destination)
 	{
 		if ($destination == 'this') {
 			$class = get_class($this);

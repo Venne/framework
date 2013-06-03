@@ -11,16 +11,16 @@
 
 namespace Venne\Security;
 
-use Venne;
-use Nette;
+use Nette\Object;
 use Nette\Security\AuthenticationException;
+use Nette\Security\IAuthenticator;
+use Nette\Security\Identity;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class Authenticator extends \Nette\Object implements \Nette\Security\IAuthenticator
+class Authenticator extends Object implements IAuthenticator
 {
-
 
 	/** @var string */
 	protected $adminLogin;
@@ -63,6 +63,6 @@ class Authenticator extends \Nette\Object implements \Nette\Security\IAuthentica
 			throw new AuthenticationException('The password is incorrect.', self::IDENTITY_NOT_FOUND);
 		}
 
-		return new \Nette\Security\Identity($username, array('admin'));
+		return new Identity($username, array('admin'));
 	}
 }

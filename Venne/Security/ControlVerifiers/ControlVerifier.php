@@ -11,9 +11,12 @@
 
 namespace Venne\Security\ControlVerifiers;
 
-use Venne;
-use Nette\Object;
 use Nette\Application\ForbiddenRequestException;
+use Nette\Application\UI\PresenterComponentReflection;
+use Nette\InvalidArgumentException;
+use Nette\Object;
+use Nette\Reflection\Method;
+use Nette\Security\User;
 use Venne\Security\IControlVerifier;
 use Venne\Security\IControlVerifierReader;
 
@@ -22,7 +25,6 @@ use Venne\Security\IControlVerifierReader;
  */
 class ControlVerifier extends Object implements IControlVerifier
 {
-
 
 	/** @var User */
 	protected $user;
@@ -41,9 +43,10 @@ class ControlVerifier extends Object implements IControlVerifier
 
 
 	/**
-	 * @param \Nette\Security\User $user
+	 * @param User $user
+	 * @param IControlVerifierReader $reader
 	 */
-	public function __construct(\Nette\Security\User $user, IControlVerifierReader $reader)
+	public function __construct(User $user, IControlVerifierReader $reader)
 	{
 		$this->user = $user;
 		$this->reader = $reader;
@@ -70,27 +73,28 @@ class ControlVerifier extends Object implements IControlVerifier
 
 	/**
 	 * @param $element
-	 * @return bool|mixed
+	 * @return bool
+	 * @throws \Nette\InvalidArgumentException
 	 */
 	public function checkRequirements($element)
 	{
-		if ($element instanceof \Nette\Reflection\Method) {
+		if ($element instanceof Method) {
 			return $this->checkMethod($element);
 		}
 
-		if ($element instanceof \Nette\Application\UI\PresenterComponentReflection) {
+		if ($element instanceof PresenterComponentReflection) {
 			return $this->checkPresenter($element);
 		}
 
-		throw new \Nette\InvalidArgumentException("Argument must be instance of 'Nette\Reflection\Method' OR 'Nette\Application\UI\PresenterComponentReflection'");
+		throw new InvalidArgumentException("Argument must be instance of 'Nette\Reflection\Method' OR 'Nette\Application\UI\PresenterComponentReflection'");
 	}
 
 
 	/**
-	 * @param \Nette\Application\UI\PresenterComponentReflection $element
+	 * @param PresenterComponentReflection $element
 	 * @return bool
 	 */
-	protected function isPresenterAllowedCached(\Nette\Application\UI\PresenterComponentReflection $element)
+	protected function isPresenterAllowedCached(PresenterComponentReflection $element)
 	{
 		if (!array_key_exists($element->name, $this->_presenterAllowed)) {
 			$this->_presenterAllowed[$element->name] = $this->isPresenterAllowed($element);
@@ -101,10 +105,10 @@ class ControlVerifier extends Object implements IControlVerifier
 
 
 	/**
-	 * @param \Nette\Reflection\Method $element
+	 * @param Method $element
 	 * @return mixed
 	 */
-	protected function isMethodAllowedCached(\Nette\Reflection\Method $element)
+	protected function isMethodAllowedCached(Method $element)
 	{
 		if (!array_key_exists($element->name, $this->_methodAllowed)) {
 			$this->_methodAllowed[$element->name] = $this->isMethodAllowed($element);
@@ -115,20 +119,20 @@ class ControlVerifier extends Object implements IControlVerifier
 
 
 	/**
-	 * @param \Nette\Application\UI\PresenterComponentReflection $element
+	 * @param PresenterComponentReflection $element
 	 * @return bool
 	 */
-	protected function checkPresenter(\Nette\Application\UI\PresenterComponentReflection $element)
+	protected function checkPresenter(PresenterComponentReflection $element)
 	{
 		return TRUE;
 	}
 
 
 	/**
-	 * @param \Nette\Reflection\Method $element
+	 * @param Method $element
 	 * @return bool
 	 */
-	protected function checkMethod(\Nette\Reflection\Method $element)
+	protected function checkMethod(Method $element)
 	{
 		$class = $element->class;
 		$name = $element->name;

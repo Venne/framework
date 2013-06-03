@@ -11,14 +11,12 @@
 
 namespace Venne\Module\Commands;
 
-use Venne;
-use Venne\Module\ModuleManager;
 use Nette\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Venne\Module\ModuleManager;
 
 /**
  * Command to execute DQL queries in a given EntityManager.

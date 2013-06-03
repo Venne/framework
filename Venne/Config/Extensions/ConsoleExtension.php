@@ -11,20 +11,14 @@
 
 namespace Venne\Config\Extensions;
 
-use Venne;
-use Nette\DI\ContainerBuilder;
 use Nette\Config\CompilerExtension;
-use Nette\Utils\Strings;
+use Nette\DI\ContainerBuilder;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
 class ConsoleExtension extends CompilerExtension
 {
-
-	/** @var string|NULL */
-	protected $consoleEntityManager;
-
 
 	public function loadConfiguration()
 	{
@@ -37,7 +31,7 @@ class ConsoleExtension extends CompilerExtension
 		$container->addDefinition($this->prefix('console'))
 			->setClass('Symfony\Component\Console\Application')
 			->addSetup('setHelperSet', array('@console.helperSet'))
-			->addSetup('setCatchExceptions', true);
+			->addSetup('setCatchExceptions', TRUE);
 
 		// helpers
 		$container->addDefinition($this->prefix('dialogHelper'))
@@ -49,8 +43,6 @@ class ConsoleExtension extends CompilerExtension
 
 	public function beforeCompile()
 	{
-		$container = $this->getContainerBuilder();
-
 		$this->registerCommands();
 		$this->registerHelpers();
 	}

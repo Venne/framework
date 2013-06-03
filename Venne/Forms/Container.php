@@ -11,8 +11,6 @@
 
 namespace Venne\Forms;
 
-use Venne;
-
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
@@ -41,6 +39,11 @@ class Container extends \Nette\Forms\Container implements IContainer
 	}
 
 
+	/**
+	 * @param $name
+	 * @param $args
+	 * @return \Nette\Forms\Container|Container
+	 */
 	public function __call($name, $args)
 	{
 		if (substr($name, 0, 3) !== 'add') {
@@ -52,6 +55,10 @@ class Container extends \Nette\Forms\Container implements IContainer
 	}
 
 
+	/**
+	 * @param $name
+	 * @return \Nette\Forms\Container|Container
+	 */
 	public function addContainer($name)
 	{
 		$control = new Container;

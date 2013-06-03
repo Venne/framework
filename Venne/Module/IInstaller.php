@@ -11,8 +11,6 @@
 
 namespace Venne\Module;
 
-use Venne;
-use Nette\DI\Container;
 use Venne\Module\IModule;
 
 /**

@@ -11,9 +11,9 @@
 
 namespace Venne\Forms;
 
-use Venne;
-use Nette\Object;
 use Nette\Callback;
+use Nette\InvalidArgumentException;
+use Nette\Object;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -40,7 +40,7 @@ class FormFactory extends Object
 	public function createForm($data = NULL)
 	{
 		if (!$this->factory) {
-			throw new \Nette\InvalidArgumentException("Form factory has not been set");
+			throw new InvalidArgumentException("Form factory has not been set");
 		}
 
 		/** @var $form Form */

@@ -11,8 +11,6 @@
 
 namespace Venne\Module;
 
-use Venne;
-
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */

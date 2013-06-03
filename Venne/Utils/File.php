@@ -11,7 +11,6 @@
 
 namespace Venne\Utils;
 
-use Venne;
 use Nette\Object;
 use Nette\Utils\Finder;
 
@@ -20,6 +19,7 @@ use Nette\Utils\Finder;
  */
 class File extends Object
 {
+
 	/**
 	 * Removes directory.
 	 *
@@ -28,7 +28,7 @@ class File extends Object
 	 * @param bool $recursive
 	 * @return bool
 	 */
-	public static function rmdir($dirname, $recursive = false)
+	public static function rmdir($dirname, $recursive = FALSE)
 	{
 		if (!$recursive) {
 			return rmdir($dirname);
@@ -44,7 +44,7 @@ class File extends Object
 		}
 
 		@rmdir($dirname);
-		return true;
+		return TRUE;
 	}
 
 
@@ -61,22 +61,22 @@ class File extends Object
 			return copy($source, $dest);
 		}
 
-		$status = true;
+		$status = TRUE;
 
 		if (!is_dir($dest)) {
 			umask(0000);
-			mkdir($dest, $mode, true);
+			mkdir($dest, $mode, TRUE);
 		}
 
 		$dir = dir($source);
-		while (false !== $entry = $dir->read()) {
+		while (FALSE !== $entry = $dir->read()) {
 			if ($entry == '.' || $entry == '..') {
 				continue;
 			}
 
 			if ($dest !== "$source/$entry") {
-				if (self::copy("$source/$entry", "$dest/$entry", $mode) === false) {
-					$status = false;
+				if (self::copy("$source/$entry", "$dest/$entry", $mode) === FALSE) {
+					$status = FALSE;
 				}
 			}
 		}

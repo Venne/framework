@@ -11,18 +11,12 @@
 
 namespace Venne\Config;
 
-use Venne;
-use Nette;
-use Nette\DI;
-use Nette\Caching\Cache;
+use Composer\Autoload\ClassLoader;
 use Nette\Config\Compiler;
-use Nette\Config\Adapters\NeonAdapter;
+use Nette\DI\Container;
 use Nette\Diagnostics\Debugger;
-use Nette\Application\Routers\SimpleRouter;
-use Nette\Application\Routers\Route;
 use Nette\InvalidArgumentException;
-use Nette\Application\ApplicationException;
-use Venne\Module\ModuleManager;
+use Nette\Loaders\RobotLoader;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -33,23 +27,24 @@ class Configurator extends \Nette\Config\Configurator
 	/** @var string|array */
 	protected $sandbox;
 
-	/** @var \Nette\DI\Container */
+	/** @var Container */
 	protected $container;
 
-	/** @var \Nette\Loaders\RobotLoader */
+	/** @var RobotLoader */
 	protected $robotLoader;
 
 	/** @var Compiler */
 	protected $compiler;
 
-	/** @var \Composer\Autoload\ClassLoader */
+	/** @var ClassLoader */
 	protected $classLoader;
 
 
 	/**
-	 * @param $sandboxDir
+	 * @param $sandbox
+	 * @param ClassLoader $classLoader
 	 */
-	public function __construct($sandbox, \Composer\Autoload\ClassLoader $classLoader = NULL)
+	public function __construct($sandbox, ClassLoader $classLoader = NULL)
 	{
 		$this->sandbox = $sandbox;
 		$this->classLoader = $classLoader;
@@ -63,7 +58,7 @@ class Configurator extends \Nette\Config\Configurator
 			if ($this->classLoader) {
 				$this->registerModuleLoaders();
 			}
-		} catch (ApplicationException $e) {
+		} catch (InvalidArgumentException $e) {
 			die($e->getMessage());
 		}
 	}
@@ -71,7 +66,7 @@ class Configurator extends \Nette\Config\Configurator
 
 	protected function registerModuleLoaders()
 	{
-		foreach ($this->parameters['modules'] as $name => $items) {
+		foreach ($this->parameters['modules'] as $items) {
 			if (isset($items['autoload']['psr-0'])) {
 				foreach ($items['autoload']['psr-0'] as $key => $val) {
 					$this->classLoader->add($key, $items['path'] . '/' . $val);
@@ -86,6 +81,9 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	protected function validateConfiguration()
 	{
 		$mandatoryConfigs = array('settings.php', 'config.neon');
@@ -97,10 +95,10 @@ class Configurator extends \Nette\Config\Configurator
 					if (is_writable($this->parameters['configDir']) && file_exists($origFile)) {
 						copy($origFile, $this->parameters['configDir'] . '/' . $config);
 					} else {
-						throw new ApplicationException("Config directory is not writable.");
+						throw new InvalidArgumentException("Config directory is not writable.");
 					}
 				} else {
-					throw new ApplicationException("Configuration file '{$config}' does not exist.");
+					throw new InvalidArgumentException("Configuration file '{$config}' does not exist.");
 				}
 			}
 		}
@@ -108,8 +106,8 @@ class Configurator extends \Nette\Config\Configurator
 
 
 	/**
-	 * @param $sandboxDir
-	 * @throws \InvalidArgumentException
+	 * @return array
+	 * @throws InvalidArgumentException
 	 */
 	protected function getSandboxParameters()
 	{
@@ -131,7 +129,7 @@ class Configurator extends \Nette\Config\Configurator
 
 		foreach ($mandatoryParameters as $item) {
 			if (!isset($parameters[$item])) {
-				throw new ApplicationException("Sandbox parameters does not contain '{$item}' parameter.");
+				throw new InvalidArgumentException("Sandbox parameters does not contain '{$item}' parameter.");
 			}
 		}
 
@@ -139,6 +137,10 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
+	/**
+	 * @param null $parameters
+	 * @return array
+	 */
 	protected function getDefaultParameters($parameters = NULL)
 	{
 		$parameters = (array)$parameters;
@@ -164,15 +166,17 @@ class Configurator extends \Nette\Config\Configurator
 
 	/**
 	 * @param string $name
+	 * @return Configurator
 	 */
 	public function setEnvironment($name)
 	{
 		$this->parameters["environment"] = $name;
+		return $this;
 	}
 
 
 	/**
-	 * @return \Nette\DI\Container
+	 * @return Container
 	 */
 	public function getContainer()
 	{
@@ -189,13 +193,9 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	public static function detectEnvironment()
 	{
-		return isset($_SERVER['SERVER_NAME']) ?
-			$_SERVER['SERVER_NAME']
-			: (
-				function_exists('gethostname')
-				? gethostname()
-				: NULL
-			);
+		return isset($_SERVER['SERVER_NAME'])
+			? $_SERVER['SERVER_NAME']
+			: (function_exists('gethostname') ? gethostname() : NULL);
 	}
 
 
@@ -203,7 +203,7 @@ class Configurator extends \Nette\Config\Configurator
 	 * Loads configuration from file and process it.
 	 *
 	 * @param string $class
-	 * @return DI\Container
+	 * @return Container
 	 */
 	public function createContainer($class = NULL)
 	{
@@ -230,6 +230,11 @@ class Configurator extends \Nette\Config\Configurator
 	}
 
 
+	/**
+	 * @param null $dependencies
+	 * @param null $class
+	 * @return Container
+	 */
 	public function buildContainer(& $dependencies = NULL, $class = NULL)
 	{
 		if ($class) {
@@ -254,14 +259,17 @@ class Configurator extends \Nette\Config\Configurator
 	{
 		$this->compiler = parent::createCompiler();
 		$this->compiler
-			->addExtension('venne', new Venne\Config\Extensions\VenneExtension())
-			->addExtension('console', new Venne\Config\Extensions\ConsoleExtension())
+			->addExtension('venne', new \Venne\Config\Extensions\VenneExtension())
+			->addExtension('console', new \Venne\Config\Extensions\ConsoleExtension())
 			->addExtension('extensions', new \Venne\Config\Extensions\ExtensionsExtension())
-			->addExtension('proxy', new Venne\Config\Extensions\ProxyExtension());
+			->addExtension('proxy', new \Venne\Config\Extensions\ProxyExtension());
 		return $this->compiler;
 	}
 
 
+	/**
+	 * @return array
+	 */
 	protected function getConfigFiles()
 	{
 		$ret = array();
@@ -274,7 +282,6 @@ class Configurator extends \Nette\Config\Configurator
 	/**
 	 * @param  string        error log directory
 	 * @param  string        administrator email
-	 * @return void
 	 */
 	public function enableDebugger($logDirectory = NULL, $email = NULL)
 	{
@@ -309,13 +316,14 @@ class Configurator extends \Nette\Config\Configurator
 			}
 		}
 
-		Nette\Diagnostics\Debugger::$strictMode = TRUE;
-		Nette\Diagnostics\Debugger::enable(!$debugMode, $logDirectory ? : $this->parameters['logDir'], $email);
+		Debugger::$strictMode = TRUE;
+		Debugger::enable(!$debugMode, $logDirectory ? : $this->parameters['logDir'], $email);
 	}
 
 
 	/**
 	 * Enable robotLoader.
+	 * @return Configurator
 	 */
 	public function enableLoader()
 	{
@@ -324,11 +332,12 @@ class Configurator extends \Nette\Config\Configurator
 		$this->robotLoader
 			->addDirectory($this->parameters['appDir'])
 			->register();
+		return $this;
 	}
 
 
 	/**
-	 * @return \Nette\Config\Compiler
+	 * @return Compiler
 	 */
 	public function getCompiler()
 	{
@@ -347,7 +356,7 @@ class Configurator extends \Nette\Config\Configurator
 
 	/**
 	 * Sets path to temporary directory.
-	 * @return Configurator  provides a fluent interface
+	 * @return Configurator
 	 */
 	public function setTempDirectory($path)
 	{

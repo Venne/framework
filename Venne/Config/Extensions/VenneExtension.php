@@ -11,8 +11,6 @@
 
 namespace Venne\Config\Extensions;
 
-use Venne;
-use Nette\DI\ContainerBuilder;
 use Venne\Config\CompilerExtension;
 
 /**
@@ -21,7 +19,7 @@ use Venne\Config\CompilerExtension;
 class VenneExtension extends CompilerExtension
 {
 
-
+	/** @var array */
 	public $defaults = array(
 		'moduleManager' => array(
 			'resourcesMode' => 'symlink'
@@ -193,8 +191,6 @@ class VenneExtension extends CompilerExtension
 		$config = $container->getDefinition($this->prefix('widgetManager'));
 
 		foreach ($container->findByTag('widget') as $factory => $meta) {
-			$definition = $container->getDefinition($factory);
-
 			if (!is_string($meta)) {
 				throw new \Nette\InvalidArgumentException("Tag widget require name. Provide it in configuration. (tags: [widget: name])");
 			}

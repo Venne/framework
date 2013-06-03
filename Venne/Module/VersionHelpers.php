@@ -11,8 +11,6 @@
 
 namespace Venne\Module;
 
-use Venne;
-
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
@@ -27,7 +25,7 @@ class VersionHelpers
 	{
 		$ret = array();
 
-		if (strpos($version, 'x') === false) {
+		if (strpos($version, 'x') === FALSE) {
 			if (substr($version, 1, 1) === '=') {
 				$ret[] = array(substr($version, 0, 2) => substr($version, 2));
 			} else {

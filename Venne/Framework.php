@@ -11,7 +11,7 @@
 
 namespace Venne;
 
-use Venne;
+use Nette\StaticClassException;
 
 final class Framework
 {

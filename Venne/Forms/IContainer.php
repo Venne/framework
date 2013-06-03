@@ -11,7 +11,6 @@
 
 namespace Venne\Forms;
 
-use Venne;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -20,5 +19,4 @@ interface IContainer
 {
 
 	public function add();
-
 }

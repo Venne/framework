@@ -23,12 +23,8 @@ use Nette\Application\Request;
 class CliRouter extends \Nette\Object implements \Nette\Application\IRouter
 {
 
-
 	/** @var \Nette\Callback */
 	private $callback;
-
-	/** @var \Nette\DI\Container|\SystemContainer */
-	protected $container;
 
 
 	/**

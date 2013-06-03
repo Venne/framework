@@ -11,7 +11,6 @@
 
 namespace Venne\Module\DependencyResolver;
 
-use Venne;
 use Nette\InvalidArgumentException;
 use Nette\Object;
 

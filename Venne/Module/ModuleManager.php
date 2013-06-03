@@ -11,18 +11,16 @@
 
 namespace Venne\Module;
 
-use Venne;
 use Exception;
-use Venne\Config\Configurator;
-use Venne\Module\DependencyResolver\Solver;
-use Venne\Module\DependencyResolver\Problem;
-use Nette\InvalidArgumentException;
-use Venne\Utils\File;
+use Nette\Config\Adapters\PhpAdapter;
 use Nette\DI\Container;
+use Nette\InvalidArgumentException;
 use Nette\Object;
 use Nette\Utils\Finder;
-use Nette\Config\Adapters\PhpAdapter;
+use Nette\Utils\LimitedScope;
 use Venne\Caching\CacheManager;
+use Venne\Module\DependencyResolver\Problem;
+use Venne\Module\DependencyResolver\Solver;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -140,10 +138,11 @@ class ModuleManager extends Object
 		/** @var $configurator Configurator */
 		$configurator = $this->context->configurator;
 		$class = $this->context->parameters['container']['class'] . $this->_systemContainer++;
-		\Nette\Utils\LimitedScope::evaluate($configurator->buildContainer($dependencies, $class));
+		LimitedScope::evaluate($configurator->buildContainer($dependencies, $class));
 
 		/** @var context Container */
 		$this->context = new $class;
+		$this->context->parameters += include $this->configDir . '/settings.php';
 		$this->context->initialize();
 		$this->context->addService("configurator", $configurator);
 	}
@@ -230,7 +229,7 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 * @param $status
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function setStatus(IModule $module, $status)
 	{
@@ -265,7 +264,7 @@ class ModuleManager extends Object
 	 *
 	 * @param IModule $module
 	 * @param $status
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function setAction(IModule $module, $action)
 	{
@@ -603,7 +602,7 @@ class ModuleManager extends Object
 	/**
 	 * @param IModules[] $modules
 	 * @param IModule $module
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function matchModulesWithModule($modules, IModule $module)
 	{
@@ -631,9 +630,9 @@ class ModuleManager extends Object
 	 */
 	protected function getModulesForRegister()
 	{
-		$activModules = $this->getModules();
+		$activeModules = $this->getModules();
 		$modules = $this->findModules();
-		$diff = array_diff(array_keys($modules), array_keys($activModules));
+		$diff = array_diff(array_keys($modules), array_keys($activeModules));
 
 		$ret = array();
 		foreach ($diff as $name) {
@@ -692,7 +691,7 @@ class ModuleManager extends Object
 	 *
 	 * @param $action
 	 * @return IModule[]
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	protected function getModulesByAction($action)
 	{
@@ -715,7 +714,7 @@ class ModuleManager extends Object
 	 *
 	 * @param $action
 	 * @return IModule[]
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	protected function getModulesByStatus($status)
 	{
@@ -789,7 +788,7 @@ class ModuleManager extends Object
 	/**
 	 * @param $file
 	 * @return string
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	protected function getModuleClassByFile($file)
 	{
@@ -806,7 +805,7 @@ class ModuleManager extends Object
 	/**
 	 * @param $file
 	 * @return array
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	protected function getClassesFromFile($file)
 	{

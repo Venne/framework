@@ -11,7 +11,7 @@
 
 namespace Venne\Module;
 
-use Venne;
+use Nette\InvalidArgumentException;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -23,6 +23,9 @@ final class Helpers
 	private $modules;
 
 
+	/**
+	 * @param $modules
+	 */
 	public function __construct($modules)
 	{
 		$this->modules = & $modules;
@@ -35,24 +38,23 @@ final class Helpers
 	 * @param $path
 	 * @param array $modules
 	 * @return string
-	 * @throws \Nette\InvalidArgumentException
+	 * @throws InvalidArgumentException
 	 */
 	public function expandPath($path, $localPrefix = '')
 	{
-		if (substr($path, 0, 1) !== '@') {
+		if (substr($path, 0, 1) !== '@' || ($pos = strpos($path, 'Module')) === FALSE) {
 			return $path;
 		}
 
-		if (($pos = strpos($path, 'Module')) !== FALSE) {
-			$module = lcfirst(substr($path, 1, $pos - 1));
 
-			if (!isset($this->modules[$module])) {
-				throw new \Nette\InvalidArgumentException("Module '{$module}' does not exist.");
-			}
+		$module = lcfirst(substr($path, 1, $pos - 1));
 
-			$path = $this->modules[$module]['path'] . ($localPrefix ? '/' . $localPrefix : '') . substr($path, $pos + 6);
-			return \Nette\Utils\Strings::replace($path, '~\\\~', '/');
+		if (!isset($this->modules[$module])) {
+			throw new InvalidArgumentException("Module '{$module}' does not exist.");
 		}
+
+		$path = $this->modules[$module]['path'] . ($localPrefix ? '/' . $localPrefix : '') . substr($path, $pos + 6);
+		return \Nette\Utils\Strings::replace($path, '~\\\~', '/');
 	}
 
 
@@ -62,7 +64,6 @@ final class Helpers
 	 * @param $path
 	 * @param array $modules
 	 * @return string
-	 * @throws \Nette\InvalidArgumentException
 	 */
 	public function expandResource($path)
 	{

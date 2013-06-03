@@ -11,10 +11,9 @@
 
 namespace Venne\Widget;
 
-use Venne;
-use Nette\Object;
 use Nette\Callback;
 use Nette\InvalidArgumentException;
+use Nette\Object;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>

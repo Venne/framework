@@ -11,18 +11,18 @@
 
 namespace Venne\Templating;
 
-use Venne;
 use Nette\Callback;
 use Nette\DI\Container;
+use Nette\Latte\Engine;
+use Nette\Object;
 use Nette\Templating\Template;
 
 /**
- * @author	 Josef Kříž
+ * @author     Josef Kříž
  * @author Filip Procházka <filip.prochazka@kdyby.org>
  */
-class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurator
+class TemplateConfigurator extends Object implements ITemplateConfigurator
 {
-
 
 	/** @var \SystemContainer|Container */
 	protected $container;
@@ -30,23 +30,21 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	/** @var array */
 	protected $macroFactories = array();
 
-	/** @var \Nette\Latte\Engine */
+	/** @var Engine */
 	protected $latte;
 
 	/** @var Callback */
 	protected $latteFactory;
 
 
-
 	/**
-	 * @param \Nette\DI\Container $container
+	 * @param Container $container
 	 */
 	public function __construct(Container $container, Callback $latteFactory)
 	{
 		$this->container = $container;
 		$this->latteFactory = $latteFactory;
 	}
-
 
 
 	/**
@@ -56,7 +54,6 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	{
 		$this->macroFactories[] = $factory;
 	}
-
 
 
 	public function configure(Template $template)
@@ -69,26 +66,23 @@ class TemplateConfigurator extends \Nette\Object implements ITemplateConfigurato
 	}
 
 
-
 	public function prepareFilters(Template $template)
 	{
 		$this->latte = $this->latteFactory->invoke();
 		foreach ($this->macroFactories as $factory) {
-			$this->container->{Container::getMethodName($factory, false)}($this->latte->getCompiler());
+			$this->container->{Container::getMethodName($factory, FALSE)}($this->latte->getCompiler());
 		}
 		$template->registerFilter($this->latte);
 	}
 
 
-
 	/**
 	 * Returns Latter parser for the last prepareFilters call.
 	 *
-	 * @return \Nette\Latte\Engine
+	 * @return Engine
 	 */
 	public function getLatte()
 	{
 		return $this->latte;
 	}
-
 }

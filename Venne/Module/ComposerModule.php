@@ -11,8 +11,6 @@
 
 namespace Venne\Module;
 
-use Venne;
-
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
@@ -23,6 +21,9 @@ class ComposerModule extends BaseModule
 	protected $composerData;
 
 
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		$this->loadComposerData();
@@ -31,6 +32,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return mixed
+	 */
 	public function getDescription()
 	{
 		$this->loadComposerData();
@@ -39,14 +43,20 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getKeywords()
 	{
 		$this->loadComposerData();
 
-		return $this->composerData['keywords'];
+		return array_map('trim', explode(',', $this->composerData['keywords']));
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getLicense()
 	{
 		$this->loadComposerData();
@@ -55,6 +65,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getVersion()
 	{
 		$this->loadComposerData();
@@ -67,6 +80,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getAuthors()
 	{
 		$this->loadComposerData();
@@ -75,6 +91,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getAutoload()
 	{
 		$this->loadComposerData();
@@ -92,7 +111,7 @@ class ComposerModule extends BaseModule
 
 
 	/**
-	 * @return VersionConstraint[]
+	 * @return array
 	 */
 	public function getRequire()
 	{
@@ -114,6 +133,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getExtra()
 	{
 		$this->loadComposerData();
@@ -122,6 +144,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getConfiguration()
 	{
 		$this->loadComposerData();
@@ -134,6 +159,9 @@ class ComposerModule extends BaseModule
 	}
 
 
+	/**
+	 * @return array
+	 */
 	public function getInstallers()
 	{
 		$this->loadComposerData();
@@ -149,7 +177,7 @@ class ComposerModule extends BaseModule
 	protected function loadComposerData()
 	{
 		if ($this->composerData === NULL) {
-			$this->composerData = json_decode(file_get_contents($this->getPath() . '/composer.json'), true);
+			$this->composerData = json_decode(file_get_contents($this->getPath() . '/composer.json'), TRUE);
 		}
 	}
 

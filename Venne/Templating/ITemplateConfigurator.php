@@ -11,12 +11,10 @@
 
 namespace Venne\Templating;
 
-use Venne;
-use Nette\DI\Container;
 use Nette\Templating\Template;
 
 /**
- * @author	 Josef Kříž
+ * @author     Josef Kříž
  */
 interface ITemplateConfigurator
 {
@@ -27,11 +25,8 @@ interface ITemplateConfigurator
 	public function configure(Template $template);
 
 
-
 	/**
 	 * @param \Nette\Templating\Template $template
 	 */
 	public function prepareFilters(Template $template);
-
-
 }
