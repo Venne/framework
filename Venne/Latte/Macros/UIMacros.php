@@ -77,7 +77,7 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	 */
 	public function macroExtends(MacroNode $node, PhpWriter $writer)
 	{
-		$node->args = $this->moduleHelpers->expandPath($node->args);
+		$node->args = $this->moduleHelpers->expandPath($node->args, 'Resources/layouts');
 		$node->tokenizer = new MacroTokenizer($node->args);
 		$writer = new PhpWriter($node->tokenizer);
 		return parent::macroExtends($node, $writer);
