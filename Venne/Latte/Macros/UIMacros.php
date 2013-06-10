@@ -89,6 +89,20 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	 * @param PhpWriter $writer
 	 * @return string
 	 */
+	public function macroIncludeBlock(MacroNode $node, PhpWriter $writer)
+	{
+		$node->args = $this->moduleHelpers->expandPath($node->args, 'Resources/layouts');
+		$node->tokenizer = new MacroTokenizer($node->args);
+		$writer = new PhpWriter($node->tokenizer);
+		return parent::macroIncludeBlock($node, $writer);
+	}
+
+
+	/**
+	 * @param MacroNode $node
+	 * @param PhpWriter $writer
+	 * @return string
+	 */
 	public function macroPath(MacroNode $node, PhpWriter $writer)
 	{
 		return $writer->write("echo \$basePath . '/' . \$presenter->context->venne->moduleHelpers->expandResource(%node.word)");
