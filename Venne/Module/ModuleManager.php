@@ -778,7 +778,7 @@ class ModuleManager extends Object
 	/**
 	 * @param $data
 	 */
-	public function saveModuleConfig($data)
+	protected function saveModuleConfig($data)
 	{
 		$config = new PhpAdapter;
 		file_put_contents($this->getModuleConfigPath(), $config->dump($data));
