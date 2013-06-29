@@ -88,6 +88,15 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 
 	/**
+	 * @return \Venne\Widget\WidgetManager
+	 */
+	public function getWidgetManager()
+	{
+		return $this->widgetManager;
+	}
+
+
+	/**
 	 * Checks authorization.
 	 *
 	 * @return void
