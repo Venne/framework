@@ -83,18 +83,24 @@ class Control extends \Nette\Application\UI\Control
 
 
 	/**
-	 * @param string $name
+	 * Component factory. Delegates the creation of components to a createComponent<Name> method.
 	 *
-	 * @return \Nette\ComponentModel\IComponent
+	 * @param  string      component name
+	 * @return IComponent  the created component (optionally)
 	 */
 	protected function createComponent($name)
 	{
-		$method = 'createComponent' . ucfirst($name);
-		if (method_exists($this, $method)) {
-			$this->checkRequirements($this->getReflection()->getMethod($method));
+		// parent
+		if (($control = parent::createComponent($name)) == TRUE) {
+			return $control;
 		}
 
-		return parent::createComponent($name);
+		// widget from widgetManager
+		if ($this->presenter->widgetManager->hasWidget($name)) {
+			return $this->presenter->widgetManager->getWidget($name)->invoke();
+		}
+
+		throw new \Nette\InvalidArgumentException("Component or widget with name '$name' does not exist.");
 	}
 
 
