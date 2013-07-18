@@ -12,7 +12,7 @@
 namespace Venne\Caching;
 
 use Nette\Caching\Cache;
-use Nette\Caching\Storages\FileStorage;
+use Nette\Caching\IStorage;
 use Nette\InvalidArgumentException;
 use Nette\Object;
 use Nette\Utils\Finder;
@@ -35,10 +35,11 @@ class CacheManager extends Object
 
 
 	/**
-	 * @param FileStorage $fileStorage
+	 * @param IStorage $fileStorage
 	 * @param $cacheDir
+	 * @param $sessionsDir
 	 */
-	public function __construct(FileStorage $fileStorage, $cacheDir, $sessionsDir)
+	public function __construct(IStorage $fileStorage, $cacheDir, $sessionsDir)
 	{
 		$this->cache = new Cache($fileStorage);
 		$this->cacheDir = $cacheDir;

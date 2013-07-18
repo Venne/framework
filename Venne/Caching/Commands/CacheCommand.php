@@ -12,7 +12,7 @@
 namespace Venne\Caching\Commands;
 
 use Nette\Caching\Cache;
-use Nette\Caching\Storages\FileStorage;
+use Nette\Caching\IStorage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +29,10 @@ class CacheCommand extends Command
 	protected $cache;
 
 
-	function __construct(FileStorage $fileStorage)
+	/**
+	 * @param IStorage $fileStorage
+	 */
+	public function __construct(IStorage $fileStorage)
 	{
 		parent::__construct();
 

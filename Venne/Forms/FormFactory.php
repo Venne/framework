@@ -14,6 +14,7 @@ namespace Venne\Forms;
 use Nette\Callback;
 use Nette\InvalidArgumentException;
 use Nette\Object;
+use Nette\Utils\Strings;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -40,7 +41,7 @@ class FormFactory extends Object
 	public function createForm($data = NULL)
 	{
 		if (!$this->factory) {
-			throw new InvalidArgumentException("Form factory has not been set");
+			throw new InvalidArgumentException('Form factory has not been set');
 		}
 
 		/** @var $form Form */
@@ -102,7 +103,7 @@ class FormFactory extends Object
 		}
 
 		foreach ($form->getComponents(TRUE, 'Nette\Forms\ISubmitterControl') as $submitControl) {
-			$name = ucfirst((\Nette\Utils\Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m) {
+			$name = ucfirst((Strings::replace($submitControl->lookupPath('Nette\Forms\Form'), '~\-(.)~i', function ($m) {
 				return strtoupper($m[1]);
 			})));
 
