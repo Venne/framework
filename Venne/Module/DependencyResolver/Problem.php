@@ -47,6 +47,9 @@ class Problem extends Object
 	}
 
 
+	/**
+	 * @return Job[]
+	 */
 	public function getSolutions()
 	{
 		return array_merge($this->solutions);

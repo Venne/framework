@@ -303,13 +303,17 @@ class ModuleManager extends Object
 
 		$modules = $this->loadModuleConfig();
 		if (!array_search($module->getName(), $modules['modules'])) {
+			$tr = array(
+				$this->libsDir => '%libsDir%',
+				$this->modulesDir => '%modulesDir%',
+			);
 			$modules['modules'][$module->getName()] = array(
 				self::MODULE_STATUS => self::STATUS_UNINSTALLED,
 				self::MODULE_ACTION => self::ACTION_NONE,
 				self::MODULE_CLASS => $module->getClassName(),
 				self::MODULE_VERSION => $module->getVersion(),
-				self::MODULE_PATH => str_replace($this->libsDir, '%libsDir%', $module->getPath()),
-				self::MODULE_AUTOLOAD => str_replace($this->libsDir, '%libsDir%', $module->getAutoload()),
+				self::MODULE_PATH => str_replace(array_keys($tr), array_merge($tr), $module->getPath()),
+				self::MODULE_AUTOLOAD => str_replace(array_keys($tr), array_merge($tr), $module->getAutoload()),
 				self::MODULE_REQUIRE => $module->getRequire(),
 			);
 		}
@@ -350,7 +354,7 @@ class ModuleManager extends Object
 		}
 
 		if (!$force) {
-			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver = $this->createSolver();
 			$dependencyResolver->testInstall($module);
 		}
 
@@ -409,7 +413,7 @@ class ModuleManager extends Object
 		}
 
 		if (!$force) {
-			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver = $this->createSolver();
 			$dependencyResolver->testUninstall($module);
 		}
 
@@ -455,12 +459,13 @@ class ModuleManager extends Object
 			throw new InvalidArgumentException("Module '{$module->getName()}' must be installed");
 		}
 
-		if ($module->getVersion() === $this->modules[$module->getName()][self::MODULE_VERSION]) {
+		$modules = $this->loadModuleConfig();
+		if ($module->getVersion() === $modules['modules'][$module->getName()][self::MODULE_VERSION]) {
 			throw new InvalidArgumentException("Module '{$module->getName()}' is current");
 		}
 
 		if (!$force) {
-			$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+			$dependencyResolver = $this->createSolver();
 			$dependencyResolver->testUpgrade($module);
 		}
 
@@ -483,7 +488,6 @@ class ModuleManager extends Object
 			}
 		}
 
-		$modules = $this->loadModuleConfig();
 		$tr = array(
 			$this->libsDir => '%libsDir%',
 			$this->modulesDir => '%modulesDir%',
@@ -497,6 +501,7 @@ class ModuleManager extends Object
 			self::MODULE_AUTOLOAD => str_replace(array_keys($tr), array_merge($tr), $module->getAutoload()),
 			self::MODULE_REQUIRE => $module->getRequire(),
 		);
+
 		$this->saveModuleConfig($modules);
 
 		$this->reloadInfo();
@@ -512,7 +517,7 @@ class ModuleManager extends Object
 	public function testInstall(IModule $module)
 	{
 		$problem = new Problem;
-		$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+		$dependencyResolver = $this->createSolver();
 		$dependencyResolver->testInstall($module, $problem);
 		return $problem;
 	}
@@ -525,7 +530,7 @@ class ModuleManager extends Object
 	public function testUninstall(IModule $module)
 	{
 		$problem = new Problem;
-		$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+		$dependencyResolver = $this->createSolver();
 		$dependencyResolver->testUninstall($module, $problem);
 		return $problem;
 	}
@@ -538,7 +543,7 @@ class ModuleManager extends Object
 	public function testUpgrade(IModule $module)
 	{
 		$problem = new Problem;
-		$dependencyResolver = new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED));
+		$dependencyResolver = $this->createSolver();
 		$dependencyResolver->testUpgrade($module, $problem);
 		return $problem;
 	}
@@ -843,6 +848,16 @@ class ModuleManager extends Object
 			}
 		}
 		return $classes;
+	}
+
+
+	/**
+	 * @return Solver
+	 */
+	protected function createSolver()
+	{
+		$config = $this->loadModuleConfig();
+		return new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED), $config['modules'], $this->libsDir, $this->modulesDir);
 	}
 }
 

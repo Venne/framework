@@ -11,6 +11,7 @@
 
 namespace Venne\Module\DependencyResolver;
 
+use Nette\InvalidArgumentException;
 use Nette\Object;
 use Venne\Module\IModule;
 
@@ -20,19 +21,36 @@ use Venne\Module\IModule;
 class Job extends Object
 {
 
+	const ACTION_INSTALL = 'install';
+
+	const ACTION_UPGRADE = 'upgrade';
+
+	const ACTION_UNINSTALL = 'uninstall';
+
 	/** @var string */
-	protected $action;
+	private $action;
 
 	/** @var IModule */
-	protected $module;
+	private $module;
+
+	/** @var array */
+	private static $actions = array(
+		self::ACTION_INSTALL => TRUE,
+		self::ACTION_UNINSTALL => TRUE,
+		self::ACTION_UPGRADE => TRUE,
+	);
 
 
 	/**
 	 * @param $action
-	 * @param \Venne\Module\IModule $module
+	 * @param IModule $module
 	 */
 	public function __construct($action, IModule $module)
 	{
+		if (!isset(self::$actions[$action])) {
+			throw new InvalidArgumentException("Action must be one of '" . join(', ', self::$actions) . "'. '{$action}' is given.");
+		}
+
 		$this->action = $action;
 		$this->module = $module;
 	}
@@ -48,7 +66,7 @@ class Job extends Object
 
 
 	/**
-	 * @return \Venne\Module\IModule
+	 * @return IModule
 	 */
 	public function getModule()
 	{

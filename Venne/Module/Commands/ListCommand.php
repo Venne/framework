@@ -11,6 +11,7 @@
 
 namespace Venne\Module\Commands;
 
+use Nette\DI\Container;
 use Nette\InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,14 +27,19 @@ class ListCommand extends Command
 	/** @var ModuleManager */
 	protected $moduleManager;
 
+	/** @var Container|\SystemContainer */
+	protected $container;
+
 
 	/**
-	 * @param \Venne\Module\ModuleManager $moduleManager
+	 * @param Container $container
+	 * @param ModuleManager $moduleManager
 	 */
-	public function __construct(ModuleManager $moduleManager)
+	public function __construct(Container $container, ModuleManager $moduleManager)
 	{
 		parent::__construct();
 
+		$this->container = $container;
 		$this->moduleManager = $moduleManager;
 	}
 
@@ -56,7 +62,15 @@ class ListCommand extends Command
 	{
 		try {
 			foreach ($this->moduleManager->findModules() as $module) {
-				$output->writeln(sprintf('<info>%15s</info> | status: <comment>%-12s</comment> | version: <comment>%s</comment>', $module->getName(), $this->moduleManager->getStatus($module), $module->getVersion()));
+				$configVersion = $this->container->parameters['modules'][$module->getName()][ModuleManager::MODULE_VERSION];
+
+				if ($configVersion == $module->getVersion()) {
+					$version = $module->getVersion();
+				} else {
+					$version = $module->getVersion() . ' (needs upgrade from: '. $configVersion .')';
+				}
+
+				$output->writeln(sprintf('<info>%25s</info> | status: <comment>%-12s</comment> | version: <comment>%s</comment>', $module->getName(), $this->moduleManager->getStatus($module), $version));
 			}
 		} catch (InvalidArgumentException $e) {
 			$output->writeln("<error>{$e->getMessage()}</error>");

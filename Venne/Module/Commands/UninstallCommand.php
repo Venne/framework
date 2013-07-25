@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Venne\Module\DependencyResolver\Job;
 use Venne\Module\ModuleManager;
 
 /**
@@ -76,7 +77,7 @@ class UninstallCommand extends Command
 			$output->writeln("<info>uninstall : {$module->getName()}</info>");
 
 			$dialog = $this->getHelperSet()->get('dialog');
-			if (!$dialog->askConfirmation($output, '<question>Continue with this actions? [y/N]</question>', FALSE)) {
+			if (!$dialog->askConfirmation($output, '<question>Continue with this actions? [y/N]</question> ', FALSE)) {
 				return;
 			}
 		}
@@ -84,7 +85,14 @@ class UninstallCommand extends Command
 		try {
 			foreach ($problem->getSolutions() as $job) {
 				$this->moduleManager->doAction($job->getAction(), $job->getModule());
-				$output->writeln("Module '{$job->getModule()->getName()}' has been uninstalled.");
+
+				if ($job->getAction() === Job::ACTION_INSTALL){
+					$output->writeln("Module '{$job->getModule()->getName()}' has been installed.");
+				} else if($job->getAction() === Job::ACTION_UNINSTALL){
+					$output->writeln("Module '{$job->getModule()->getName()}' has been uninstalled.");
+				} else if($job->getAction() === Job::ACTION_UPGRADE){
+					$output->writeln("Module '{$job->getModule()->getName()}' has been upgraded.");
+				}
 			}
 			$this->moduleManager->uninstall($module);
 			$output->writeln("Module '{$input->getArgument('module')}' has been uninstalled.");
