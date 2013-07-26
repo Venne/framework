@@ -140,6 +140,15 @@ class BaseModule extends Object implements IModule
 	/**
 	 * @return string
 	 */
+	public function getRelativePublicPath()
+	{
+		return '/Resources/public';
+	}
+
+
+	/**
+	 * @return string
+	 */
 	public function getClassName()
 	{
 		return get_class($this);

@@ -50,6 +50,9 @@ interface IModule
 	public function getPath();
 
 
+	public function getRelativePublicPath();
+
+
 	public function getClassName();
 
 

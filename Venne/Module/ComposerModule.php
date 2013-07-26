@@ -134,6 +134,21 @@ class ComposerModule extends BaseModule
 
 
 	/**
+	 * @return string
+	 */
+	public function getRelativePublicPath()
+	{
+		$this->loadComposerData();
+
+		if (isset($this->composerData['extra']['venne']['relativePublicPath'])) {
+			return $this->composerData['extra']['venne']['relativePublicPath'];
+		}
+
+		return parent::getRelativePublicPath();
+	}
+
+
+	/**
 	 * @return array
 	 */
 	public function getExtra()

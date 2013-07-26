@@ -57,7 +57,8 @@ class BaseInstaller extends Object implements IInstaller
 			// create resources dir
 			$resourcesDir = $this->resourcesDir;
 			$moduleDir = $resourcesDir . "/{$name}Module";
-			$targetDir = $module->getPath() . '/Resources/public';
+			$targetDir = new \SplFileInfo($module->getPath() . $module->getRelativePublicPath());
+			$targetDir = $targetDir->getRealPath();
 			if (!file_exists($moduleDir) && file_exists($targetDir)) {
 				umask(0000);
 				@mkdir(dirname($moduleDir), 0777, TRUE);
