@@ -142,7 +142,7 @@ class ModuleManager extends Object
 
 		/** @var context Container */
 		$this->context = new $class;
-		$this->context->parameters += include $this->configDir . '/settings.php';
+		$this->context->parameters = (include $this->configDir . '/settings.php') + $this->context->parameters;
 		$this->context->initialize();
 		$this->context->addService("configurator", $configurator);
 	}
