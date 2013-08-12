@@ -144,7 +144,7 @@ class Configurator extends \Nette\Config\Configurator
 	protected function getDefaultParameters($parameters = NULL)
 	{
 		$parameters = (array)$parameters;
-		$debugMode = isset($parameters["debugMode"]) ? $parameters["debugMode"] : static::detectDebugMode();
+		$debugMode = isset($parameters['debugMode']) ? $parameters['debugMode'] : static::detectDebugMode();
 		$ret = array(
 			'debugMode' => $debugMode,
 			'environment' => ($e = static::detectEnvironment()) ? $e : ($debugMode ? 'development' : 'production'),
@@ -170,7 +170,7 @@ class Configurator extends \Nette\Config\Configurator
 	 */
 	public function setEnvironment($name)
 	{
-		$this->parameters["environment"] = $name;
+		$this->parameters['environment'] = $name;
 		return $this;
 	}
 
@@ -222,9 +222,9 @@ class Configurator extends \Nette\Config\Configurator
 
 		// register robotLoader and configurator
 		if ($this->robotLoader) {
-			$container->addService("robotLoader", $this->robotLoader);
+			$container->addService('robotLoader', $this->robotLoader);
 		}
-		$container->addService("configurator", $this);
+		$container->addService('configurator', $this);
 
 		return $container;
 	}
