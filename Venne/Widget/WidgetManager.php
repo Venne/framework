@@ -26,11 +26,12 @@ class WidgetManager extends Object
 
 
 	/**
-	 * @param string $name
-	 * @param Callback $factory
+	 * @param $name
+	 * @param $class
+	 * @param $factory
 	 * @throws InvalidArgumentException
 	 */
-	public function addWidget($name, $factory)
+	public function addWidget($name, $class, $factory)
 	{
 		if (!$factory instanceof Callback) {
 			throw new InvalidArgumentException('Second argument must be callback');
@@ -40,7 +41,10 @@ class WidgetManager extends Object
 			throw new InvalidArgumentException('Name of widget must be string');
 		}
 
-		$this->widgets[$name] = $factory;
+		$this->widgets[$name] = array(
+			'factory' => $factory,
+			'class' => $class,
+		);
 	}
 
 
@@ -55,6 +59,15 @@ class WidgetManager extends Object
 
 
 	/**
+	 * @return \Callback[]
+	 */
+	public function getWidgets()
+	{
+		return $this->widgets;
+	}
+
+
+	/**
 	 * @param string $name
 	 * @return Callback
 	 * @throws InvalidArgumentException
@@ -65,7 +78,7 @@ class WidgetManager extends Object
 			throw new InvalidArgumentException("Widget $name does not exists");
 		}
 
-		return $this->widgets[$name];
+		return $this->widgets[$name]['factory'];
 	}
 }
 

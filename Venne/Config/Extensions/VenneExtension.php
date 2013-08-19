@@ -206,8 +206,8 @@ class VenneExtension extends CompilerExtension
 			if (!is_string($meta)) {
 				throw new \Nette\InvalidArgumentException("Tag widget require name. Provide it in configuration. (tags: [widget: name])");
 			}
-
-			$config->addSetup('addWidget', array($meta, "@{$factory}"));
+			$class = $container->getDefinition(substr($factory, 0, -7))->class;
+			$config->addSetup('addWidget', array($meta, $class, "@{$factory}"));
 		}
 	}
 
