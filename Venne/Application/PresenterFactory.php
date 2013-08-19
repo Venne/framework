@@ -117,6 +117,10 @@ class PresenterFactory extends \Nette\Application\PresenterFactory
 	 */
 	public function formatPresenterFromServiceName($name)
 	{
+		if (substr($name, -7) == 'Factory') {
+			$name = substr($name, 0, -7);
+		}
+
 		return Strings::replace(substr($name, 0, -9), '/(^|\\.)+(.)/', function ($match) {
 			return ('.' === $match[1] ? ':' : '') . strtoupper($match[2]);
 		});
