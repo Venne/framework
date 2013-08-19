@@ -12,6 +12,7 @@
 namespace Venne\Config\Extensions;
 
 use Venne\Config\CompilerExtension;
+use Venne\Utils\File;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -119,6 +120,17 @@ class VenneExtension extends CompilerExtension
 		// helpers
 		$container->addDefinition($this->prefix('moduleHelpers'))
 			->setClass('Venne\Module\Helpers', array('%modules%'));
+
+		// symlink to client-side
+		$clientSidePath = realpath($container->parameters['libsDir'] . '/nette/nette/client-side');
+		$netteModulePath = $container->parameters['resourcesDir'] . '/netteModule';
+		if (!file_exists($netteModulePath) && file_exists($clientSidePath)) {
+			umask(0000);
+			@mkdir(dirname($netteModulePath), 0777, TRUE);
+			if (!@symlink(File::getRelativePath(dirname($netteModulePath), $clientSidePath), $netteModulePath) && !file_exists($netteModulePath)) {
+				File::copy($clientSidePath, $netteModulePath);
+			}
+		}
 	}
 
 
