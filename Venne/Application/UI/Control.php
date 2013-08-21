@@ -20,6 +20,9 @@ use Venne\Templating\ITemplateConfigurator;
  * Description of Control
  *
  * @author Josef Kříž <pepakriz@gmail.com>
+ *
+ * @property-read Presenter $presenter
+ * @method Presenter getPresenter()
  */
 class Control extends \Nette\Application\UI\Control
 {

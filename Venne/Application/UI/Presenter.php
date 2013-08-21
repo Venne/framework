@@ -256,5 +256,30 @@ class Presenter extends \Nette\Application\UI\Presenter
 
 		return TRUE;
 	}
-}
 
+
+	/**
+	 * Redirect to another presenter, action or signal in AJAX mode.
+	 * @param  string   destination in format "[[module:]presenter:]view" or "signal!"
+	 * @param  array|mixed
+	 */
+	public function ajaxRedirect($destination = NULL, $args = array())
+	{
+		if (!$this->isAjax()) {
+			$this->redirect($destination, $args);
+		}
+
+		$args['_redirectByAjax'] = TRUE;
+		$this->forward($destination, $args);
+	}
+
+
+	protected function afterRender()
+	{
+		parent::afterRender();
+
+		if ($this->getParameter('_redirectByAjax', FALSE)) {
+			$this->payload->url = $this->link('this');
+		}
+	}
+}
