@@ -71,6 +71,12 @@ class ModuleManager extends Object
 		self::ACTION_UPGRADE => 'Upgrade',
 	);
 
+	/** @var array */
+	protected static $moduleFiles = array(
+		'Module.php',
+		'.Venne.php',
+	);
+
 	/** @var Container|\SystemContainer */
 	protected $context;
 
@@ -561,15 +567,19 @@ class ModuleManager extends Object
 
 			foreach (Finder::findDirectories('*')->in($this->libsDir) as $dir) {
 				foreach (Finder::findDirectories('*')->in($dir) as $dir2) {
-					foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
-						$this->findModulesClosure($file);
+					foreach (self::$moduleFiles as $moduleFile) {
+						foreach (Finder::findFiles($moduleFile)->in($dir2) as $file) {
+							$this->findModulesClosure($file);
+						}
 					}
 				}
 			}
 
 			foreach (Finder::findDirectories('*')->in($this->modulesDir) as $dir2) {
-				foreach (Finder::findFiles('Module.php')->in($dir2) as $file) {
-					$this->findModulesClosure($file);
+				foreach (self::$moduleFiles as $moduleFile) {
+					foreach (Finder::findFiles($moduleFile)->in($dir2) as $file) {
+						$this->findModulesClosure($file);
+					}
 				}
 			}
 		}
