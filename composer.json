@@ -1,30 +1,29 @@
 {
-	"name":"venne/framework",
-	"description":"Simple and easy for use system for managing your websites.",
-	"keywords":["cms", "nette", "doctrine"],
-	"authors":[
+	"name": "venne/framework",
+	"description": "Simple and easy for use system for managing your websites.",
+	"keywords": ["cms", "nette", "doctrine"],
+	"authors": [
 		{
-			"name":"Josef Kříž",
-			"homepage":"http://josef-kriz.cz"
+			"name": "Josef Kříž",
+			"homepage": "http://josef-kriz.cz"
 		}
 	],
-	"require":{
-		"php":">=5.3.2",
-		"nette/nette":"2.0.*",
-		"symfony/console":"2.1.*"
+	"require": {
+		"php": ">=5.3.2",
+		"nette/nette": "v2.0.12",
+		"symfony/console": "v2.3.4"
 	},
 	"require-dev": {
 		"nette/tester": "@dev"
 	},
-	"autoload":{
-		"psr-0":{
-			"Venne":""
+	"autoload": {
+		"psr-0": {
+			"Venne": ""
 		}
 	},
-	"extra":{
-		"branch-alias":{
-			"dev-master":"2.0.x-dev"
+	"extra": {
+		"branch-alias": {
+			"dev-master": "2.0-dev"
 		}
-	},
-	"minimum-stability":"dev"
+	}
 }
