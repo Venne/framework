@@ -57,6 +57,21 @@ class ModuleManager extends Object
 	const ACTION_NONE = '';
 
 	/** @var array */
+	public $onInstall;
+
+	/** @var array */
+	public $onUninstall;
+
+	/** @var array */
+	public $onUpgrade;
+
+	/** @var array */
+	public $onRegister;
+
+	/** @var array */
+	public $onUnregister;
+
+	/** @var array */
 	protected static $statuses = array(
 		self::STATUS_INSTALLED => 'Installed',
 		self::STATUS_UNINSTALLED => 'Uninstalled',
@@ -326,6 +341,7 @@ class ModuleManager extends Object
 		$this->saveModuleConfig($modules);
 
 		$this->reloadInfo();
+		$this->onRegister($this, $module);
 	}
 
 
@@ -345,6 +361,7 @@ class ModuleManager extends Object
 		$this->saveModuleConfig($modules);
 
 		$this->reloadInfo();
+		$this->onUnregister($this, $name);
 	}
 
 
@@ -404,6 +421,7 @@ class ModuleManager extends Object
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
 		$this->cacheManager->clean();
+		$this->onInstall($this, $module);
 	}
 
 
@@ -450,6 +468,7 @@ class ModuleManager extends Object
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
 		$this->cacheManager->clean();
+		$this->onUninstall($this, $module);
 	}
 
 
@@ -513,6 +532,7 @@ class ModuleManager extends Object
 		$this->reloadInfo();
 		$this->reloadSystemContainer();
 		$this->cacheManager->clean();
+		$this->onUpgrade($this, $module);
 	}
 
 
