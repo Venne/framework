@@ -120,8 +120,11 @@ class UIMacros extends \Nette\Latte\Macros\UIMacros
 	{
 		$c = '$_macroIfLinkExistsOld = $_presenter->invalidLinkMode;
 		$_presenter->invalidLinkMode = $_presenter::INVALID_LINK_EXCEPTION;
+		$_macroIfLinkExistsPresenter = %node.word;
+		$_macroIfLinkExistsArgs = %node.array?;
+
 		try {
-			$_macroIfLinkExistslink = %escape(%modify(' . ($node->name === 'ifPlinkExists' ? '$_presenter' : '$_control') . '->link(%node.word, %node.array?)));
+			$_macroIfLinkExistslink = %escape(%modify(' . ($node->name === 'ifPlinkExists' ? '$_presenter' : '$_control') . '->link($_macroIfLinkExistsPresenter, $_macroIfLinkExistsArgs)));
 			$_macroIfLinkExistsRet = TRUE;
 		} catch (\Nette\Application\UI\InvalidLinkException $e) {
 			$_macroIfLinkExistslink = \'#\';
