@@ -324,17 +324,13 @@ class ModuleManager extends Object
 
 		$modules = $this->loadModuleConfig();
 		if (!array_search($module->getName(), $modules['modules'])) {
-			$tr = array(
-				$this->libsDir => '%libsDir%',
-				$this->modulesDir => '%modulesDir%',
-			);
 			$modules['modules'][$module->getName()] = array(
 				self::MODULE_STATUS => self::STATUS_UNINSTALLED,
 				self::MODULE_ACTION => self::ACTION_NONE,
 				self::MODULE_CLASS => $module->getClassName(),
 				self::MODULE_VERSION => $module->getVersion(),
-				self::MODULE_PATH => str_replace(array_keys($tr), array_merge($tr), $module->getPath()),
-				self::MODULE_AUTOLOAD => str_replace(array_keys($tr), array_merge($tr), $module->getAutoload()),
+				self::MODULE_PATH => $this->getFormattedPath($module->getPath()),
+				self::MODULE_AUTOLOAD => $this->getFormattedPath($module->getAutoload()),
 				self::MODULE_REQUIRE => $module->getRequire(),
 			);
 		}
@@ -403,17 +399,13 @@ class ModuleManager extends Object
 		}
 
 		$modules = $this->loadModuleConfig();
-		$tr = array(
-			$this->libsDir => '%libsDir%',
-			$this->modulesDir => '%modulesDir%',
-		);
 		$modules['modules'][$module->getName()] = array(
 			self::MODULE_STATUS => self::STATUS_INSTALLED,
 			self::MODULE_ACTION => self::ACTION_NONE,
 			self::MODULE_CLASS => $module->getClassName(),
 			self::MODULE_VERSION => $module->getVersion(),
-			self::MODULE_PATH => str_replace(array_keys($tr), array_merge($tr), $module->getPath()),
-			self::MODULE_AUTOLOAD => str_replace(array_keys($tr), array_merge($tr), $module->getAutoload()),
+			self::MODULE_PATH => $this->getFormattedPath($module->getPath()),
+			self::MODULE_AUTOLOAD => $this->getFormattedPath($module->getAutoload()),
 			self::MODULE_REQUIRE => $module->getRequire(),
 		);
 		$this->saveModuleConfig($modules);
@@ -513,17 +505,13 @@ class ModuleManager extends Object
 			}
 		}
 
-		$tr = array(
-			$this->libsDir => '%libsDir%',
-			$this->modulesDir => '%modulesDir%',
-		);
 		$modules['modules'][$module->getName()] = array(
 			self::MODULE_STATUS => self::STATUS_INSTALLED,
 			self::MODULE_ACTION => self::ACTION_NONE,
 			self::MODULE_CLASS => $module->getClassName(),
 			self::MODULE_VERSION => $module->getVersion(),
-			self::MODULE_PATH => str_replace(array_keys($tr), array_merge($tr), $module->getPath()),
-			self::MODULE_AUTOLOAD => str_replace(array_keys($tr), array_merge($tr), $module->getAutoload()),
+			self::MODULE_PATH => $this->getFormattedPath($module->getPath()),
+			self::MODULE_AUTOLOAD => $this->getFormattedPath($module->getAutoload()),
 			self::MODULE_REQUIRE => $module->getRequire(),
 		);
 
@@ -888,6 +876,21 @@ class ModuleManager extends Object
 	{
 		$config = $this->loadModuleConfig();
 		return new Solver($this->getModules(), $this->getModulesByStatus(self::STATUS_INSTALLED), $config['modules'], $this->libsDir, $this->modulesDir);
+	}
+
+
+	/**
+	 * @param $path
+	 * @return mixed
+	 */
+	private function getFormattedPath($path)
+	{
+		$tr = array(
+			$this->libsDir => '%libsDir%',
+			$this->modulesDir => '%modulesDir%',
+		);
+
+		return str_replace(array_keys($tr), array_merge($tr), $path);
 	}
 }
 
