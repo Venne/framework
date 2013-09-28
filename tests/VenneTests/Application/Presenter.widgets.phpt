@@ -31,10 +31,10 @@ class PresenterTest extends \Tester\TestCase
 		$this->presenter = new BasePresenter();
 
 		$widgetManager = new \Venne\Widget\WidgetManager();
-		$widgetManager->addWidget('foo', \Nette\Callback::create(function () {
+		$widgetManager->addWidget('foo', 'FooControl', \Nette\Callback::create(function () {
 			return new FooControl();
 		}));
-		$widgetManager->addWidget('bar', \Nette\Callback::create(function () {
+		$widgetManager->addWidget('bar', 'BarControl', \Nette\Callback::create(function () {
 			return new BarControl();
 		}));
 
