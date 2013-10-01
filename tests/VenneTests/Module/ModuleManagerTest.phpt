@@ -36,9 +36,9 @@ class ModuleManagerTest extends TestCase
 		$this->moduleManager = new ModuleManager(
 			new Container(),
 			new CacheManager(new DevNullStorage(), '', ''),
-			'/project/vendor',
+			'C:\project/vendor',
 			__DIR__ ,
-			'/project/app/modules'
+			'C:\project\app/modules'
 		);
 	}
 
@@ -50,8 +50,8 @@ class ModuleManagerTest extends TestCase
 	{
 		return array(
 			array('/foo/bar', '/foo/bar'),
-			array('%libsDir%/foo', '/project/vendor/foo'),
-			array('%modulesDir%/foo', '/project/app/modules/foo'),
+			array('%libsDir%/foo', 'C:\project\vendor\foo'),
+			array('%modulesDir%/foo', 'C:\project\app\modules\foo'),
 		);
 	}
 

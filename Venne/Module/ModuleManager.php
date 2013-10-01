@@ -881,13 +881,17 @@ class ModuleManager extends Object
 
 	/**
 	 * @param $path
-	 * @return mixed
+	 * @return string
 	 */
 	private function getFormattedPath($path)
 	{
+		$path = str_replace('\\', '/', $path);
+		$libsDir = str_replace('\\', '/', $this->libsDir);
+		$modulesDir = str_replace('\\', '/', $this->modulesDir);
+
 		$tr = array(
-			$this->libsDir => '%libsDir%',
-			$this->modulesDir => '%modulesDir%',
+			$libsDir => '%libsDir%',
+			$modulesDir => '%modulesDir%',
 		);
 
 		return str_replace(array_keys($tr), array_merge($tr), $path);
