@@ -2,6 +2,7 @@
 	"name": "venne/framework",
 	"description": "Simple and easy for use system for managing your websites.",
 	"keywords": ["cms", "nette", "doctrine"],
+	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
 			"name": "Josef Kříž",
