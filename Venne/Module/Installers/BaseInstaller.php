@@ -113,6 +113,17 @@ class BaseInstaller extends Object implements IInstaller
 		if (count($configuration) > 0) {
 			$orig = $data = $this->loadConfig();
 			$data = $this->getRecursiveDiff($data, $configuration);
+
+			// remove extension parameters
+			$configuration = $module->getConfiguration();
+			if (isset($configuration['extensions'])) {
+				foreach ($configuration['extensions'] as $key => $values) {
+					if (isset($data[$key])) {
+						unset($data[$key]);
+					}
+				}
+			}
+
 			$this->saveConfig($data);
 
 			$this->actions[] = function ($self) use ($orig) {
