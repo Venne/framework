@@ -12,10 +12,10 @@
 namespace Venne\Latte;
 
 use Nette\Latte\Compiler;
-use Nette\Latte\Macros\CacheMacro;
 use Nette\Latte\Macros\CoreMacros;
 use Nette\Latte\Macros\FormMacros;
 use Nette\Latte\Parser;
+use Venne\Latte\Macros\GlobalCacheMacro;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
@@ -37,7 +37,7 @@ class Engine extends \Nette\Latte\Engine
 		$this->compiler->defaultContentType = Compiler::CONTENT_XHTML;
 
 		CoreMacros::install($this->compiler);
-		$this->compiler->addMacro('cache', new CacheMacro($this->compiler));
+		$this->compiler->addMacro('cache', new GlobalCacheMacro($this->compiler));
 		FormMacros::install($this->compiler);
 	}
 
