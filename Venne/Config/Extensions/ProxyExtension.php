@@ -36,7 +36,7 @@ class ProxyExtension extends CompilerExtension
 
 			$class = substr($definition->class, strrpos($definition->class, '\\') + 1);
 			$namespace = substr($definition->class, 0, strrpos($definition->class, '\\'));
-			$extend = trim($meta, '\\');
+			$extend = ltrim($meta, '\\');
 
 			$code .= $this->generateCode($class, $extend, $namespace);
 		}

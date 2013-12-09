@@ -765,7 +765,7 @@ class ModuleManager extends Object
 	 */
 	protected function formatClass($class)
 	{
-		return '\\' . trim($class, '\\');
+		return '\\' . ltrim($class, '\\');
 	}
 
 
