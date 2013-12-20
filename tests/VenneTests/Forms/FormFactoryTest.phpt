@@ -51,10 +51,10 @@ class FormFactoryTest extends TestCase
 		$formFactory->injectFactory(new \Nette\Callback(function () {
 			return new \Venne\Forms\Form;
 		}));
-		$form = $formFactory->createForm();
+		$form = $formFactory->invoke();
 
 		Assert::type('\Venne\Forms\Form', $formFactory->invoke());
-		Assert::type('\Venne\Forms\Form', $formFactory->createForm());
+		Assert::type('\Venne\Forms\Form', $formFactory->invoke());
 		Assert::type('\VenneTests\Forms\NullMapper', $form->getMapper());
 	}
 

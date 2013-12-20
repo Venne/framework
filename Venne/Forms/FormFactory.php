@@ -12,14 +12,14 @@
 namespace Venne\Forms;
 
 use Nette\Callback;
-use Nette\InvalidArgumentException;
-use Nette\Object;
+use Nette\InvalidStateException;
 use Nette\Utils\Strings;
+use Venne\BaseFactory;
 
 /**
  * @author Josef Kříž <pepakriz@gmail.com>
  */
-class FormFactory extends Object
+class FormFactory extends BaseFactory
 {
 
 	/** @var Callback */
@@ -29,19 +29,21 @@ class FormFactory extends Object
 	/**
 	 * @param Callback|NULL $formFactory
 	 */
-	public function injectFactory(Callback $factory = NULL)
+	public function injectFactory($factory = NULL)
 	{
-		$this->factory = $factory;
+		$this->factory = Callback::create($factory);
 	}
 
 
 	/**
+	 * @param null $data
 	 * @return Form
+	 * @throws \Nette\InvalidStateException
 	 */
-	public function createForm($data = NULL)
+	public function invoke($data = NULL)
 	{
 		if (!$this->factory) {
-			throw new InvalidArgumentException('Form factory has not been set');
+			throw new InvalidStateException('Form factory has not been set');
 		}
 
 		/** @var $form Form */
@@ -63,9 +65,16 @@ class FormFactory extends Object
 	}
 
 
-	public function invoke($class = NULL)
+	/**
+	 * @param null $data
+	 * @return Form
+	 * @deprecated
+	 */
+	public function createForm($data = NULL)
 	{
-		return $this->createForm($class);
+		trigger_error(__METHOD__ . '() is deprecated; use create() instead.', E_USER_WARNING);
+
+		return $this->__invoke($data);
 	}
 
 
